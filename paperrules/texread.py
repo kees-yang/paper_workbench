@@ -23,12 +23,19 @@ from pathlib import Path
 FLOAT_RE = re.compile(r'\\begin\{(figure\*?|table\*?|algorithm\*?)\}.*?\\end\{\1\}', re.S)
 DISPLAY_ENVS = ('equation', 'align', 'gather', 'multline', 'eqnarray', 'displaymath', 'flalign')
 CITE_RE = re.compile(r'\\(?:cite[a-zA-Z]*|nocite)\*?(?:\[[^\]]*\]){0,2}\{([^}]*)\}')
+REF_PREFIX_RE = re.compile(r'\\(cref|Cref|autoref)\{([^}]*)\}')     # these commands print the kind of the label as well
+
+
+def _kind(label):
+    return {'fig': 'Fig. ', 'tab': 'Table ', 'sec': 'Section ', 'eq': 'Eq. '}.get(label.split(':')[0].lower(), '') if ':' in label else ''
+
+
 REF_RE = re.compile(r'\\(?:eqref|ref|autoref|cref|Cref)\{([^}]*)\}')
 HEADING_RE = re.compile(r'\\(section|subsection|subsubsection)(\*?)\s*(?:\[[^\]]*\])?\s*\{')
 LIST_ENV_RE = re.compile(r'\\(?:begin|end)\{(?:itemize|enumerate|description)\}(?:\[[^\]]*\])?')
 DEF_RE = re.compile(r'\\(?:re)?newcommand\*?\s*\{?\\[a-zA-Z]+\}?(?:\s*\[\d\])*(?:\s*\[[^\]]*\])?\s*\{|\\(?:def|DeclareMathOperator\*?|providecommand)\s*\{?\\[a-zA-Z]+\}?[^{]*\{')
 ABBREV = ['e.g.', 'i.e.', 'et al.', 'Fig.', 'Figs.', 'Eq.', 'Eqs.', 'Eqn.', 'Eqns.', 'Sec.', 'Secs.', 'Tab.', 'Tabs.', 'vs.', 'cf.',
-          'resp.', 'approx.', 'No.', 'Dr.', 'Prof.', 'w.r.t.', 'a.k.a.']
+          'resp.', 'approx.', 'No.', 'Dr.', 'Prof.', 'w.r.t.', 'a.k.a.', 'v.s.']
 
 
 @dataclass
@@ -37,6 +44,7 @@ class Paper:
     floats: list = field(default_factory=list)
     labels: dict = field(default_factory=dict)
     cites: list = field(default_factory=list)
+    bold_macros: set = field(default_factory=set)
     cite_locs: dict = field(default_factory=dict)
     refs: list = field(default_factory=list)
     abstract: str = ''
@@ -86,6 +94,8 @@ def expand(path, base=None, seen=frozenset()):
     out = []
     for i, raw in enumerate(path.read_text(encoding='utf-8', errors='replace').splitlines(), 1):
         line = strip_comment(raw)
+        if not line.strip() and raw.strip():
+            continue                      # a comment-only line is not a blank line: it does not end the paragraph
         m = re.fullmatch(r'\s*\\(?:input|include)\{([^}]+)\}\s*', line)
         if m:
             f = base / m.group(1)
@@ -171,10 +181,12 @@ def plain(tex, cite_no, ref_no):
     t = re.sub(r'\\\[.*?\\\]|\$\$.*?\$\$', ' ', t, flags=re.S)
     t = re.sub(r'(?<!\\)\$[^$]*(?<!\\)\$|\\\(.*?\\\)', 'X', t, flags=re.S)
     t = CITE_RE.sub(lambda m: '[' + ', '.join(str(cite_no.get(k.strip(), '?')) for k in m.group(1).split(',') if k.strip()) + ']', t)
+    t = REF_PREFIX_RE.sub(lambda m: ', '.join(_kind(k.strip()) + str(ref_no.get(k.strip(), '?')) for k in m.group(2).split(',')), t)
     t = REF_RE.sub(lambda m: ', '.join(str(ref_no.get(k.strip(), '?')) for k in m.group(1).split(',')), t)
+    t = re.sub(r'\\href\{[^}]*\}\s*\{', '{', t)
     t = drop_commands(t, 'label|vspace|hspace|vskip|hskip|setlength|footnote|footnotemark|thanks|index|paragraph|subparagraph')
     t = re.sub(r'\\(?:textcolor|colorbox)\s*\{[^}]*\}', '', t)
-    t = unwrap(t, 'textit|textbf|emph|textrm|textsf|texttt|textsc|textsl|text|mbox|mathrm|underline|uline|textnormal')
+    t = unwrap(t, 'url|textit|textbf|emph|textrm|textsf|texttt|textsc|textsl|text|mbox|mathrm|underline|uline|textnormal')
     t = re.sub(r'\{\\(?:em|it|bf|sc|sl|rm|sf|tt|small|large|footnotesize)\s+([^{}]*)\}', r'\1', t)
     t = re.sub(r'\\begin\{[^}]*\}(?:\[[^\]]*\])?|\\end\{[^}]*\}', ' ', t)
     t = re.sub(r'\\\\(?:\[[^\]]*\])?', ' ', t)
@@ -214,9 +226,10 @@ def read(main_tex):
     b, e = re.search(r'\\begin\{document\}', text), re.search(r'\\end\{document\}', text)
     start = b.end() if b else 0
     end = e.start() if e else len(text)
-    stop = re.search(r'\\(?:bibliography\{|printbibliography|begin\{thebibliography\})', text[start:end])
+    stop = re.search(r'\\(?:bibliography(?:style)?\{|printbibliography|begin\{thebibliography\})', text[start:end])
     if stop:
         end = start + stop.start()
+    p.bold_macros = {m.group(1) for m in re.finditer(r'\\(?:re)?newcommand\*?\{\\(\w+)\}[^\n]*', text) if 'textbf' in m.group(0)}
     p.bib_files = [x.strip() for m in re.finditer(r'\\bibliography\{([^}]*)\}', text) for x in m.group(1).split(',')]
     body = text[start:end]
 
@@ -259,7 +272,7 @@ def read(main_tex):
         lm = re.match(r'\s*\\label\{([^}]*)\}', body[hend:])
         if lm and num:
             labels[lm.group(1)] = num
-        p.headings.append(dict(level=lvl, title=title, number=num, file=where(hm.start())[0], line=where(hm.start())[1]))
+        p.headings.append(dict(level=lvl, title=title, number=num, file=where(hm.start())[0], line=where(hm.start())[1], offset=hm.start()))
     p.labels = labels
     for m in REF_RE.finditer(body):
         for k in m.group(1).split(','):
@@ -297,22 +310,25 @@ def read(main_tex):
 
     rows, n_row, n_para = [], 0, 0
 
-    def emit(txt, section, kind, loc):
+    def emit(txt, section, kind, loc, off=0, chapter=''):
         nonlocal n_row, n_para
         n_para += 1
         for s in split_sentences(txt):
             if len(re.findall(r'[A-Za-z]{2,}', s)) < 2:
                 continue
             n_row += 1
-            rows.append(dict(id=f'S{n_row:03d}', para=f'P{n_para:03d}', section=section, kind=kind, en=s, file=loc[0], line=loc[1]))
+            rows.append(dict(id=f'S{n_row:03d}', para=f'P{n_para:03d}', section=section, chapter=chapter or section, kind=kind, en=s,
+                             file=loc[0], line=loc[1], offset=off))
 
     if p.abstract:
-        emit(p.abstract, 'Abstract', 'abstract', p.abstract_loc)
+        emit(p.abstract, 'Abstract', 'abstract', p.abstract_loc, am.start())
     for pm in re.finditer(r'(?:[^\n]|\n(?!\s*\n))+', work):
         if not pm.group(0).strip():
             continue
         k = bisect.bisect_right(head_starts, pm.start()) - 1
         section = plain(heads[k][3], cite_no, labels) if k >= 0 else ''
+        top = max((i for i in range(k + 1) if heads[i][2] == 0), default=-1)
+        chapter = plain(heads[top][3], cite_no, labels) if top >= 0 else section
         pieces = [(pm.start(), pm.group(0))]
         items = list(re.finditer(r'\\item\b', pm.group(0)))
         if items:
@@ -325,10 +341,10 @@ def read(main_tex):
             txt = plain(seg, cite_no, labels)
             if not txt or re.fullmatch(r'X?\.?', txt):
                 continue
-            emit(txt, section, 'item' if items and i > 0 else 'paragraph', where(off + len(seg) - len(seg.lstrip())))
+            emit(txt, section, 'item' if items and i > 0 else 'paragraph', where(off + len(seg) - len(seg.lstrip())), off, chapter)
     for f in floats:
         f['caption_plain'] = plain(f['caption'], cite_no, labels)
         if f['caption_plain']:
-            emit(f['caption_plain'], '(caption)', f['env'], (f['file'], f['line']))
+            emit(f['caption_plain'], '(caption)', f['env'], (f['file'], f['line']), f['offset'])
     p.rows = rows
     return p

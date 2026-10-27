@@ -1,0 +1,3624 @@
+{
+ "schema": "paperrules-workbench-annotations/1",
+ "note": "Illustrative annotations written for this repository to populate the workbench demo (Chinese rendering, sentence links, claims, storyline). They are not the authors' and may contain errors.",
+ "title": "Beyond Strict Pairing（示例）",
+ "version": "arXiv v1 · CVPR 2026",
+ "journal": "CVPR 2026",
+ "language": "zh",
+ "chapters": {
+  "Introduction": "引言",
+  "Related Work": "相关工作",
+  "Approach": "方法",
+  "Experiments": "实验",
+  "Conclusion": "结论",
+  "Acknowledgement": "致谢"
+ },
+ "sections": {
+  "Strictly Paired IVIF": "严格配对的IVIF",
+  "Unpaired Training Mode": "非配对训练模式",
+  "Loss Functions": "损失函数",
+  "Overview of strictly-paired IVIF": "严格配对IVIF概述",
+  "Formulation of Arbitrarily-Paired IVIF": "任意配对IVIF的形式化",
+  "Arbitrarily-Paired Training Paradigm": "任意配对训练范式",
+  "Working mechanism of APTP": "APTP的工作机制",
+  "Essential advantages": "基本优势",
+  "Setup": "实验设置",
+  "Validation Experiments": "验证实验",
+  "Feasibility of UPTP and APTP": "UPTP与APTP的可行性",
+  "Advantages of APTP": "APTP的优势",
+  "Comparison with State-of-the-Art Methods": "与最新方法的比较",
+  "Abstract": "摘要",
+  "Introduction": "引言",
+  "Related Work": "相关工作",
+  "Approach": "方法",
+  "Experiments": "实验",
+  "Conclusion": "结论",
+  "Acknowledgement": "致谢"
+ },
+ "abstract": {
+  "slots": [
+   {
+    "id": "S1",
+    "name": "State of the art",
+    "name_zh": "研究现状",
+    "sentences": [
+     "P001-R001",
+     "P001-R002"
+    ],
+    "claim_zh": "红外与可见光融合要合成互补模态，现有方案依赖大量严格对齐的图像对训练。",
+    "claim_en": "Infrared and visible fusion combines complementary modalities; existing solutions train on rigidly aligned pairs.",
+    "scope": "只陈述任务与现有训练方式，不评价效果。",
+    "points": [
+     {
+      "id": "S1.a",
+      "zh": "红外与可见光融合要合成两种互补模态的信息"
+     },
+     {
+      "id": "S1.b",
+      "zh": "现有方案依赖大量严格对齐的图像对训练"
+     }
+    ]
+   },
+   {
+    "id": "S2",
+    "name": "Gap",
+    "name_zh": "不足",
+    "sentences": [
+     "P001-R003",
+     "P001-R004"
+    ],
+    "claim_zh": "对齐数据难以获得，严格配对还限制了跨模态关系的数量，从而限制泛化。",
+    "claim_en": "Aligned data are costly to get, and rigid pairing limits the cross-modal relationships and so generalisation.",
+    "scope": "两个不足：数据成本、关系数量与泛化。",
+    "points": [
+     {
+      "id": "S2.a",
+      "zh": "对齐数据的采集与配准代价高"
+     },
+     {
+      "id": "S2.b",
+      "zh": "严格配对限制跨模态关系的数量与泛化"
+     }
+    ]
+   },
+   {
+    "id": "S3",
+    "name": "Motivation",
+    "name_zh": "动机",
+    "sentences": [
+     "P001-R005"
+    ],
+    "claim_zh": "质疑严格配对训练的必要性，研究非配对与任意配对训练。",
+    "claim_en": "Question whether strictly paired training is necessary; study unpaired and arbitrarily paired training.",
+    "scope": "只写研究问题与对象。",
+    "points": [
+     {
+      "id": "S3.a",
+      "zh": "质疑严格配对的必要性，转向非配对与任意配对训练"
+     }
+    ]
+   },
+   {
+    "id": "S4",
+    "name": "Method",
+    "name_zh": "方法",
+    "sentences": [
+     "P001-R006",
+     "P001-R007",
+     "P001-R008"
+    ],
+    "claim_zh": "给出任意配对训练的理论目标与实用框架，并用三个轻量基线与新损失验证。",
+    "claim_en": "A theoretical objective and a practical framework for arbitrarily paired training, checked on three lightweight baselines.",
+    "scope": "理论目标、实用框架、三个基线。",
+    "points": [
+     {
+      "id": "S4.a",
+      "zh": "理论目标：UPTP与SPTP是APTP的互补子集"
+     },
+     {
+      "id": "S4.b",
+      "zh": "实用框架：新损失函数与三个轻量基线"
+     }
+    ]
+   },
+   {
+    "id": "S5",
+    "name": "Results",
+    "name_zh": "结果",
+    "sentences": [
+     "P001-R009",
+     "P001-R010",
+     "P001-R011"
+    ],
+    "claim_zh": "非配对与任意配对训练可行，用极少数据即可达到大100倍的严格配对数据集的性能。",
+    "claim_en": "Unpaired and arbitrarily paired training are feasible and match a 100-times larger strictly paired set.",
+    "scope": "结果与意义；给出代码地址。",
+    "points": [
+     {
+      "id": "S5.a",
+      "zh": "非配对与任意配对训练可行"
+     },
+     {
+      "id": "S5.b",
+      "zh": "极少数据即可匹敌大100倍的严格配对数据集"
+     },
+     {
+      "id": "S5.c",
+      "zh": "基础数据越少，APTP带来的提升越大"
+     }
+    ]
+   }
+  ]
+ },
+ "paragraphs": {
+  "P001": {
+   "title": "摘要",
+   "question": "这项工作要解决什么问题、怎么做、结果如何？",
+   "claim": "质疑严格配对训练的必要性，提出非配对与任意配对训练范式，并用三个轻量基线验证。",
+   "flow": "研究现状→不足→动机→方法→结果",
+   "scope": "摘要给出结论，不含证据细节。",
+   "move": "results",
+   "serves": []
+  },
+  "P002": {
+   "title": "任务与两种模态",
+   "question": "红外与可见光融合是什么？两种模态各有何长短？",
+   "claim": "融合要把两种模态的一致与互补信息合成一幅图；可见光贴近人眼但怕光照与天气，红外稳健但缺颜色与细节。",
+   "flow": "任务定义→可见光特点→可见光弱点→红外特点→红外弱点→应用",
+   "scope": "只陈述背景，不评价任何方法。",
+   "move": "background",
+   "serves": [
+    "S1.a"
+   ]
+  },
+  "P003": {
+   "title": "严格配对数据的采集代价",
+   "question": "现有方法为什么受限于严格配对数据？",
+   "claim": "现有融合依赖大量严格对齐的图像对；多天气下的同步采集与随后的配准都代价高。",
+   "flow": "常规训练→决定性能的四个因素→依赖严格配对→采集困难→配准代价",
+   "scope": "只讨论数据与配准，不涉及泛化。",
+   "move": "problem",
+   "serves": [
+    "S1.b",
+    "S2.a"
+   ]
+  },
+  "P004": {
+   "title": "配对范式的第二个问题",
+   "question": "严格配对范式在数据之外还有什么问题？",
+   "claim": "配对数据集规模有限，可学关系有上界，泛化受限；SPTP在成本与泛化上都有问题。",
+   "flow": "分布差异→关系有上界→泛化性能→小结SPTP",
+   "scope": "以机器学习中的常识为依据，不引入实验。",
+   "move": "problem",
+   "serves": [
+    "S2.b"
+   ]
+  },
+  "P005": {
+   "title": "转向任意配对的动机",
+   "question": "为什么要探索任意配对训练？",
+   "claim": "单模态数据易得，可随意配对，这促使探索APTP；但融合缺少真值，不能照搬图像生成的做法。",
+   "flow": "单模态数据易得→提出APTP→图像生成中常见→融合缺少真值",
+   "scope": "动机段，不展开方法。",
+   "move": "motivation",
+   "serves": [
+    "S3.a"
+   ]
+  },
+  "P006": {
+   "title": "任意配对的思路",
+   "question": "怎样在没有真值的融合任务中做任意配对训练？",
+   "claim": "融合是像素级自监督任务，可放宽对内容一致的要求；独立性使APTP成为UPTP与SPTP的并集。",
+   "flow": "新视角→放宽学习目标→监督信号→独立关系→并集→UPTP最具挑战",
+   "scope": "概述思路，细节在方法一节。",
+   "move": "approach",
+   "serves": [
+    "S3.a",
+    "S4.a"
+   ]
+  },
+  "P007": {
+   "title": "好处、基线与贡献",
+   "question": "不受限的配对带来什么？用什么验证？",
+   "claim": "不受限的配对丰富跨模态多样性并降低成本；用CNN、Transformer、GAN三个简洁基线检验三种范式。",
+   "flow": "多样性→成本与鲁棒性→三个基线→三基线特点→实验对比→列出贡献",
+   "scope": "三个基线只作验证工具，不是方法主张。",
+   "move": "contributions",
+   "serves": [
+    "S4.b",
+    "S5.a"
+   ]
+  },
+  "P008": {
+   "title": "贡献一：两种新范式",
+   "question": "第一项贡献是什么？",
+   "claim": "提出两种不再局限于严格配对输入的新训练范式。",
+   "flow": "新范式",
+   "scope": "",
+   "move": "contributions",
+   "serves": [
+    "S4.a"
+   ]
+  },
+  "P009": {
+   "title": "贡献二：数据关系分析",
+   "question": "第二项贡献是什么？",
+   "claim": "分析三种范式下的数据关系与训练要求。",
+   "flow": "数据关系→训练要求",
+   "scope": "",
+   "move": "contributions",
+   "serves": [
+    "S4.a"
+   ]
+  },
+  "P010": {
+   "title": "贡献三：优点研究",
+   "question": "第三项贡献是什么？",
+   "claim": "研究新范式的优点：降低采集成本、扩大有效训练集、增强鲁棒性。",
+   "flow": "降低成本→扩大训练集→增强鲁棒性",
+   "scope": "",
+   "move": "contributions",
+   "serves": [
+    "S5.b"
+   ]
+  },
+  "P011": {
+   "title": "贡献四：实验结果",
+   "question": "第四项贡献是什么？",
+   "claim": "实验支持APTP与UPTP的有效性，性能优于SOTA，兼具高效率与稳健泛化。",
+   "flow": "有效性→优于SOTA→效率与泛化",
+   "scope": "",
+   "move": "contributions",
+   "serves": [
+    "S5.a"
+   ]
+  },
+  "P012": {
+   "title": "严格配对的IVIF方法",
+   "question": "现有严格配对方法如何分类、各有什么问题？",
+   "claim": "大多数方法用严格配对数据训练，可分为CNN、CNN-Transformer与生成式三类，各有取舍；GAN类有训练不稳定问题。",
+   "flow": "总体→三类框架→CNN→Transformer→GAN",
+   "scope": "只综述方法，不评价本文。",
+   "move": "prior_work",
+   "serves": [
+    "S1.b"
+   ]
+  },
+  "P013": {
+   "title": "本文的三个基线",
+   "question": "本文如何覆盖这三类方法？",
+   "claim": "为覆盖主流方法，构建三个轻量基线以验证APTP与UPTP的可行性与优点。",
+   "flow": "覆盖三类→轻量基线→验证对象",
+   "scope": "基线只用于验证。",
+   "move": "contrast",
+   "serves": [
+    "S4.b"
+   ]
+  },
+  "P014": {
+   "title": "图像生成中的非配对训练",
+   "question": "非配对训练从哪里来？为什么在融合中仍可行？",
+   "claim": "非配对训练源于图像生成；融合缺少融合图像域，难以照搬，但期望图像的缺失加上像素级特性反而使其可行。",
+   "flow": "起源→CycleGAN式监督→复原任务→融合的困难→仍可行",
+   "scope": "只述相关做法，不比较性能。",
+   "move": "prior_work",
+   "serves": [
+    "S3.a"
+   ]
+  },
+  "P015": {
+   "title": "为什么非配对仍可行",
+   "question": "没有配对输入时监督从哪里来？",
+   "claim": "融合无真值，监督来自源图像，所以输入不配对也能提取监督信号；这引出本文的探索。",
+   "flow": "无真值→监督来自源图像→可提取监督→开创探索",
+   "scope": "论证可行性，实验在后文。",
+   "move": "motivation",
+   "serves": [
+    "S3.a"
+   ]
+  },
+  "P016": {
+   "title": "本节概览",
+   "question": "本节要做什么？",
+   "claim": "从定义、机制与性质三方面分析UPTP与APTP，并构建三个基线。",
+   "flow": "分析内容→三个基线→网络结构见补充材料",
+   "scope": "网络结构不在正文。",
+   "move": "overview",
+   "serves": [
+    "S4.b"
+   ]
+  },
+  "P017": {
+   "title": "损失函数设计",
+   "question": "怎样让模型选择合适的源线索？",
+   "claim": "用线性加权函数逐像素、逐信息范围地决定哪幅源图更重要，并据此设计自适应加权损失。",
+   "flow": "联合保证三类保真→加权函数→逐像素选择→稳定训练→加权损失",
+   "scope": "损失细节见补充材料。",
+   "move": "objective",
+   "serves": [
+    "S4.b"
+   ]
+  },
+  "P018": {
+   "title": "总损失",
+   "question": "三个基线的总损失是什么？",
+   "claim": "给出CNN与Transformer基线的总损失，以及GAN基线的对抗损失与总损失。",
+   "flow": "总损失→GAN基线的生成器与对抗损失",
+   "scope": "各项定义在补充材料。",
+   "move": "objective",
+   "serves": [
+    "S4.b"
+   ]
+  },
+  "P019": {
+   "title": "严格配对IVIF的设定",
+   "question": "严格配对下的融合如何形式化？",
+   "claim": "在严格对齐的源图像对上定义融合模型及其输出集。",
+   "flow": "源图像对→融合模型→输出集",
+   "scope": "只给记号与设定。",
+   "move": "notation_inputs",
+   "serves": [
+    "S4.b"
+   ]
+  },
+  "P020": {
+   "title": "联合概率与优化目标",
+   "question": "总损失为什么对应联合概率？",
+   "claim": "各损失统计独立，联合概率最大化等价于总损失最小化，并可分解为似然项与先验项。",
+   "flow": "独立概率→联合概率→最大化等价最小化→贝叶斯分解→逐元素形式",
+   "scope": "以CNN基线为例。",
+   "move": "analysis",
+   "serves": [
+    "S4.a"
+   ]
+  },
+  "P021": {
+   "title": "SPTP的要求",
+   "question": "严格配对训练要求什么？",
+   "claim": "SPTP要求同设置同步采集，错位时还需要配准。",
+   "flow": "学到一致场景→同步采集→错位要配准",
+   "scope": "",
+   "move": "problem",
+   "serves": [
+    "S2.a"
+   ]
+  },
+  "P022": {
+   "title": "任意配对训练的设想",
+   "question": "怎样降低采集成本？",
+   "claim": "直接用任意配对的红外与可见光图像训练，让模型关注跨模态特征而非刚性内容。",
+   "flow": "成本高→任意配对→关注跨模态特征→只需跨模态数据",
+   "scope": "",
+   "move": "approach",
+   "serves": [
+    "S4.a"
+   ]
+  },
+  "P023": {
+   "title": "独立性与数据关系",
+   "question": "任意配对在数学上意味着什么？",
+   "claim": "两种模态图像相互独立，联合分布可分解；SPTP与UPTP是APTP的互补子集。",
+   "flow": "独立→配对关系随机→联合分布分解→两点理论观察→数据关系→适用性",
+   "scope": "不推翻已有融合工作，是扩展。",
+   "move": "analysis",
+   "serves": [
+    "S4.a"
+   ]
+  },
+  "P024": {
+   "title": "APTP的工作机制",
+   "question": "APTP为什么能提供监督？",
+   "claim": "APTP不要求时空一致；损失只用像素值的组合，任意采集的图像也能提供可训练的像素关系。",
+   "flow": "参数更新→SPTP的损失→APTP消除一致性→不妨碍学习→像素组合→不同范式提供不同基础",
+   "scope": "",
+   "move": "analysis",
+   "serves": [
+    "S4.a"
+   ]
+  },
+  "P025": {
+   "title": "如何观察工作机制",
+   "question": "用什么证据观察机制？",
+   "claim": "用损失收敛曲线与训练可视化观察；按数据关系只需比较SPTP与UPTP。",
+   "flow": "观察手段→只比较SPTP与UPTP",
+   "scope": "",
+   "move": "analysis",
+   "serves": [
+    "S4.a"
+   ]
+  },
+  "P026": {
+   "title": "收敛与SSIM曲线",
+   "question": "两种范式的训练过程相似吗？",
+   "claim": "三个基线在两种范式下收敛速度与终值相近，测试集SSIM先升后稳，UPTP的中间结果虽混乱但最终可用。",
+   "flow": "损失收敛→三基线相近→预期性能提升→SSIM指标→曲线上升→UPTP仍可学→配对测试图连贯→佐证主张",
+   "scope": "只比较SPTP与UPTP。",
+   "move": "qualitative",
+   "serves": [
+    "S5.a"
+   ]
+  },
+  "P027": {
+   "title": "训练过程可视化",
+   "question": "训练中融合质量如何变化？",
+   "claim": "融合质量随训练提高，UPTP中间结果混乱，但早期与中期就在某些方面超过严格配对模型。",
+   "flow": "可视化→初期都困难→UPTP更混乱→逐步改善→早中期已优于SPTP",
+   "scope": "定性观察，不作统计检验。",
+   "move": "qualitative",
+   "serves": [
+    "S5.a"
+   ]
+  },
+  "P028": {
+   "title": "最终模型的融合结果",
+   "question": "最终模型保留了什么信息？",
+   "claim": "SPTP与UPTP训练的最终模型都保留红外热辐射与可见光纹理信息。",
+   "flow": "正常与异常场景→红框热辐射→黄绿框纹理与线索",
+   "scope": "",
+   "move": "qualitative",
+   "serves": [
+    "S5.a"
+   ]
+  },
+  "P029": {
+   "title": "数据规模的二次增长",
+   "question": "APTP带来什么数据优势？",
+   "claim": "随机配对可重组跨模态关系，把基础数据扩成平方量级，并归纳三个优势。",
+   "flow": "重配对的可能→公式重写→平方扩展→三个优势",
+   "scope": "",
+   "move": "analysis",
+   "serves": [
+    "S4.a",
+    "S5.b"
+   ]
+  },
+  "P030": {
+   "title": "关系多样性与泛化",
+   "question": "为什么APTP泛化更强？",
+   "claim": "SPTP受限于固定配对；APTP能学到二次增长的关系，因而泛化更强。",
+   "flow": "SPTP的限制→APTP二次增长→泛化更强→固定配对的局限→APTP的新关系",
+   "scope": "",
+   "move": "analysis",
+   "serves": [
+    "S2.b",
+    "S5.b"
+   ]
+  },
+  "P031": {
+   "title": "数据集与指标",
+   "question": "实验在什么条件下进行？",
+   "claim": "五个评测数据集，五个指标，一台RTX 3090服务器，所有实验超参数相同。",
+   "flow": "数据集→指标→指标含义→硬件→超参数",
+   "scope": "",
+   "move": "setup",
+   "serves": [
+    "S5.a"
+   ]
+  },
+  "P032": {
+   "title": "UPTP与SPTP的可行性",
+   "question": "非配对训练真的可行吗？",
+   "claim": "用150对配对与150对非配对图像训练三个基线，三个测试集上五个指标几乎一致。",
+   "flow": "放宽目标→训练设置→指标几乎一致→Transformer上UPTP略好→可视化佐证",
+   "scope": "只比较UPTP与SPTP。",
+   "move": "main_results",
+   "serves": [
+    "S5.a"
+   ]
+  },
+  "P033": {
+   "title": "可行性小结",
+   "question": "这说明什么？",
+   "claim": "UPTP能学到与等量严格配对数据相当甚至更丰富的数据关系。",
+   "flow": "小结",
+   "scope": "",
+   "move": "main_results",
+   "serves": [
+    "S5.a"
+   ]
+  },
+  "P034": {
+   "title": "单数据集内的关系",
+   "question": "重组配对能否带来更好的泛化？",
+   "claim": "把150对扩成50倍与100倍的非配对训练集，三个数据集与三个基线上的指标一致提升。",
+   "flow": "构造训练集→丰富多样性→指标提升→EN下降的解释→可视化佐证",
+   "scope": "以MSRS为基础数据。",
+   "move": "ablation",
+   "serves": [
+    "S5.b"
+   ]
+  },
+  "P035": {
+   "title": "鲁棒性：15000对",
+   "question": "重新配对能否匹敌更多的严格配对数据？",
+   "claim": "从同一150对扩成15000对，SPTP、UPTP、APTP三类训练集上三个基线性能几乎一致，匹敌100倍严格配对数据。",
+   "flow": "构造三类训练集→三基线一致→数据利用率",
+   "scope": "",
+   "move": "main_results",
+   "serves": [
+    "S5.b"
+   ]
+  },
+  "P036": {
+   "title": "跨数据集配对",
+   "question": "跨数据集配对是否仍然有效？",
+   "claim": "跨三个数据集做非配对训练，仍在所提范式适用范围内，融合模型学到与内容无关的像素关系。",
+   "flow": "跨数据集设置→场景差异大仍适用",
+   "scope": "",
+   "move": "ablation",
+   "serves": [
+    "S5.a"
+   ]
+  },
+  "P037": {
+   "title": "跨数据集的结果",
+   "question": "哪种跨数据集配置更好？",
+   "claim": "前五种配置带来稳定提升，最后一组在EN与SSIM上下降，是次优选择。",
+   "flow": "表中不同像素组合→前五种稳定提升→最后一组权衡→可视化佐证",
+   "scope": "",
+   "move": "ablation",
+   "serves": [
+    "S5.a"
+   ]
+  },
+  "P038": {
+   "title": "不同基础数据量",
+   "question": "基础数据越少，APTP的收益越大吗？",
+   "claim": "基础数据越少，APTP带来的相对提升越明显；模型过小时过度增加数据反而有害。",
+   "flow": "设计基础数据量→扩展到最大量→模型容量限制→APTP稳定增强→相对提升→实际建议",
+   "scope": "",
+   "move": "ablation",
+   "serves": [
+    "S5.c"
+   ]
+  },
+  "P039": {
+   "title": "与SOTA的比较",
+   "question": "与最新方法相比如何？",
+   "claim": "用15000对训练三个基线，与SOTA相比在四个数据集上更优，说明泛化能力与损失函数的有效性。",
+   "flow": "训练设置→与SOTA比较→公平性→四个数据集更优→未见数据集上的泛化→降低数据依赖→补充材料",
+   "scope": "训练数据细节在补充材料。",
+   "move": "main_results",
+   "serves": [
+    "S5.a",
+    "S5.b"
+   ]
+  },
+  "P040": {
+   "title": "补充材料",
+   "question": "更多分析在哪里？",
+   "claim": "更多分析在补充材料中。",
+   "flow": "指向补充材料",
+   "scope": "",
+   "move": "scope",
+   "serves": []
+  },
+  "P041": {
+   "title": "结论",
+   "question": "这项工作的结论是什么？",
+   "claim": "质疑SPTP的必要性；理论上UPTP与SPTP是APTP的互补子集；实验显示100倍更少的数据即可训练。",
+   "flow": "质疑→理论→扩展多样性→实验结果→意义",
+   "scope": "结论只回扣摘要，不引入新主张。",
+   "move": "results",
+   "serves": [
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5"
+   ]
+  },
+  "P042": {
+   "title": "致谢",
+   "question": "谁资助了这项工作？",
+   "claim": "列出基金支持。",
+   "flow": "基金",
+   "scope": "",
+   "move": "scope",
+   "serves": []
+  },
+  "P043": {
+   "title": "图1：两种新范式的动机",
+   "question": "图1说明什么？",
+   "claim": "(a)两种新范式不再要求时空对齐，可训练图像对增至N(N−1)与N²；(b)基础数据越少，N²带来的提升越大。",
+   "flow": "(a)可训练对数→(b)性能提升规律",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  },
+  "P044": {
+   "title": "图2：收敛与性能",
+   "question": "图2展示什么？",
+   "claim": "SPTP与UPTP在三个基线上的训练收敛与性能对比。",
+   "flow": "损失收敛→SSIM对比",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  },
+  "P045": {
+   "title": "图3：训练中的融合演变",
+   "question": "图3展示什么？",
+   "claim": "CNN基线训练中融合结果的演变，SPTP对UPTP。",
+   "flow": "训练演变",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  },
+  "P046": {
+   "title": "图4：SPTP与APTP的融合图",
+   "question": "图4展示什么？",
+   "claim": "在SPTP与APTP上训练的基线所产生的融合图像。",
+   "flow": "融合图对比",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  },
+  "P047": {
+   "title": "图5：关系多样性",
+   "question": "图5解释什么？",
+   "claim": "解释关系多样性：APTP下可学关系二次增长。",
+   "flow": "关系多样性",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  },
+  "P048": {
+   "title": "图6：三个基线的定性比较",
+   "question": "图6展示什么？",
+   "claim": "三个基线在不同训练数据设置下，在LLVIP、M3FD、MSRS测试集上的定性对比。",
+   "flow": "三基线→三测试集",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  },
+  "P049": {
+   "title": "表1：泛化结果",
+   "question": "表1报告什么？",
+   "claim": "三个基线在MSRS上用不同训练设置训练，在LLVIP、MSRS、MXFD测试集上的结果；粗体表示高于对应的SPTP基线。",
+   "flow": "测试集→三基线→训练设置",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  },
+  "P050": {
+   "title": "图7：跨数据集的融合图",
+   "question": "图7展示什么？",
+   "claim": "跨数据集非配对训练与单数据集严格配对训练模型的融合图像对比。",
+   "flow": "跨数据集→单数据集",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  },
+  "P051": {
+   "title": "表2：不同训练集的结果",
+   "question": "表2报告什么？",
+   "claim": "CNN基线在MSRS上用不同训练集训练的结果；粗体表示优于其原始配对数据训练的模型。",
+   "flow": "训练集→指标",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  },
+  "P052": {
+   "title": "表3：不同基础数据量的提升",
+   "question": "表3报告什么？",
+   "claim": "比较APTP在不同基础严格配对图像数量上的提升。",
+   "flow": "基础数据量→提升",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  },
+  "P053": {
+   "title": "表4：与SOTA的比较",
+   "question": "表4报告什么？",
+   "claim": "三个基线与若干SOTA方法的结果，粗体为最佳值。",
+   "flow": "方法→四个数据集→五个指标",
+   "scope": "",
+   "move": "caption",
+   "serves": []
+  }
+ },
+ "rows": {
+  "P001-R001": {
+   "zh": "红外与可见光图像融合（IVIF）在保留自然纹理和显著热信号的同时，融合两种互补模态。"
+  },
+  "P001-R002": {
+   "zh": "现有方案主要依赖大量严格对齐的图像对进行训练。",
+   "previous": {
+    "anchor_id": "P001-R001",
+    "anchor_quote": "红外与可见光图像融合（IVIF）",
+    "anchor_head": "图像融合",
+    "target_quote": "现有方案",
+    "target_head": "方案",
+    "relation": "由任务转到现有做法",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P001-R003": {
+   "zh": "然而，由于对齐过程成本高、费时费力，获取这类数据往往不现实。",
+   "previous": {
+    "anchor_id": "P001-R002",
+    "anchor_quote": "严格对齐的图像对",
+    "anchor_head": "图像对",
+    "target_quote": "这类数据",
+    "target_head": "数据",
+    "relation": "同指：这类数据即严格对齐的图像对",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P001-R004": {
+   "zh": "此外，严格配对的训练设置限制了跨模态关系的数量，从而限制了泛化性能。",
+   "previous": {
+    "anchor_id": "P001-R003",
+    "anchor_quote": "对齐过程",
+    "anchor_head": "过程",
+    "target_quote": "严格配对的训练设置",
+    "target_head": "设置",
+    "relation": "并列：数据之外的第二个不足",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P001-R005": {
+   "zh": "为此，本工作通过系统研究非配对与任意配对训练范式（UPTP与APTP），质疑严格配对训练范式（SPTP）的必要性，面向高性能IVIF。",
+   "previous": {
+    "anchor_id": "P001-R004",
+    "anchor_quote": "严格配对的训练设置",
+    "anchor_head": "设置",
+    "target_quote": "严格配对训练范式（SPTP）",
+    "target_head": "范式",
+    "relation": "同指并命名：前句的设置即SPTP，本句质疑其必要性",
+    "phrase_type": "专有名词短语"
+   }
+  },
+  "P001-R006": {
+   "zh": "我们建立了APTP的理论目标，反映了UPTP与SPTP之间的互补关系。",
+   "previous": {
+    "anchor_id": "P001-R005",
+    "anchor_quote": "非配对与任意配对训练范式（UPTP与APTP）",
+    "anchor_head": "范式",
+    "target_quote": "APTP的理论目标",
+    "target_head": "目标",
+    "relation": "展开：为所提范式给出理论目标",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P001-R007": {
+   "zh": "更重要的是，我们构建了一个实用框架，即使训练数据极少且未对齐，也能显著丰富跨模态关系。",
+   "previous": {
+    "anchor_id": "P001-R006",
+    "anchor_quote": "APTP的理论目标",
+    "anchor_head": "目标",
+    "target_quote": "一个实用框架",
+    "target_head": "框架",
+    "relation": "递进：理论之外的实用框架",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P001-R008": {
+   "zh": "为验证上述主张，我们设计了三个端到端轻量基线和一组创新的损失函数，覆盖三种经典框架（CNN、Transformer、GAN）。",
+   "previous": {
+    "anchor_id": "P001-R007",
+    "anchor_quote": "实用框架",
+    "anchor_head": "框架",
+    "target_quote": "三个端到端轻量基线",
+    "target_head": "基线",
+    "relation": "验证手段：用基线检验框架",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P001-R009": {
+   "zh": "综合实验表明，所提出的APTP与UPTP是可行的，能够在极少且内容不一致的红外与可见光数据集上训练模型，取得与SPTP下大100倍的数据集相当的性能。",
+   "previous": {
+    "anchor_id": "P001-R008",
+    "anchor_quote": "三个端到端轻量基线",
+    "anchor_head": "基线",
+    "target_quote": "综合实验",
+    "target_head": "实验",
+    "relation": "结果：基线上的实验结果",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P001-R010": {
+   "zh": "这一发现从根本上降低了数据采集的成本与难度，并从数据角度增强了模型鲁棒性，为IVIF研究提供了可行方案。",
+   "previous": {
+    "anchor_id": "P001-R009",
+    "anchor_quote": "相当的性能",
+    "anchor_head": "性能",
+    "target_quote": "这一发现",
+    "target_head": "发现",
+    "relation": "指代：这一发现即上句结果",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P001-R011": {
+   "zh": "代码见 https://github.com/yanglinDeng/IVIF_unpair。",
+   "previous": {
+    "anchor_id": "P001-R010",
+    "anchor_quote": "可行方案",
+    "anchor_head": "方案",
+    "target_quote": "代码",
+    "target_head": "代码",
+    "relation": "补充：给出代码地址",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P002-R001": {
+   "zh": "红外与可见光图像融合（IVIF）旨在生成一幅综合的融合图像O，它同时包含来自红外源I_ir与可见光源I_vis的一致信息和互补信息[1]，其中F表示融合模型。"
+  },
+  "P002-R002": {
+   "zh": "具体而言，可见光模态擅长捕捉符合人类感知的彩色视觉信息。",
+   "previous": {
+    "anchor_id": "P002-R001",
+    "anchor_quote": "可见光源I_vis",
+    "anchor_head": "可见光源",
+    "target_quote": "可见光模态",
+    "target_head": "模态",
+    "relation": "同指：可见光源即可见光模态，展开其特点",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P002-R003": {
+   "zh": "然而，它对异常光照、遮挡和恶劣天气较为敏感[2]。",
+   "previous": {
+    "anchor_id": "P002-R002",
+    "anchor_quote": "可见光模态",
+    "anchor_head": "模态",
+    "target_quote": "它",
+    "target_head": "它",
+    "relation": "指代：可见光模态，转折谈其弱点",
+    "phrase_type": "代词"
+   }
+  },
+  "P002-R004": {
+   "zh": "相比之下，红外模态对光照变化和环境挑战（如黑暗、烟雾、雾霾）具有鲁棒性。",
+   "previous": {
+    "anchor_id": "P002-R003",
+    "anchor_quote": "异常光照、遮挡和恶劣天气",
+    "anchor_head": "天气",
+    "target_quote": "光照变化和环境挑战",
+    "target_head": "挑战",
+    "relation": "对照：可见光的弱点正是红外的强项",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P002-R005": {
+   "zh": "然而，它缺少可见光模态所固有的颜色和细粒度纹理细节[3]。",
+   "previous": {
+    "anchor_id": "P002-R004",
+    "anchor_quote": "红外模态",
+    "anchor_head": "模态",
+    "target_quote": "它",
+    "target_head": "它",
+    "relation": "指代：红外模态，转折谈其不足",
+    "phrase_type": "代词"
+   }
+  },
+  "P002-R006": {
+   "zh": "得益于二者的互补性，IVIF在近几十年得到研究，并有语义分割[4, 5, 6]、目标检测[7, 8, 9]和人群计数[10, 11]等实际应用需求。",
+   "previous": {
+    "anchor_id": "P002-R005",
+    "anchor_quote": "颜色和细粒度纹理细节",
+    "anchor_head": "细节",
+    "target_quote": "二者的互补性",
+    "target_head": "互补性",
+    "relation": "归结：两种模态的长短形成互补",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P003-R001": {
+   "zh": "一般而言，IVIF模型经过训练，从各模态中提取互补内容和一致的场景信息[12, 13, 14, 15, 16, 17, 18, 19, 20]。",
+   "previous": {
+    "anchor_id": "P002-R006",
+    "anchor_quote": "实际应用需求",
+    "anchor_head": "需求",
+    "target_quote": "IVIF模型",
+    "target_head": "模型",
+    "relation": "转入：由应用需求转到模型如何训练",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P003-R002": {
+   "zh": "原则上，融合性能由四个因素决定，即配对训练数据、模型架构、监督损失和训练策略[21]。",
+   "previous": {
+    "anchor_id": "P003-R001",
+    "anchor_quote": "IVIF模型",
+    "anchor_head": "模型",
+    "target_quote": "融合性能",
+    "target_head": "性能",
+    "relation": "由模型训练转到决定性能的因素",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P003-R003": {
+   "zh": "尽管性能令人鼓舞，现有方案仍需要大量严格对齐的红外与可见光图像对，这给数据采集带来了重大挑战[1]。",
+   "previous": {
+    "anchor_id": "P003-R002",
+    "anchor_quote": "配对训练数据",
+    "anchor_head": "数据",
+    "target_quote": "严格对齐的红外与可见光图像对",
+    "target_head": "图像对",
+    "relation": "展开四因素中的数据因素：问题出在配对数据",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P003-R004": {
+   "zh": "例如，在多种天气下采集严格配对的数据时，管理空间与时间同步以及设备设置并非易事。",
+   "previous": {
+    "anchor_id": "P003-R003",
+    "anchor_quote": "数据采集",
+    "anchor_head": "采集",
+    "target_quote": "采集严格配对的数据",
+    "target_head": "数据",
+    "relation": "举例：说明采集的困难",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P003-R005": {
+   "zh": "此外，考虑到传感器标定误差、目标运动和热形变，图像配准还需要额外的工作[22, 23, 24, 25]。",
+   "previous": {
+    "anchor_id": "P003-R004",
+    "anchor_quote": "设备设置",
+    "anchor_head": "设置",
+    "target_quote": "图像配准",
+    "target_head": "配准",
+    "relation": "并列：采集之外的第二个困难",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P003-R006": {
+   "zh": "鉴于模态之间的固有差异，实现完美配准既困难又耗时。",
+   "previous": {
+    "anchor_id": "P003-R005",
+    "anchor_quote": "图像配准",
+    "anchor_head": "配准",
+    "target_quote": "完美配准",
+    "target_head": "配准",
+    "relation": "同指承接：配准，进一步说明难以做到完美",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P004-R001": {
+   "zh": "撇开采集配对图像数据所带来的问题不谈，融合性能还因数据分布的差异而变得脆弱。",
+   "previous": {
+    "anchor_id": "P003-R006",
+    "anchor_quote": "完美配准",
+    "anchor_head": "配准",
+    "target_quote": "采集配对图像数据所带来的问题",
+    "target_head": "问题",
+    "relation": "转折：由采集问题转向数据分布问题",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P004-R002": {
+   "zh": "具体而言，在某一数据集内，配对图像数据集中的观测关系因数据集规模而较为有限，这为模型所能吸收的融合能力设定了上界。",
+   "previous": {
+    "anchor_id": "P004-R001",
+    "anchor_quote": "数据分布的差异",
+    "anchor_head": "差异",
+    "target_quote": "观测关系",
+    "target_head": "关系",
+    "relation": "展开：分布差异在数据集内表现为关系有限",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P004-R003": {
+   "zh": "这是机器学习中一条众所周知的结论的推论：增加训练数据量总能帮助提升泛化性能。",
+   "previous": {
+    "anchor_id": "P004-R002",
+    "anchor_quote": "数据集规模",
+    "anchor_head": "规模",
+    "target_quote": "增加训练数据量",
+    "target_head": "数据量",
+    "relation": "依据：规模决定可学关系，对应已知结论",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P004-R004": {
+   "zh": "总之，传统的严格配对训练范式（SPTP）在成本效益与模型泛化两方面都存在关键问题。",
+   "previous": {
+    "anchor_id": "P004-R003",
+    "anchor_quote": "泛化性能",
+    "anchor_head": "性能",
+    "target_quote": "传统的严格配对训练范式（SPTP）",
+    "target_head": "范式",
+    "relation": "总结：由采集与泛化两类问题归结到SPTP",
+    "phrase_type": "专有名词短语"
+   }
+  },
+  "P005-R001": {
+   "zh": "反之，由于单模态数据集容易获得，很容易构造任意配对的红外与可见光图像对。",
+   "previous": {
+    "anchor_id": "P004-R004",
+    "anchor_quote": "传统的严格配对训练范式（SPTP）",
+    "anchor_head": "范式",
+    "target_quote": "任意配对的红外与可见光图像对",
+    "target_head": "图像对",
+    "relation": "转折：与SPTP相反",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P005-R002": {
+   "zh": "这种便利促使我们探索一种新的任意配对训练范式（APTP）。",
+   "previous": {
+    "anchor_id": "P005-R001",
+    "anchor_quote": "任意配对的红外与可见光图像对",
+    "anchor_head": "图像对",
+    "target_quote": "任意配对训练范式（APTP）",
+    "target_head": "范式",
+    "relation": "动机：便利催生新范式",
+    "phrase_type": "专有名词短语"
+   }
+  },
+  "P005-R003": {
+   "zh": "事实上，APTP的想法在图像到图像生成领域相当普遍[26, 27, 28, 29, 30, 31]。",
+   "previous": {
+    "anchor_id": "P005-R002",
+    "anchor_quote": "任意配对训练范式（APTP）",
+    "anchor_head": "范式",
+    "target_quote": "APTP的想法",
+    "target_head": "想法",
+    "relation": "同指承接：转述APTP在他处的体现",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P005-R004": {
+   "zh": "在这一特定任务中，不可或缺的有利因素是存在期望的图像输出。",
+   "previous": {
+    "anchor_id": "P005-R003",
+    "anchor_quote": "图像到图像生成领域",
+    "anchor_head": "领域",
+    "target_quote": "这一特定任务",
+    "target_head": "任务",
+    "relation": "指代：图像生成任务",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P005-R005": {
+   "zh": "遗憾的是，融合真值输出的缺失使[26]这类方法无法应用于IVIF任务。",
+   "previous": {
+    "anchor_id": "P005-R004",
+    "anchor_quote": "期望的图像输出",
+    "anchor_head": "输出",
+    "target_quote": "融合真值输出",
+    "target_head": "输出",
+    "relation": "转折：生成任务有期望输出，融合没有",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P006-R001": {
+   "zh": "为解决这一状况，我们从全新的视角开创了IVIF的APTP。",
+   "previous": {
+    "anchor_id": "P005-R005",
+    "anchor_quote": "无法应用于IVIF任务",
+    "anchor_head": "任务",
+    "target_quote": "这一状况",
+    "target_head": "状况",
+    "relation": "指代：前段指出的无法应用",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P006-R002": {
+   "zh": "图像融合任务的像素级自监督特性，使我们能够放宽传统SPTP的学习目标，后者以跨模态内容严格一致为前提。",
+   "previous": {
+    "anchor_id": "P006-R001",
+    "anchor_quote": "全新的视角",
+    "anchor_head": "视角",
+    "target_quote": "像素级自监督特性",
+    "target_head": "特性",
+    "relation": "展开：新视角的依据",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P006-R003": {
+   "zh": "具体地，我们探索监督信号，以支持跨模态源图像的任意像素级组合，从而避免依赖严格一致的内容，实现任意训练。",
+   "previous": {
+    "anchor_id": "P006-R002",
+    "anchor_quote": "放宽传统SPTP的学习目标",
+    "anchor_head": "目标",
+    "target_quote": "监督信号",
+    "target_head": "信号",
+    "relation": "做法：如何放宽目标",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P006-R004": {
+   "zh": "这一新的工作机制促成了多模态输入之间被扩展的独立关系。",
+   "previous": {
+    "anchor_id": "P006-R003",
+    "anchor_quote": "任意像素级组合",
+    "anchor_head": "组合",
+    "target_quote": "这一新的工作机制",
+    "target_head": "机制",
+    "relation": "指代：上句的做法",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P006-R005": {
+   "zh": "依据其独立性，我们把融合系统参数的最大对数似然估计优化目标从SPTP扩展到APTP。",
+   "previous": {
+    "anchor_id": "P006-R004",
+    "anchor_quote": "独立关系",
+    "anchor_head": "关系",
+    "target_quote": "其独立性",
+    "target_head": "独立性",
+    "relation": "同指承接：独立关系",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P006-R006": {
+   "zh": "APTP的独立条件和改进的优化形式共同传递了一个关键信息：APTP是两个互补集合UPTP（非配对训练范式）与SPTP的并集，因而适用范围更广。",
+   "previous": {
+    "anchor_id": "P006-R005",
+    "anchor_quote": "优化目标",
+    "anchor_head": "目标",
+    "target_quote": "改进的优化形式",
+    "target_head": "形式",
+    "relation": "结果：优化目标扩展得到的形式",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P006-R007": {
+   "zh": "其中，UPTP是最具挑战性的子任务。",
+   "previous": {
+    "anchor_id": "P006-R006",
+    "anchor_quote": "UPTP（非配对训练范式）",
+    "anchor_head": "范式",
+    "target_quote": "UPTP",
+    "target_head": "UPTP",
+    "relation": "同指承接：并集中的一个子集",
+    "phrase_type": "专有名词"
+   }
+  },
+  "P007-R001": {
+   "zh": "源图像之间不受限制的配对显著增强了体量有限的基础数据集内可训练的跨模态多样性，使优化形式更加稳健。",
+   "previous": {
+    "anchor_id": "P006-R007",
+    "anchor_quote": "UPTP",
+    "anchor_head": "UPTP",
+    "target_quote": "不受限制的配对",
+    "target_head": "配对",
+    "relation": "展开：非配对带来的好处",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P007-R002": {
+   "zh": "这不仅从根本上缓解了数据采集的困难并降低了成本，还丰富了训练数据的多样性，从而增强了模型鲁棒性。",
+   "previous": {
+    "anchor_id": "P007-R001",
+    "anchor_quote": "跨模态多样性",
+    "anchor_head": "多样性",
+    "target_quote": "训练数据的多样性",
+    "target_head": "多样性",
+    "relation": "同指承接：多样性的两方面效果",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P007-R003": {
+   "zh": "为系统考察所提APTP与UPTP的优点，我们构建了三个简洁的融合基线，包括CNN、Transformer和GAN。",
+   "previous": {
+    "anchor_id": "P007-R002",
+    "anchor_quote": "模型鲁棒性",
+    "anchor_head": "鲁棒性",
+    "target_quote": "三个简洁的融合基线",
+    "target_head": "基线",
+    "relation": "验证手段：用基线检验上述优点",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P007-R004": {
+   "zh": "具体而言，CNN侧重通过关注局部模式提取上下文特征。",
+   "previous": {
+    "anchor_id": "P007-R003",
+    "anchor_quote": "CNN、Transformer和GAN",
+    "anchor_head": "CNN",
+    "target_quote": "CNN",
+    "target_head": "CNN",
+    "relation": "列举三个基线之一",
+    "phrase_type": "专有名词"
+   }
+  },
+  "P007-R005": {
+   "zh": "相比之下，Transformer架构擅长长距离建模，但在一定程度上忽略了局部细节[32]。",
+   "previous": {
+    "anchor_id": "P007-R004",
+    "anchor_quote": "局部模式",
+    "anchor_head": "模式",
+    "target_quote": "长距离建模",
+    "target_head": "建模",
+    "relation": "对照：局部与长距离",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P007-R006": {
+   "zh": "生成对抗网络（GAN）基线遵循“生成—验证”模式进行网络训练。",
+   "previous": {
+    "anchor_id": "P007-R005",
+    "anchor_quote": "Transformer架构",
+    "anchor_head": "架构",
+    "target_quote": "生成对抗网络（GAN）基线",
+    "target_head": "基线",
+    "relation": "列举：第三个基线",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P007-R007": {
+   "zh": "我们对传统SPTP、新的UPTP与APTP所做的实验对比，为所提出的创新提供了令人信服的支持。",
+   "previous": {
+    "anchor_id": "P007-R006",
+    "anchor_quote": "生成对抗网络（GAN）基线",
+    "anchor_head": "基线",
+    "target_quote": "实验对比",
+    "target_head": "对比",
+    "relation": "结果：三基线上的对比实验",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P007-R008": {
+   "zh": "我们的贡献如下：",
+   "previous": {
+    "anchor_id": "P007-R007",
+    "anchor_quote": "令人信服的支持",
+    "anchor_head": "支持",
+    "target_quote": "我们的贡献",
+    "target_head": "贡献",
+    "relation": "转入：列出贡献",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P008-R001": {
+   "zh": "提出了两种新的IVIF训练范式，它们不再局限于严格配对的输入。",
+   "previous": {
+    "anchor_id": "P007-R008",
+    "anchor_quote": "我们的贡献",
+    "anchor_head": "贡献",
+    "target_quote": "两种新的IVIF训练范式",
+    "target_head": "范式",
+    "relation": "列举贡献之一",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P009-R001": {
+   "zh": "对三种范式下的数据关系与训练要求进行了详细分析。",
+   "previous": {
+    "anchor_id": "P008-R001",
+    "anchor_quote": "两种新的IVIF训练范式",
+    "anchor_head": "范式",
+    "target_quote": "三种范式",
+    "target_head": "范式",
+    "relation": "列举贡献之二：分析这些范式",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P010-R001": {
+   "zh": "对新训练范式的优点进行了深入研究，揭示其能降低数据采集成本、扩大有效训练集并增强模型鲁棒性。",
+   "previous": {
+    "anchor_id": "P009-R001",
+    "anchor_quote": "三种范式",
+    "anchor_head": "范式",
+    "target_quote": "新训练范式",
+    "target_head": "范式",
+    "relation": "列举贡献之三：研究优点",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P011-R001": {
+   "zh": "实验结果为所提APTP与UPTP的有效性提供了支持证据，并表明其性能优于SOTA，兼具高效率与稳健的泛化。",
+   "previous": {
+    "anchor_id": "P010-R001",
+    "anchor_quote": "增强模型鲁棒性",
+    "anchor_head": "鲁棒性",
+    "target_quote": "实验结果",
+    "target_head": "结果",
+    "relation": "列举贡献之四：实验证实",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P012-R001": {
+   "zh": "大多数IVIF方法使用严格配对的数据集训练。"
+  },
+  "P012-R002": {
+   "zh": "按所采用的深度学习框架，这些方法大致可分为三类：CNN框架[12, 33, 16, 34, 14]、CNN-Transformer框架[35, 17, 36, 37]和生成式框架[38, 39, 15, 40]。",
+   "previous": {
+    "anchor_id": "P012-R001",
+    "anchor_quote": "大多数IVIF方法",
+    "anchor_head": "方法",
+    "target_quote": "这些方法",
+    "target_head": "方法",
+    "relation": "同指承接：按框架分类",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P012-R003": {
+   "zh": "为便于端到端训练，[12]、[33]引入密集块与残差块来探索多尺度特征，并避免手工设计融合规则。",
+   "previous": {
+    "anchor_id": "P012-R002",
+    "anchor_quote": "CNN框架",
+    "anchor_head": "框架",
+    "target_quote": "[12]、[33]",
+    "target_head": "[12]",
+    "relation": "展开：CNN框架中的两项工作",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P012-R004": {
+   "zh": "[34]延续这种端到端的训练方式，用仅含两个CNN块的小模型，表明追求高性能并不需要复杂的网络结构。",
+   "previous": {
+    "anchor_id": "P012-R003",
+    "anchor_quote": "端到端训练",
+    "anchor_head": "训练",
+    "target_quote": "这种端到端的训练方式",
+    "target_head": "方式",
+    "relation": "同指承接：端到端训练",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P012-R005": {
+   "zh": "为强调全局长程上下文，[35]基于交叉注意力机制进行融合。",
+   "previous": {
+    "anchor_id": "P012-R004",
+    "anchor_quote": "复杂的网络结构",
+    "anchor_head": "结构",
+    "target_quote": "全局长程上下文",
+    "target_head": "上下文",
+    "relation": "转入下一类：CNN-Transformer框架",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P012-R006": {
+   "zh": "[17]与[36]采用改进的Transformer块[41]，以在效率与性能之间取得平衡。",
+   "previous": {
+    "anchor_id": "P012-R005",
+    "anchor_quote": "交叉注意力机制",
+    "anchor_head": "机制",
+    "target_quote": "改进的Transformer块[41]",
+    "target_head": "块",
+    "relation": "并列：同类框架的另一种做法",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P012-R007": {
+   "zh": "为区分模态特有的特征，[39, 15]引入两个判别器，帮助增强与模态相关的线索。",
+   "previous": {
+    "anchor_id": "P012-R006",
+    "anchor_quote": "效率与性能",
+    "anchor_head": "性能",
+    "target_quote": "两个判别器",
+    "target_head": "判别器",
+    "relation": "转入下一类：生成式框架",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P012-R008": {
+   "zh": "然而，基于GAN的方法面临模式坍塌与训练不稳定等问题。",
+   "previous": {
+    "anchor_id": "P012-R007",
+    "anchor_quote": "两个判别器",
+    "anchor_head": "判别器",
+    "target_quote": "基于GAN的方法",
+    "target_head": "方法",
+    "relation": "转折：生成式方法的问题",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P012-R009": {
+   "zh": "尽管[40]采用似然校正实现了无模式坍塌的稳定训练，但其计算量很大。",
+   "previous": {
+    "anchor_id": "P012-R008",
+    "anchor_quote": "模式坍塌与训练不稳定",
+    "anchor_head": "不稳定",
+    "target_quote": "无模式坍塌的稳定训练",
+    "target_head": "训练",
+    "relation": "对照：一项工作解决了问题但代价高",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P013-R001": {
+   "zh": "在本工作中，为覆盖IVIF方法的广泛范围，我们构建了三个轻量基线模型，以验证APTP与UPTP的可行性、非配对程度和优点。",
+   "previous": {
+    "anchor_id": "P012-R002",
+    "anchor_quote": "三类",
+    "anchor_head": "类",
+    "target_quote": "三个轻量基线模型",
+    "target_head": "模型",
+    "relation": "转入本文做法：用轻量基线覆盖上述三类",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P014-R001": {
+   "zh": "非配对训练最早在图像生成领域被引入，以应对收集大规模配对数据集的高昂代价[42]。"
+  },
+  "P014-R002": {
+   "zh": "[26]通过引入对抗与循环一致性监督打破了这一限制，在保持内容一致的情况下实现风格迁移。",
+   "previous": {
+    "anchor_id": "P014-R001",
+    "anchor_quote": "收集大规模配对数据集的高昂代价",
+    "anchor_head": "代价",
+    "target_quote": "这一限制",
+    "target_head": "限制",
+    "relation": "指代：配对数据的代价",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P014-R003": {
+   "zh": "这一创新范式使得用非配对数据训练成为可能，极大地拓宽了任务的应用范围。",
+   "previous": {
+    "anchor_id": "P014-R002",
+    "anchor_quote": "对抗与循环一致性监督",
+    "anchor_head": "监督",
+    "target_quote": "这一创新范式",
+    "target_head": "范式",
+    "relation": "指代并评价：[26]的做法",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P014-R004": {
+   "zh": "继[26]之后，[43]、[44]把复原视为从退化图像到清晰图像的非配对生成任务。",
+   "previous": {
+    "anchor_id": "P014-R003",
+    "anchor_quote": "非配对数据",
+    "anchor_head": "数据",
+    "target_quote": "非配对生成任务",
+    "target_head": "任务",
+    "relation": "举例：后续工作沿用非配对思路",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P014-R005": {
+   "zh": "类似的挑战性问题也存在于IVIF领域。",
+   "previous": {
+    "anchor_id": "P014-R004",
+    "anchor_quote": "非配对生成任务",
+    "anchor_head": "任务",
+    "target_quote": "类似的挑战性问题",
+    "target_head": "问题",
+    "relation": "转到IVIF：同类问题",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P014-R006": {
+   "zh": "与图像生成不同，IVIF要求两幅互补图像之间而非单幅图像之内的内容一致，并且缺少明确的融合图像域，致使像[26]那样的非配对训练不可行。",
+   "previous": {
+    "anchor_id": "P014-R005",
+    "anchor_quote": "类似的挑战性问题",
+    "anchor_head": "问题",
+    "target_quote": "非配对训练",
+    "target_head": "训练",
+    "relation": "说明：这一问题为何使[26]不可行",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P014-R007": {
+   "zh": "然而，恰恰是期望融合图像的缺失，加上IVIF任务的像素级特性，使非配对训练仍然可行。",
+   "previous": {
+    "anchor_id": "P014-R006",
+    "anchor_quote": "缺少明确的融合图像域",
+    "anchor_head": "融合图像域",
+    "target_quote": "期望融合图像的缺失",
+    "target_head": "缺失",
+    "relation": "转折：同一缺失反而使非配对可行",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P015-R001": {
+   "zh": "由于缺少真值，融合网络无需从理想的融合图像中学习。",
+   "previous": {
+    "anchor_id": "P014-R007",
+    "anchor_quote": "期望融合图像的缺失",
+    "anchor_head": "缺失",
+    "target_quote": "缺少真值",
+    "target_head": "真值",
+    "relation": "同指承接：缺失即无真值",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P015-R002": {
+   "zh": "相反，监督通常来自源图像。",
+   "previous": {
+    "anchor_id": "P015-R001",
+    "anchor_quote": "理想的融合图像",
+    "anchor_head": "图像",
+    "target_quote": "监督",
+    "target_head": "监督",
+    "relation": "对照：不是来自融合图，而是来自源图",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P015-R003": {
+   "zh": "因此，我们认为即使输入是非配对的，模型仍能提取相应的监督信号。",
+   "previous": {
+    "anchor_id": "P015-R002",
+    "anchor_quote": "源图像",
+    "anchor_head": "图像",
+    "target_quote": "监督信号",
+    "target_head": "信号",
+    "relation": "结论：监督来自源图像，故输入可不配对",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P015-R004": {
+   "zh": "基于这些点，我们开创性地探索用非配对源图像进行训练的可能性。",
+   "previous": {
+    "anchor_id": "P015-R003",
+    "anchor_quote": "输入是非配对的",
+    "anchor_head": "输入",
+    "target_quote": "用非配对源图像进行训练",
+    "target_head": "训练",
+    "relation": "转入本文工作",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P016-R001": {
+   "zh": "本节通过理论定义、工作机制和基本性质，分别系统分析UPTP与APTP。"
+  },
+  "P016-R002": {
+   "zh": "由于缺乏先前研究，我们构建了三个用于对比验证的基线，它们基于三种流行架构，即CNN、Transformer和GAN。",
+   "previous": {
+    "anchor_id": "P016-R001",
+    "anchor_quote": "UPTP与APTP",
+    "anchor_head": "APTP",
+    "target_quote": "三个用于对比验证的基线",
+    "target_head": "基线",
+    "relation": "补充：分析之外还要有基线以验证",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P016-R003": {
+   "zh": "详细的网络结构见补充材料。",
+   "previous": {
+    "anchor_id": "P016-R002",
+    "anchor_quote": "三个用于对比验证的基线",
+    "anchor_head": "基线",
+    "target_quote": "详细的网络结构",
+    "target_head": "结构",
+    "relation": "指向补充材料",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P017-R001": {
+   "zh": "利用源模态的像素级互补性，我们设计了联合保证像素保真、梯度纹理与结构感知的损失函数。"
+  },
+  "P017-R002": {
+   "zh": "除损失项之外，关键在于引导模型学会选择合适的源线索以及跨模态的组合比例。",
+   "previous": {
+    "anchor_id": "P017-R001",
+    "anchor_quote": "损失函数",
+    "anchor_head": "函数",
+    "target_quote": "损失项",
+    "target_head": "项",
+    "relation": "转到另一关键：权重选择",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P017-R003": {
+   "zh": "为使模型能处理多样的输入，我们设计了一个通用线性加权函数：其中a、b是需要度量的各自输入。",
+   "previous": {
+    "anchor_id": "P017-R002",
+    "anchor_quote": "源线索以及跨模态的组合比例",
+    "anchor_head": "比例",
+    "target_quote": "通用线性加权函数",
+    "target_head": "函数",
+    "relation": "做法：用加权函数决定组合比例",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P017-R004": {
+   "zh": "公式(2)使模型能够在每个像素、每个信息范围（强度、梯度、结构）上自动决定哪幅源图像更值得关注。",
+   "previous": {
+    "anchor_id": "P017-R003",
+    "anchor_quote": "通用线性加权函数",
+    "anchor_head": "函数",
+    "target_quote": "公式(2)",
+    "target_head": "公式",
+    "relation": "同指承接：公式(2)即该函数",
+    "phrase_type": "指示短语"
+   },
+   "earlier": {
+    "anchor_id": "P017-R002",
+    "anchor_quote": "选择合适的源线索",
+    "anchor_head": "线索",
+    "target_quote": "哪幅源图像更值得关注",
+    "target_head": "源图像",
+    "relation": "回答：该公式正是“选择源线索”的手段",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P017-R005": {
+   "zh": "它保留了源像素的相对大小，使结果无失真，并通过防止梯度爆炸与消失来稳定训练。",
+   "previous": {
+    "anchor_id": "P017-R004",
+    "anchor_quote": "自动决定哪幅源图像更值得关注",
+    "anchor_head": "关注",
+    "target_quote": "它",
+    "target_head": "它",
+    "relation": "指代：公式(2)，说明其作用",
+    "phrase_type": "代词"
+   }
+  },
+  "P017-R006": {
+   "zh": "为利用这一点，我们设计了一组自适应加权的损失函数。",
+   "previous": {
+    "anchor_id": "P017-R005",
+    "anchor_quote": "稳定训练",
+    "anchor_head": "训练",
+    "target_quote": "自适应加权的损失函数",
+    "target_head": "函数",
+    "relation": "落实：把加权用到损失上",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P018-R001": {
+   "zh": "它们共同构成CNN与Transformer基线的总损失：对于GAN基线，由生成器生成最终融合图像，并用对抗损失与总损失训练：其中各项的细节见补充材料。",
+   "previous": {
+    "anchor_id": "P017-R006",
+    "anchor_quote": "自适应加权的损失函数",
+    "anchor_head": "函数",
+    "target_quote": "它们",
+    "target_head": "它们",
+    "relation": "指代并汇总：这些损失构成总损失",
+    "phrase_type": "代词"
+   }
+  },
+  "P019-R001": {
+   "zh": "给定严格对齐的源图像对，即红外图像集与可见光图像集，其中三个量分别表示高度、宽度与通道数，融合模型应输出信息丰富的融合输出集。",
+   "previous": {
+    "anchor_id": "P018-R001",
+    "anchor_quote": "CNN与Transformer基线的总损失",
+    "anchor_head": "损失",
+    "target_quote": "严格对齐的源图像对",
+    "target_head": "图像对",
+    "relation": "转入形式化：先给出SPTP的设定",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P020-R001": {
+   "zh": "通过引入公式(3)中各损失函数的统计独立概率，可以得到它们的联合概率，它与IVIF任务的优化目标成正比（以CNN基线为例）：因此，最大化联合概率的过程等价于最小化总损失值：再引入贝叶斯定理，公式(6)中的优化目标可变换为一个似然项与一个先验项的组合：其中似然项度量融合图像从源图像中保留内容的概率，先验项刻画图像的自然度。",
+   "previous": {
+    "anchor_id": "P019-R001",
+    "anchor_quote": "融合输出集",
+    "anchor_head": "输出集",
+    "target_quote": "各损失函数的统计独立概率",
+    "target_head": "概率",
+    "relation": "转入概率表述：把损失写成概率",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P020-R002": {
+   "zh": "其逐元素形式如下，式中各符号为逐元素形式中的像素位置与通道。",
+   "previous": {
+    "anchor_id": "P020-R001",
+    "anchor_quote": "优化目标",
+    "anchor_head": "目标",
+    "target_quote": "逐元素形式",
+    "target_head": "形式",
+    "relation": "展开：优化目标的逐元素写法",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P021-R001": {
+   "zh": "对于传统的SPTP，模型学习融合的不仅是模态特性，还有特定一致的场景与细节。"
+  },
+  "P021-R002": {
+   "zh": "在这种情况下，一对源输入应当以相同的设备设置同步采集。",
+   "previous": {
+    "anchor_id": "P021-R001",
+    "anchor_quote": "特定一致的场景与细节",
+    "anchor_head": "细节",
+    "target_quote": "同步采集",
+    "target_head": "采集",
+    "relation": "条件：一致性要求同步采集",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P021-R003": {
+   "zh": "如果存在任何空间或时间上的错位，则需要在融合之前或融合过程中进行配准。",
+   "previous": {
+    "anchor_id": "P021-R002",
+    "anchor_quote": "同步采集",
+    "anchor_head": "采集",
+    "target_quote": "任何空间或时间上的错位",
+    "target_head": "错位",
+    "relation": "假设：同步失败的后果",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P022-R001": {
+   "zh": "大量研究表明，用严格配对的数据训练是有效的，但在人力和时间上代价高昂。",
+   "previous": {
+    "anchor_id": "P021-R003",
+    "anchor_quote": "配准",
+    "anchor_head": "配准",
+    "target_quote": "严格配对的数据",
+    "target_head": "数据",
+    "relation": "承接：由配准要求转到总体代价",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P022-R002": {
+   "zh": "为降低数据采集成本、提高数据利用效率，我们提出直接在一组任意配对的红外与可见光图像上训练融合模型。",
+   "previous": {
+    "anchor_id": "P022-R001",
+    "anchor_quote": "人力和时间上代价高昂",
+    "anchor_head": "代价",
+    "target_quote": "数据采集成本",
+    "target_head": "成本",
+    "relation": "对策：针对成本提出做法",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P022-R003": {
+   "zh": "这可以通过引导融合模型关注跨模态特性，而不是刚性的内容来实现。",
+   "previous": {
+    "anchor_id": "P022-R002",
+    "anchor_quote": "任意配对的红外与可见光图像",
+    "anchor_head": "图像",
+    "target_quote": "引导融合模型关注跨模态特性",
+    "target_head": "特性",
+    "relation": "实现方式：说明如何做到任意配对训练",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P022-R004": {
+   "zh": "这意味着模型所需要的只是跨模态数据，而不一定是配对且对齐的。",
+   "previous": {
+    "anchor_id": "P022-R003",
+    "anchor_quote": "跨模态特性",
+    "anchor_head": "特性",
+    "target_quote": "跨模态数据",
+    "target_head": "数据",
+    "relation": "同指承接：特性即数据层面的要求",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P023-R001": {
+   "zh": "据此，红外图像与可见光图像彼此独立，因为它们可以在不同的地点、不同的时间、不同的设置下采集。",
+   "previous": {
+    "anchor_id": "P022-R004",
+    "anchor_quote": "跨模态数据",
+    "anchor_head": "数据",
+    "target_quote": "红外图像与可见光图像",
+    "target_head": "图像",
+    "relation": "展开：为什么只需跨模态数据——二者独立",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P023-R002": {
+   "zh": "从数学上讲，数据集中的配对关系是随机的。",
+   "previous": {
+    "anchor_id": "P023-R001",
+    "anchor_quote": "彼此独立",
+    "anchor_head": "独立",
+    "target_quote": "配对关系",
+    "target_head": "关系",
+    "relation": "数学表述：独立即配对随机",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P023-R003": {
+   "zh": "因此，联合概率分布可以分解为两个单独概率分布的乘积：公式(7)可据此写成：给定公式(9)，值得注意两条理论观察，即：1。",
+   "previous": {
+    "anchor_id": "P023-R002",
+    "anchor_quote": "配对关系是随机的",
+    "anchor_head": "关系",
+    "target_quote": "联合概率分布",
+    "target_head": "分布",
+    "relation": "推论：配对随机则联合分布可分解",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P023-R004": {
+   "zh": "当两种源输入相互独立时，存在最优的模型参数集。",
+   "previous": {
+    "anchor_id": "P023-R003",
+    "anchor_quote": "两条理论观察",
+    "anchor_head": "观察",
+    "target_quote": "最优的模型参数集",
+    "target_head": "参数集",
+    "relation": "观察之一的内容",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P023-R005": {
+   "zh": "传统的SPTP与新的UPTP是所提APTP的互补子集。",
+   "previous": {
+    "anchor_id": "P023-R004",
+    "anchor_quote": "最优的模型参数集",
+    "anchor_head": "参数集",
+    "target_quote": "APTP的互补子集",
+    "target_head": "子集",
+    "relation": "观察之二：并列的第二条观察",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P023-R006": {
+   "zh": "我们把数据关系整理如下，显然，提出任意配对训练并不是要推翻此前所有的图像融合工作。",
+   "previous": {
+    "anchor_id": "P023-R005",
+    "anchor_quote": "互补子集",
+    "anchor_head": "子集",
+    "target_quote": "数据关系",
+    "target_head": "关系",
+    "relation": "归纳：用数据关系表示子集结构",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P023-R007": {
+   "zh": "事实上，它引入的是建立在SPTP之上的扩展融合范式。",
+   "previous": {
+    "anchor_id": "P023-R006",
+    "anchor_quote": "任意配对训练",
+    "anchor_head": "训练",
+    "target_quote": "它",
+    "target_head": "它",
+    "relation": "指代：任意配对训练，说明它是扩展而非推翻",
+    "phrase_type": "代词"
+   }
+  },
+  "P023-R008": {
+   "zh": "假设融合模型与训练策略并不针对任何特定的子集范式量身定制。",
+   "previous": {
+    "anchor_id": "P023-R007",
+    "anchor_quote": "扩展融合范式",
+    "anchor_head": "范式",
+    "target_quote": "融合模型与训练策略",
+    "target_head": "策略",
+    "relation": "设定条件：模型与策略的通用性",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P023-R009": {
+   "zh": "在这种情况下，它们对所有范式都适用，这意味着凡适合APTP的做法自动适合SPTP与UPTP，反之则不一定成立。",
+   "previous": {
+    "anchor_id": "P023-R008",
+    "anchor_quote": "并不针对任何特定的子集范式量身定制",
+    "anchor_head": "范式",
+    "target_quote": "所有范式",
+    "target_head": "范式",
+    "relation": "推论：通用的模型与策略适用于所有范式",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P024-R001": {
+   "zh": "在图像融合领域，融合模型的参数会根据所设计的监督不断更新。"
+  },
+  "P024-R002": {
+   "zh": "按照传统的SPTP框架，损失值来自在严格一致的时空条件下采集的图像的像素强度。",
+   "previous": {
+    "anchor_id": "P024-R001",
+    "anchor_quote": "所设计的监督",
+    "anchor_head": "监督",
+    "target_quote": "损失值",
+    "target_head": "损失值",
+    "relation": "具体化：SPTP下监督如何计算",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P024-R003": {
+   "zh": "相反，所提出的APTP方法不再需要一致的时空成像设置，从而能通过像素级监督从任意跨模态图像获得监督。",
+   "previous": {
+    "anchor_id": "P024-R002",
+    "anchor_quote": "严格一致的时空条件",
+    "anchor_head": "条件",
+    "target_quote": "一致的时空成像设置",
+    "target_head": "设置",
+    "relation": "对照：SPTP需要一致条件，APTP不需要",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P024-R004": {
+   "zh": "然而，只要损失函数和训练策略都没有明确地强制跨模态内容一致（SPTP）或不一致（UPTP），这并不妨碍模型获得所需的能力。",
+   "previous": {
+    "anchor_id": "P024-R003",
+    "anchor_quote": "任意跨模态图像",
+    "anchor_head": "图像",
+    "target_quote": "损失函数和训练策略",
+    "target_head": "策略",
+    "relation": "条件：不妨碍学习的前提",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P024-R005": {
+   "zh": "这是因为在这种情况下，用来计算损失函数值的只是期望的像素值组合，而这种组合对不同形式的损失函数呈现不同的数据关系。",
+   "previous": {
+    "anchor_id": "P024-R004",
+    "anchor_quote": "获得所需的能力",
+    "anchor_head": "能力",
+    "target_quote": "期望的像素值组合",
+    "target_head": "组合",
+    "relation": "理由：为什么不妨碍",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P024-R006": {
+   "zh": "因此，即使可训练的图像是任意采集的，也不妨碍它们提供可训练的像素关系来监督模型的训练。",
+   "previous": {
+    "anchor_id": "P024-R005",
+    "anchor_quote": "像素值组合",
+    "anchor_head": "组合",
+    "target_quote": "可训练的像素关系",
+    "target_head": "关系",
+    "relation": "结论：像素组合即可训练的关系",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P024-R007": {
+   "zh": "如图5中红圈标出的像素所示，来自SPTP与UPTP的不同像素组合，可为每个损失函数提供不同的计算基础，无论图像在时空上是否对齐。",
+   "previous": {
+    "anchor_id": "P024-R006",
+    "anchor_quote": "可训练的像素关系",
+    "anchor_head": "关系",
+    "target_quote": "不同像素组合",
+    "target_head": "组合",
+    "relation": "举例：用图5说明",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P025-R001": {
+   "zh": "可以通过损失收敛曲线和可视化结果的渐进变化来观察这一工作机制。"
+  },
+  "P025-R002": {
+   "zh": "正如公式(10)所表达的数据关系所暗示的，凡同时适合SPTP与UPTP的方法或策略必然适用于APTP，因此我们只比较分析SPTP与UPTP。",
+   "previous": {
+    "anchor_id": "P025-R001",
+    "anchor_quote": "这一工作机制",
+    "anchor_head": "机制",
+    "target_quote": "公式(10)所表达的数据关系",
+    "target_head": "关系",
+    "relation": "依据：数据关系决定只需比较两个子集",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P026-R001": {
+   "zh": "在模型收敛方面，图2(a)(c)(e)显示三个基线模型的总训练损失收敛情况。",
+   "previous": {
+    "anchor_id": "P025-R001",
+    "anchor_quote": "损失收敛曲线",
+    "anchor_head": "曲线",
+    "target_quote": "总训练损失收敛情况",
+    "target_head": "情况",
+    "relation": "展开：先看损失收敛",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P026-R002": {
+   "zh": "显然，在相同设置下，三个基线在SPTP与UPTP训练下的收敛速度与终值都表现出相似的行为。",
+   "previous": {
+    "anchor_id": "P026-R001",
+    "anchor_quote": "总训练损失收敛情况",
+    "anchor_head": "情况",
+    "target_quote": "收敛速度与终值",
+    "target_head": "终值",
+    "relation": "读图结果",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P026-R003": {
+   "zh": "理论上，融合性能预期会在训练中逐步提高。",
+   "previous": {
+    "anchor_id": "P026-R002",
+    "anchor_quote": "收敛速度与终值",
+    "anchor_head": "终值",
+    "target_quote": "融合性能",
+    "target_head": "性能",
+    "relation": "转向性能：收敛之外还要看性能",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P026-R004": {
+   "zh": "为定量评估亮度、对比度与结构信息的融合，我们采用结构相似性（SSIM）指数作为评价指标。",
+   "previous": {
+    "anchor_id": "P026-R003",
+    "anchor_quote": "融合性能",
+    "anchor_head": "性能",
+    "target_quote": "结构相似性（SSIM）指数",
+    "target_head": "指数",
+    "relation": "手段：用SSIM量化性能",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P026-R005": {
+   "zh": "如图2(b)(d)(f)所示，两种训练范式下的SSIM值在测试集上都呈持续上升趋势，最终收敛。",
+   "previous": {
+    "anchor_id": "P026-R004",
+    "anchor_quote": "结构相似性（SSIM）指数",
+    "anchor_head": "指数",
+    "target_quote": "SSIM值",
+    "target_head": "值",
+    "relation": "同指承接：SSIM的变化",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P026-R006": {
+   "zh": "值得注意的是，尽管UPTP在训练中使用非配对图像，导致中间融合结果在视觉上杂乱，但这并不妨碍模型学到有意义的融合表示。",
+   "previous": {
+    "anchor_id": "P026-R005",
+    "anchor_quote": "持续上升趋势",
+    "anchor_head": "趋势",
+    "target_quote": "中间融合结果在视觉上杂乱",
+    "target_head": "结果",
+    "relation": "转折：曲线正常但中间结果杂乱",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P026-R007": {
+   "zh": "在配对的测试图像上评估时，输出在视觉上连贯，SSIM得分也与标准训练条件下的相当。",
+   "previous": {
+    "anchor_id": "P026-R006",
+    "anchor_quote": "中间融合结果",
+    "anchor_head": "结果",
+    "target_quote": "配对的测试图像上评估",
+    "target_head": "评估",
+    "relation": "转折：换到配对测试图则结果正常",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P026-R008": {
+   "zh": "这一观察印证了我们的主张：即使没有严格对齐的数据，也能学到有效的融合模型。",
+   "previous": {
+    "anchor_id": "P026-R007",
+    "anchor_quote": "SSIM得分",
+    "anchor_head": "得分",
+    "target_quote": "这一观察",
+    "target_head": "观察",
+    "relation": "指代：上述结果，印证主张",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P027-R001": {
+   "zh": "图3(b)(d)展示训练期间融合图像中热信息与纹理信息的可视化，进一步说明UPTP范式下取得的逐步改善。",
+   "previous": {
+    "anchor_id": "P026-R008",
+    "anchor_quote": "有效的融合模型",
+    "anchor_head": "模型",
+    "target_quote": "热信息与纹理信息的可视化",
+    "target_head": "可视化",
+    "relation": "进一步证据：可视化",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P027-R002": {
+   "zh": "在训练初期，两种范式都难以有效整合关键的热信息和纹理信息。",
+   "previous": {
+    "anchor_id": "P027-R001",
+    "anchor_quote": "逐步改善",
+    "anchor_head": "改善",
+    "target_quote": "训练初期",
+    "target_head": "初期",
+    "relation": "按时间展开：先看初期",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P027-R003": {
+   "zh": "尤其是用UPTP训练的模型，由于缺少显式配对，输出在视觉上杂乱。",
+   "previous": {
+    "anchor_id": "P027-R002",
+    "anchor_quote": "两种范式",
+    "anchor_head": "范式",
+    "target_quote": "用UPTP训练的模型",
+    "target_head": "模型",
+    "relation": "特殊情形：UPTP更乱",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P027-R004": {
+   "zh": "随着有效监督下训练的推进，融合质量逐步提升，热目标（如电线杆、卡车和垃圾桶）更清晰、更分明，纹理细节（如道路标线和立交桥结构）也得到增强。",
+   "previous": {
+    "anchor_id": "P027-R003",
+    "anchor_quote": "视觉上杂乱",
+    "anchor_head": "杂乱",
+    "target_quote": "融合质量逐步提升",
+    "target_head": "质量",
+    "relation": "转折：杂乱之后逐步改善",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P027-R005": {
+   "zh": "值得注意的是，即使在早期和中期阶段（如第20和80次迭代），用任意配对数据训练的模型在某些方面也超过严格配对的模型，显示出更可辨认的物体热特征，以及道路和电线杆等元素上更锐利的纹理边缘。",
+   "previous": {
+    "anchor_id": "P027-R004",
+    "anchor_quote": "融合质量逐步提升",
+    "anchor_head": "质量",
+    "target_quote": "早期和中期阶段",
+    "target_head": "阶段",
+    "relation": "补充：改善早在中期就已出现",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P028-R001": {
+   "zh": "为展示最终训练模型的能力，图4(b)(d)分别比较了SPTP与UPTP产生的正常及异常融合图像。",
+   "previous": {
+    "anchor_id": "P027-R005",
+    "anchor_quote": "用任意配对数据训练的模型",
+    "anchor_head": "模型",
+    "target_quote": "最终训练模型",
+    "target_head": "模型",
+    "relation": "转到最终模型：训练过程之后看终点",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P028-R002": {
+   "zh": "红框显示，SPTP与UPTP训练的两种模型都能成功保留红外模态中的热辐射信息（如人和发光的灯）。",
+   "previous": {
+    "anchor_id": "P028-R001",
+    "anchor_quote": "正常及异常融合图像",
+    "anchor_head": "图像",
+    "target_quote": "红框",
+    "target_head": "框",
+    "relation": "读图：红框指示热辐射",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P028-R003": {
+   "zh": "黄框和绿框表明，它们能同时保留两种模态中的纹理细节与红外线索（如行走的人、骑车的人和公交车）。",
+   "previous": {
+    "anchor_id": "P028-R002",
+    "anchor_quote": "热辐射信息",
+    "anchor_head": "信息",
+    "target_quote": "纹理细节与红外线索",
+    "target_head": "线索",
+    "relation": "并列：黄绿框指示纹理与线索",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P029-R001": {
+   "zh": "APTP固有的随机性带来了重新配置跨模态配对关系的可能。"
+  },
+  "P029-R002": {
+   "zh": "于是，公式(9)可重写如下：公式(11)从理论上表明，基础配对数据集可以通过对所有可能的图像对配对，扩展为其平方形式，使配对与非配对数据之比如下。",
+   "previous": {
+    "anchor_id": "P029-R001",
+    "anchor_quote": "重新配置跨模态配对关系",
+    "anchor_head": "关系",
+    "target_quote": "公式(9)可重写如下",
+    "target_head": "公式",
+    "relation": "具体化：用公式表达重配对",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P029-R003": {
+   "zh": "原则上，所提方法有三个主要优势：(1)即使初始数据量有限，也能有效扩展基础数据集；(2)在一定程度上丰富了数据集内部的关系，从而提高模型鲁棒性；(3)显著降低数据采集成本，尤其是在具有挑战性的条件下采集的稀有数据。",
+   "previous": {
+    "anchor_id": "P029-R002",
+    "anchor_quote": "扩展为其平方形式",
+    "anchor_head": "形式",
+    "target_quote": "三个主要优势",
+    "target_head": "优势",
+    "relation": "归纳：平方扩展带来的三个优势",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P030-R001": {
+   "zh": "如图1所述，在传统的严格配对训练范式（SPTP）下，模型的表示能力受限于数据集中有限的跨模态关系。",
+   "previous": {
+    "anchor_id": "P029-R003",
+    "anchor_quote": "三个主要优势",
+    "anchor_head": "优势",
+    "target_quote": "图1所述",
+    "target_head": "图1",
+    "relation": "对照说明：用图1比较两种范式",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P030-R002": {
+   "zh": "相比之下，如图5所示，任意配对训练范式（APTP）凭借灵活的跨模态匹配机制，使模型能捕获二次增长的关系集合。",
+   "previous": {
+    "anchor_id": "P030-R001",
+    "anchor_quote": "有限的跨模态关系",
+    "anchor_head": "关系",
+    "target_quote": "二次增长的关系集合",
+    "target_head": "集合",
+    "relation": "对照：有限对二次增长",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P030-R003": {
+   "zh": "因此，用APTP训练的模型表现出更强的泛化能力。",
+   "previous": {
+    "anchor_id": "P030-R002",
+    "anchor_quote": "二次增长的关系集合",
+    "anchor_head": "集合",
+    "target_quote": "更强的泛化能力",
+    "target_head": "能力",
+    "relation": "结果：关系增长带来泛化",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P030-R004": {
+   "zh": "尽管真实的严格配对数据集可能包含更多图像，但可学习的关系仍受其固定配对结构的限制。",
+   "previous": {
+    "anchor_id": "P030-R003",
+    "anchor_quote": "更强的泛化能力",
+    "anchor_head": "能力",
+    "target_quote": "真实的严格配对数据集",
+    "target_head": "数据集",
+    "relation": "让步：图像多不等于关系多",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P030-R005": {
+   "zh": "通过APTP，模型可以推导出原始数据中所没有的新的关系模式，从而增强其泛化能力。",
+   "previous": {
+    "anchor_id": "P030-R004",
+    "anchor_quote": "固定配对结构",
+    "anchor_head": "结构",
+    "target_quote": "新的关系模式",
+    "target_head": "模式",
+    "relation": "对照：突破固定结构",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P031-R001": {
+   "zh": "评测数据集包括MSRS[53]、MXFD[39]、LLVIP[54]、RoadScene[55]和TNO[56]。"
+  },
+  "P031-R002": {
+   "zh": "在定性评价指标方面，我们采用一个无参考指标：熵（EN），以及四个全参考指标：互信息（MI）、视觉信息保真度（VIFF）、Q^{AB/F}和结构相似性指数（SSIM）。",
+   "previous": {
+    "anchor_id": "P031-R001",
+    "anchor_quote": "评测数据集",
+    "anchor_head": "数据集",
+    "target_quote": "定性评价指标",
+    "target_head": "指标",
+    "relation": "并列：数据集之后说明指标",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P031-R003": {
+   "zh": "这些指标既可从融合图像本身，也可从融合图像与源图像之间的差异，全面评估图像质量，如[57]所述。",
+   "previous": {
+    "anchor_id": "P031-R002",
+    "anchor_quote": "四个全参考指标",
+    "anchor_head": "指标",
+    "target_quote": "这些指标",
+    "target_head": "指标",
+    "relation": "同指承接：说明评估角度",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P031-R004": {
+   "zh": "我们的评测在配有NVIDIA GeForce RTX 3090 GPU的Linux服务器上进行。",
+   "previous": {
+    "anchor_id": "P031-R003",
+    "anchor_quote": "图像质量",
+    "anchor_head": "质量",
+    "target_quote": "Linux服务器",
+    "target_head": "服务器",
+    "relation": "补充：评测环境",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P031-R005": {
+   "zh": "所有实验的超参数设置相同，三个超参数分别为1、0.2和0.01。",
+   "previous": {
+    "anchor_id": "P031-R004",
+    "anchor_quote": "NVIDIA GeForce RTX 3090 GPU",
+    "anchor_head": "GPU",
+    "target_quote": "超参数设置",
+    "target_head": "设置",
+    "relation": "并列：环境之外的设置",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P032-R001": {
+   "zh": "在放宽的优化目标下，模型学习跨模态的像素到像素关系，使严格配对训练（SPTP）与非配对训练（UPTP）都成为可行。"
+  },
+  "P032-R002": {
+   "zh": "为验证这一点，我们用MSRS数据集中的150对配对图像和150对非配对图像训练三个基线融合模型，并在MXFD、MSRS和LLVIP基准上定性与定量地评估其融合性能。",
+   "previous": {
+    "anchor_id": "P032-R001",
+    "anchor_quote": "严格配对训练（SPTP）与非配对训练（UPTP）",
+    "anchor_head": "训练",
+    "target_quote": "150对配对图像和150对非配对图像",
+    "target_head": "图像",
+    "relation": "验证设置：配对与非配对各150对",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P032-R003": {
+   "zh": "如表1（每组的第1–2行）所报告，在三个数据集上，SPTP与UPTP下的融合结果在五个评价指标上几乎相同。",
+   "previous": {
+    "anchor_id": "P032-R002",
+    "anchor_quote": "定性与定量地评估其融合性能",
+    "anchor_head": "性能",
+    "target_quote": "融合结果",
+    "target_head": "结果",
+    "relation": "结果：评估的结果",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P032-R004": {
+   "zh": "在基于Transformer的基线中，UPTP甚至取得略好的性能。",
+   "previous": {
+    "anchor_id": "P032-R003",
+    "anchor_quote": "几乎相同",
+    "anchor_head": "相同",
+    "target_quote": "基于Transformer的基线",
+    "target_head": "基线",
+    "relation": "例外：个别基线上UPTP略好",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P032-R005": {
+   "zh": "图6直观地支持了这一观察：第四列的结果在某些元素（如云、路边树枝和路面）上保留了更丰富的模态特有细节，而在另一些元素（如灯泡）上保持相当的清晰度，相对第三列而言。",
+   "previous": {
+    "anchor_id": "P032-R004",
+    "anchor_quote": "略好的性能",
+    "anchor_head": "性能",
+    "target_quote": "这一观察",
+    "target_head": "观察",
+    "relation": "指代：上述结果，图6从视觉上支持",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P033-R001": {
+   "zh": "这些结果表明，通过所提出的UPTP策略，模型可以利用随机配对的跨模态样本，学到与等量严格配对数据所学相当、甚至更丰富的数据关系。",
+   "previous": {
+    "anchor_id": "P032-R005",
+    "anchor_quote": "模态特有细节",
+    "anchor_head": "细节",
+    "target_quote": "这些结果",
+    "target_head": "结果",
+    "relation": "总结：上述表与图的结果",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P034-R001": {
+   "zh": "单数据集内的数据关系：利用公式(11)中形式化的数据可扩展性优势（优势1），我们把MSRS数据集中原有的150对图像扩展到初始规模的50倍和100倍，构造非配对训练集。",
+   "previous": {
+    "anchor_id": "P033-R001",
+    "anchor_quote": "更丰富的数据关系",
+    "anchor_head": "关系",
+    "target_quote": "单数据集内的数据关系",
+    "target_head": "关系",
+    "relation": "展开：先看单数据集内的关系",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P034-R002": {
+   "zh": "通过重组源图像，我们丰富了训练期间可用的跨模态关系的多样性，从而提高了融合模型的泛化能力。",
+   "previous": {
+    "anchor_id": "P034-R001",
+    "anchor_quote": "非配对训练集",
+    "anchor_head": "训练集",
+    "target_quote": "跨模态关系的多样性",
+    "target_head": "多样性",
+    "relation": "作用：重组的效果",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P034-R003": {
+   "zh": "这在表1（每组的第1–4行）中三个数据集和各基线模型上评价指标的一致提升中得到证实。",
+   "previous": {
+    "anchor_id": "P034-R002",
+    "anchor_quote": "泛化能力",
+    "anchor_head": "能力",
+    "target_quote": "评价指标的一致提升",
+    "target_head": "提升",
+    "relation": "证据：指标提升印证",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P034-R004": {
+   "zh": "值得注意的是，在某些情况下，随着可训练数据量增加，EN值下降，而其他指标继续提升。",
+   "previous": {
+    "anchor_id": "P034-R003",
+    "anchor_quote": "评价指标的一致提升",
+    "anchor_head": "提升",
+    "target_quote": "EN值下降",
+    "target_head": "下降",
+    "relation": "例外：个别指标反向",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P034-R005": {
+   "zh": "这表明模型在滤除噪声，产生信息密度更高、视觉质量更好、结构更连贯的融合结果。",
+   "previous": {
+    "anchor_id": "P034-R004",
+    "anchor_quote": "EN值下降",
+    "anchor_head": "下降",
+    "target_quote": "滤除噪声",
+    "target_head": "噪声",
+    "relation": "解释：EN下降的原因",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P034-R006": {
+   "zh": "图6提供了进一步的视觉证据：第三至第六列中突出显示的区域，输出逐步变得更清晰、更详细。",
+   "previous": {
+    "anchor_id": "P034-R005",
+    "anchor_quote": "更连贯的融合结果",
+    "anchor_head": "结果",
+    "target_quote": "进一步的视觉证据",
+    "target_head": "证据",
+    "relation": "补充：视觉证据",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P035-R001": {
+   "zh": "为检验UPTP与APTP所带来的鲁棒性增强（对应公式(11)中的优势2），我们用三个训练集设计了对比研究，每个训练集都包含从同一150对基础配对图像扩展而来的15,000对图像。"
+  },
+  "P035-R002": {
+   "zh": "这些训练集分别在严格配对（SPTP）、完全非配对（UPTP）与任意配对（APTP）协议下构造。",
+   "previous": {
+    "anchor_id": "P035-R001",
+    "anchor_quote": "三个训练集",
+    "anchor_head": "训练集",
+    "target_quote": "这些训练集",
+    "target_head": "训练集",
+    "relation": "同指承接：三个训练集的构造协议",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P035-R003": {
+   "zh": "如图6与表1（每组的第4–6行）所示，三个基线在各范式下取得几乎相同的定性性能。",
+   "previous": {
+    "anchor_id": "P035-R002",
+    "anchor_quote": "严格配对（SPTP）、完全非配对（UPTP）与任意配对（APTP）协议",
+    "anchor_head": "协议",
+    "target_quote": "几乎相同的定性性能",
+    "target_head": "性能",
+    "relation": "结果：不同协议下性能几乎相同",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P035-R004": {
+   "zh": "这一结果突显了所提方法的一个关键优势：通过策略性地重新配对已有数据，我们可以匹敌用多100倍严格配对数据训练的模型的融合性能，显著提高数据利用率和训练灵活性。",
+   "previous": {
+    "anchor_id": "P035-R003",
+    "anchor_quote": "几乎相同的定性性能",
+    "anchor_head": "性能",
+    "target_quote": "这一结果",
+    "target_head": "结果",
+    "relation": "指代并解读：重新配对即可匹敌",
+    "phrase_type": "指示短语"
+   },
+   "earlier": {
+    "anchor_id": "P029-R003",
+    "anchor_quote": "三个主要优势",
+    "anchor_head": "优势",
+    "target_quote": "一个关键优势",
+    "target_head": "优势",
+    "relation": "回扣：此前归纳的优势之一",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P036-R001": {
+   "zh": "跨数据集的数据关系：就公式(11)的优势3而言，我们利用三个数据集在它们之间进行非配对训练。",
+   "previous": {
+    "anchor_id": "P035-R004",
+    "anchor_quote": "训练灵活性",
+    "anchor_head": "灵活性",
+    "target_quote": "跨数据集的数据关系",
+    "target_head": "关系",
+    "relation": "转入第三个优势：跨数据集",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P036-R002": {
+   "zh": "尽管各数据集间场景内容差异很大，它们仍然落在所提训练范式的适用范围内，这承认了融合模型学习的是与内容无关的像素到像素关系。",
+   "previous": {
+    "anchor_id": "P036-R001",
+    "anchor_quote": "三个数据集",
+    "anchor_head": "数据集",
+    "target_quote": "各数据集间场景内容差异很大",
+    "target_head": "差异",
+    "relation": "让步：差异大但仍适用",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P037-R001": {
+   "zh": "如表2所示，不同数据对之间的不同像素组合呈现出不同的可学习信息。",
+   "previous": {
+    "anchor_id": "P036-R002",
+    "anchor_quote": "像素到像素关系",
+    "anchor_head": "关系",
+    "target_quote": "不同像素组合",
+    "target_head": "组合",
+    "relation": "展开：不同配置给出不同信息",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P037-R002": {
+   "zh": "在这些配置中，前五种提供了足够有效的训练关系，MI、VIF、Qabf和SSIM持续提升，EN仅有轻微波动，表明融合效率、结构保真、视觉质量和噪声抑制都得到增强。",
+   "previous": {
+    "anchor_id": "P037-R001",
+    "anchor_quote": "可学习信息",
+    "anchor_head": "信息",
+    "target_quote": "前五种",
+    "target_head": "五种",
+    "relation": "分类：前五种配置的表现",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P037-R003": {
+   "zh": "相比之下，最后一组在MI、VIF和Qabf上有所提高，但EN和SSIM下降，说明这是以自然外观和纹理细节为代价来增强显著目标和边缘的折中，因而是次优选择。",
+   "previous": {
+    "anchor_id": "P037-R002",
+    "anchor_quote": "前五种",
+    "anchor_head": "五种",
+    "target_quote": "最后一组",
+    "target_head": "组",
+    "relation": "对照：最后一组不同",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P037-R004": {
+   "zh": "图7中整体视觉质量的提升和更清晰的树枝细节，为这一结论提供了令人信服的证据。",
+   "previous": {
+    "anchor_id": "P037-R003",
+    "anchor_quote": "次优选择",
+    "anchor_head": "选择",
+    "target_quote": "这一结论",
+    "target_head": "结论",
+    "relation": "指代：上述判断，图7佐证",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P038-R001": {
+   "zh": "不同基础配对数量下的数据关系：在已构建的受容量约束的基线之上，我们设计了不同数量的基础严格配对数据，即15、30、60和150个图像块。",
+   "previous": {
+    "anchor_id": "P037-R004",
+    "anchor_quote": "令人信服的证据",
+    "anchor_head": "证据",
+    "target_quote": "不同基础配对数量下的数据关系",
+    "target_head": "关系",
+    "relation": "转入：不同基础数据量",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P038-R002": {
+   "zh": "用所提APTP以不同的配对阶数，我们把可训练数据量最大扩展到225、900、3600和22500，以探索APTP的潜在增益。",
+   "previous": {
+    "anchor_id": "P038-R001",
+    "anchor_quote": "15、30、60和150个图像块",
+    "anchor_head": "图像块",
+    "target_quote": "可训练数据量",
+    "target_head": "数据量",
+    "relation": "扩展：由基础量扩到最大量",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P038-R003": {
+   "zh": "由于所构建的基线模型大小仅0.88 MB，过度增加可训练数据量会对模型性能产生不利影响。",
+   "previous": {
+    "anchor_id": "P038-R002",
+    "anchor_quote": "可训练数据量",
+    "anchor_head": "数据量",
+    "target_quote": "过度增加可训练数据量",
+    "target_head": "数据量",
+    "relation": "限制：模型容量",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P038-R004": {
+   "zh": "如表3所示，APTP能通过丰富可训练的数据关系持续增强模型鲁棒性。",
+   "previous": {
+    "anchor_id": "P038-R003",
+    "anchor_quote": "模型性能",
+    "anchor_head": "性能",
+    "target_quote": "模型鲁棒性",
+    "target_head": "鲁棒性",
+    "relation": "转折：限制之外的总体趋势",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P038-R005": {
+   "zh": "值得注意的是，当基础数据量较小时，所提APTP带来的相对提升更为明显。",
+   "previous": {
+    "anchor_id": "P038-R004",
+    "anchor_quote": "持续增强模型鲁棒性",
+    "anchor_head": "鲁棒性",
+    "target_quote": "相对提升",
+    "target_head": "提升",
+    "relation": "细化：提升随基础数据量变化",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P038-R006": {
+   "zh": "因此，在真实场景中，我们只需少量采集的数据即可追求令人满意的模型性能，显著提高任务效率。",
+   "previous": {
+    "anchor_id": "P038-R005",
+    "anchor_quote": "基础数据量较小时",
+    "anchor_head": "数据量",
+    "target_quote": "少量采集的数据",
+    "target_head": "数据",
+    "relation": "推论：基础数据少时收益最大",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P039-R001": {
+   "zh": "受表2中MSRS与MXFD出色的跨数据集表现的启发，我们分别用MSRS和MXFD的150对图像作为可见光与红外源图像，并把训练集扩展到15,000对，训练三个基线模型。"
+  },
+  "P039-R002": {
+   "zh": "所得模型与最新（SOTA）方法比较，以证明所提训练范式与损失函数的优越性。",
+   "previous": {
+    "anchor_id": "P039-R001",
+    "anchor_quote": "三个基线模型",
+    "anchor_head": "模型",
+    "target_quote": "所得模型",
+    "target_head": "模型",
+    "relation": "同指承接：训练得到的模型",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P039-R003": {
+   "zh": "为保证公平，所有方法所用训练数据的细节见补充材料。",
+   "previous": {
+    "anchor_id": "P039-R002",
+    "anchor_quote": "与最新（SOTA）方法比较",
+    "anchor_head": "方法",
+    "target_quote": "所有方法所用训练数据的细节",
+    "target_head": "细节",
+    "relation": "补充：比较的公平性",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P039-R004": {
+   "zh": "如表4所清楚显示的，我们的方法在全部四个数据集上取得更优的性能。",
+   "previous": {
+    "anchor_id": "P039-R003",
+    "anchor_quote": "所有方法",
+    "anchor_head": "方法",
+    "target_quote": "我们的方法",
+    "target_head": "方法",
+    "relation": "结果：比较结果",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P039-R005": {
+   "zh": "值得注意的是，其在三个未见数据集上的出色表现有力地证明了强大的泛化能力以及所提损失函数的有效性。",
+   "previous": {
+    "anchor_id": "P039-R004",
+    "anchor_quote": "全部四个数据集",
+    "anchor_head": "数据集",
+    "target_quote": "三个未见数据集",
+    "target_head": "数据集",
+    "relation": "细化：其中三个是未见数据集",
+    "phrase_type": "名词短语"
+   },
+   "earlier": {
+    "anchor_id": "P036-R002",
+    "anchor_quote": "与内容无关的像素到像素关系",
+    "anchor_head": "关系",
+    "target_quote": "强大的泛化能力",
+    "target_head": "能力",
+    "relation": "回扣：跨数据集适用性支撑泛化",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P039-R006": {
+   "zh": "尽管只用150对图像，我们改变配对策略的做法为所有模型创造了丰富的可训练像素关系。",
+   "previous": {
+    "anchor_id": "P039-R005",
+    "anchor_quote": "强大的泛化能力",
+    "anchor_head": "能力",
+    "target_quote": "改变配对策略的做法",
+    "target_head": "做法",
+    "relation": "原因：为什么泛化强",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P039-R007": {
+   "zh": "这不仅增强了鲁棒性，还从根本上降低了模型对大数据量的依赖，从而显著降低数据采集成本。",
+   "previous": {
+    "anchor_id": "P039-R006",
+    "anchor_quote": "丰富的可训练像素关系",
+    "anchor_head": "关系",
+    "target_quote": "降低了模型对大数据量的依赖",
+    "target_head": "依赖",
+    "relation": "效果：鲁棒性与数据依赖",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P039-R008": {
+   "zh": "更多的视觉结果及相应分析见补充材料。",
+   "previous": {
+    "anchor_id": "P039-R007",
+    "anchor_quote": "数据采集成本",
+    "anchor_head": "成本",
+    "target_quote": "更多的视觉结果及相应分析",
+    "target_head": "分析",
+    "relation": "指向补充材料",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P040-R001": {
+   "zh": "除上述实验研究外，我们在补充材料中对所提训练范式作了进一步分析。",
+   "previous": {
+    "anchor_id": "P039-R008",
+    "anchor_quote": "补充材料",
+    "anchor_head": "材料",
+    "target_quote": "补充材料",
+    "target_head": "材料",
+    "relation": "同指承接：指向补充材料",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P041-R001": {
+   "zh": "本工作通过系统探索非配对与任意配对训练范式（UPTP与APTP），质疑红外与可见光图像融合中严格配对训练范式（SPTP）的必要性。"
+  },
+  "P041-R002": {
+   "zh": "理论上，UPTP与SPTP被证明是更灵活的APTP的互补子集。",
+   "previous": {
+    "anchor_id": "P041-R001",
+    "anchor_quote": "UPTP与APTP",
+    "anchor_head": "APTP",
+    "target_quote": "更灵活的APTP",
+    "target_head": "APTP",
+    "relation": "展开：理论结论",
+    "phrase_type": "专有名词短语"
+   }
+  },
+  "P041-R003": {
+   "zh": "所提方案显著扩大了有限数据集中跨模态关系的数量与多样性。",
+   "previous": {
+    "anchor_id": "P041-R002",
+    "anchor_quote": "互补子集",
+    "anchor_head": "子集",
+    "target_quote": "跨模态关系的数量与多样性",
+    "target_head": "多样性",
+    "relation": "作用：APTP带来的扩展",
+    "phrase_type": "名词短语"
+   },
+   "earlier": {
+    "anchor_id": "P029-R002",
+    "anchor_quote": "平方形式",
+    "anchor_head": "形式",
+    "target_quote": "跨模态关系的数量与多样性",
+    "target_head": "多样性",
+    "relation": "回扣：平方扩展",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P041-R004": {
+   "zh": "通过三个轻量基线和新的损失函数，实验表明UPTP与APTP可以在极少且内容不一致的数据上训练模型，取得与SPTP下大100倍的数据集所训练模型相当的性能。",
+   "previous": {
+    "anchor_id": "P041-R003",
+    "anchor_quote": "跨模态关系的数量与多样性",
+    "anchor_head": "多样性",
+    "target_quote": "三个轻量基线和新的损失函数",
+    "target_head": "基线",
+    "relation": "验证：用基线证实上述作用",
+    "phrase_type": "名词短语"
+   }
+  },
+  "P041-R005": {
+   "zh": "这一发现从数据角度大幅降低了数据采集成本并增强了模型鲁棒性。",
+   "previous": {
+    "anchor_id": "P041-R004",
+    "anchor_quote": "相当的性能",
+    "anchor_head": "性能",
+    "target_quote": "这一发现",
+    "target_head": "发现",
+    "relation": "指代：上句结果，给出意义",
+    "phrase_type": "指示短语"
+   }
+  },
+  "P042-R001": {
+   "zh": "本工作得到国家自然科学基金（62576152、62332008、62336004）、江苏省基础研究计划（BK20250104）、中央高校基本科研业务费专项资金（JUSRP202504007）以及Leverhulme Trust荣休研究员基金EM-2025-06-09的部分资助。"
+  },
+  "P043-R001": {
+   "zh": "所提两种训练范式的动机。(a)与严格配对范式相比，所提两种范式不再要求时空对齐的图像对，可训练的图像对分别扩展到N×(N−1)与N²，降低数据采集成本并提高泛化。(b)性能提升规律：N越小，N²带来的提升越大。"
+  },
+  "P044-R001": {
+   "zh": "SPTP与UPTP在三个基线上的训练收敛与性能比较。"
+  },
+  "P045-R001": {
+   "zh": "CNN基线训练过程中融合结果的演变（SPTP对UPTP）。"
+  },
+  "P046-R001": {
+   "zh": "在SPTP与APTP上训练的基线所产生的融合图像。"
+  },
+  "P047-R001": {
+   "zh": "关系多样性的说明。"
+  },
+  "P048-R001": {
+   "zh": "三个基线（自上而下：CNN、Transformer和GAN）在不同训练数据设置下，在LLVIP、M3FD和MSRS测试集上的定性比较。"
+  },
+  "P049-R001": {
+   "zh": "三个基线模型在MSRS上用不同训练设置训练后，在LLVIP（250对）、MSRS（361对）和MXFD（420对）测试集上的定性泛化结果。"
+  },
+  "P049-R002": {
+   "zh": "粗体表示高于其对应SPTP基线组的结果。"
+  },
+  "P050-R001": {
+   "zh": "融合图像的可视化：跨数据集非配对训练与单数据集严格配对训练的模型。"
+  },
+  "P051-R001": {
+   "zh": "CNN基线在MSRS上用不同训练集训练的定性结果。"
+  },
+  "P051-R002": {
+   "zh": "粗体表示该模型优于用其原始配对数据训练的模型。"
+  },
+  "P052-R001": {
+   "zh": "在MSRS上比较APTP对不同基础严格配对图像数量提升的定量结果。"
+  },
+  "P053-R001": {
+   "zh": "三个基线模型与若干SOTA方法的定性结果。"
+  },
+  "P053-R002": {
+   "zh": "粗体表示最佳值。"
+  }
+ },
+ "claims": [
+  {
+   "id": "C1",
+   "short": "回扣问题",
+   "zh": "质疑严格配对训练的必要性，系统探索非配对与任意配对训练。",
+   "sentences": [
+    "P041-R001"
+   ],
+   "mirrors": [
+    "S2.a",
+    "S2.b",
+    "S3.a"
+   ],
+   "supported_by": [
+    "P003",
+    "P004",
+    "P014",
+    "P015"
+   ]
+  },
+  {
+   "id": "C2",
+   "short": "理论",
+   "zh": "UPTP与SPTP是更灵活的APTP的互补子集。",
+   "sentences": [
+    "P041-R002"
+   ],
+   "mirrors": [
+    "S4.a"
+   ],
+   "supported_by": [
+    "P022",
+    "P023",
+    "P024",
+    "P029",
+    "P030"
+   ]
+  },
+  {
+   "id": "C3",
+   "short": "关系多样性",
+   "zh": "APTP显著扩大有限数据集中跨模态关系的数量与多样性。",
+   "sentences": [
+    "P041-R003"
+   ],
+   "mirrors": [
+    "S5.b"
+   ],
+   "supported_by": [
+    "P029",
+    "P030",
+    "P034",
+    "P038"
+   ]
+  },
+  {
+   "id": "C4",
+   "short": "实验结果",
+   "zh": "三个轻量基线上，UPTP与APTP可在极少数据上训练，性能相当于大100倍的严格配对数据集。",
+   "sentences": [
+    "P041-R004"
+   ],
+   "mirrors": [
+    "S4.b",
+    "S5.a"
+   ],
+   "supported_by": [
+    "P032",
+    "P033",
+    "P035",
+    "P039"
+   ]
+  },
+  {
+   "id": "C5",
+   "short": "意义",
+   "zh": "这一发现降低数据采集成本并增强模型鲁棒性。",
+   "sentences": [
+    "P041-R005"
+   ],
+   "mirrors": [
+    "S5.b",
+    "S5.c"
+   ],
+   "supported_by": [
+    "P034",
+    "P035",
+    "P038",
+    "P039"
+   ]
+  }
+ ],
+ "storyline": [
+  {
+   "id": "GAP",
+   "name": "不足",
+   "story": "严格配对训练的数据采集与配准代价高，并限制跨模态关系的数量与泛化——这是本文要解决的问题。",
+   "points": [
+    {
+     "key": "S2.a",
+     "zh": "严格配对数据的采集代价高",
+     "concepts": [
+      {
+       "zh": "数据采集",
+       "core": true
+      },
+      {
+       "zh": "配准",
+       "core": false
+      }
+     ],
+     "nodes": [
+      {
+       "level": "摘要",
+       "role": "state",
+       "rows": [
+        "P001-R003"
+       ]
+      },
+      {
+       "level": "引言",
+       "role": "expand",
+       "rows": [
+        "P003-R003",
+        "P003-R004",
+        "P003-R005",
+        "P003-R006"
+       ]
+      },
+      {
+       "level": "方法",
+       "role": "expand",
+       "rows": [
+        "P022-R001",
+        "P022-R002"
+       ]
+      },
+      {
+       "level": "结论",
+       "role": "echo",
+       "rows": [
+        "P041-R005"
+       ]
+      }
+     ]
+    },
+    {
+     "key": "S2.b",
+     "zh": "严格配对限制关系数量与泛化",
+     "concepts": [
+      {
+       "zh": "关系",
+       "core": true
+      },
+      {
+       "zh": "泛化",
+       "core": true
+      }
+     ],
+     "nodes": [
+      {
+       "level": "摘要",
+       "role": "state",
+       "rows": [
+        "P001-R004"
+       ]
+      },
+      {
+       "level": "引言",
+       "role": "expand",
+       "rows": [
+        "P004-R002",
+        "P004-R003",
+        "P004-R004"
+       ]
+      },
+      {
+       "level": "方法",
+       "role": "expand",
+       "rows": [
+        "P030-R001",
+        "P030-R002",
+        "P030-R003"
+       ]
+      },
+      {
+       "level": "结论",
+       "role": "echo",
+       "rows": [
+        "P041-R003"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "MOTIVATION",
+   "name": "动机",
+   "story": "单模态数据易得，监督又来自源图像，所以可以放弃严格配对，探索任意配对训练。",
+   "points": [
+    {
+     "key": "S3.a",
+     "zh": "任意配对训练的动机",
+     "concepts": [
+      {
+       "zh": "配对",
+       "core": true
+      },
+      {
+       "zh": "监督信号",
+       "core": false
+      }
+     ],
+     "nodes": [
+      {
+       "level": "摘要",
+       "role": "state",
+       "rows": [
+        "P001-R005"
+       ]
+      },
+      {
+       "level": "引言",
+       "role": "expand",
+       "rows": [
+        "P005-R001",
+        "P005-R002"
+       ]
+      },
+      {
+       "level": "相关工作",
+       "role": "expand",
+       "rows": [
+        "P015-R002",
+        "P015-R003"
+       ]
+      },
+      {
+       "level": "结论",
+       "role": "echo",
+       "rows": [
+        "P041-R001"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "METHOD",
+   "name": "方法",
+   "story": "独立性使UPTP与SPTP成为APTP的互补子集；用三个轻量基线验证这一范式。",
+   "points": [
+    {
+     "key": "S4.a",
+     "zh": "UPTP与SPTP是APTP的互补子集",
+     "concepts": [
+      {
+       "zh": "互补",
+       "core": true
+      },
+      {
+       "zh": "子集",
+       "core": false
+      }
+     ],
+     "nodes": [
+      {
+       "level": "摘要",
+       "role": "state",
+       "rows": [
+        "P001-R006"
+       ]
+      },
+      {
+       "level": "引言",
+       "role": "expand",
+       "rows": [
+        "P006-R005",
+        "P006-R006",
+        "P006-R007"
+       ]
+      },
+      {
+       "level": "方法",
+       "role": "expand",
+       "rows": [
+        "P023-R004",
+        "P023-R005",
+        "P023-R006"
+       ]
+      },
+      {
+       "level": "结论",
+       "role": "echo",
+       "rows": [
+        "P041-R002"
+       ]
+      }
+     ]
+    },
+    {
+     "key": "S4.b",
+     "zh": "三个轻量基线验证新范式",
+     "concepts": [
+      {
+       "zh": "基线",
+       "core": true
+      }
+     ],
+     "nodes": [
+      {
+       "level": "摘要",
+       "role": "state",
+       "rows": [
+        "P001-R008"
+       ]
+      },
+      {
+       "level": "引言",
+       "role": "expand",
+       "rows": [
+        "P007-R003",
+        "P007-R004",
+        "P007-R005",
+        "P007-R006"
+       ]
+      },
+      {
+       "level": "相关工作",
+       "role": "expand",
+       "rows": [
+        "P013-R001"
+       ]
+      },
+      {
+       "level": "方法",
+       "role": "expand",
+       "rows": [
+        "P016-R002"
+       ]
+      },
+      {
+       "level": "结论",
+       "role": "echo",
+       "rows": [
+        "P041-R004"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "RESULTS",
+   "name": "结果",
+   "story": "非配对与任意配对训练可行，用少量数据即可匹敌大100倍的严格配对数据集。",
+   "points": [
+    {
+     "key": "S5.a",
+     "zh": "UPTP与SPTP的性能几乎相同",
+     "concepts": [
+      {
+       "zh": "性能",
+       "core": true
+      }
+     ],
+     "nodes": [
+      {
+       "level": "摘要",
+       "role": "state",
+       "rows": [
+        "P001-R009"
+       ]
+      },
+      {
+       "level": "引言",
+       "role": "expand",
+       "rows": [
+        "P011-R001"
+       ]
+      },
+      {
+       "level": "实验",
+       "role": "expand",
+       "rows": [
+        "P032-R003",
+        "P032-R004"
+       ]
+      },
+      {
+       "level": "结论",
+       "role": "echo",
+       "rows": [
+        "P041-R004"
+       ]
+      }
+     ]
+    },
+    {
+     "key": "S5.b",
+     "zh": "重新配对匹敌100倍数据",
+     "concepts": [
+      {
+       "zh": "100倍",
+       "core": true
+      }
+     ],
+     "nodes": [
+      {
+       "level": "摘要",
+       "role": "state",
+       "rows": [
+        "P001-R009"
+       ]
+      },
+      {
+       "level": "实验",
+       "role": "expand",
+       "rows": [
+        "P035-R004"
+       ]
+      },
+      {
+       "level": "结论",
+       "role": "echo",
+       "rows": [
+        "P041-R004"
+       ]
+      }
+     ]
+    },
+    {
+     "key": "S5.c",
+     "zh": "基础数据越少，APTP提升越大",
+     "concepts": [
+      {
+       "zh": "提升",
+       "core": true
+      }
+     ],
+     "nodes": [
+      {
+       "level": "摘要",
+       "role": "state",
+       "rows": [
+        "P001-R007"
+       ]
+      },
+      {
+       "level": "实验",
+       "role": "expand",
+       "rows": [
+        "P038-R004",
+        "P038-R005"
+       ]
+      },
+      {
+       "level": "结论",
+       "role": "echo",
+       "rows": [
+        "P041-R003"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "evidence": {
+  "records": {
+   "table1.base.150": {
+    "label": "表1 · 基础配对数 150",
+    "printed": "150",
+    "type": "table",
+    "row": {
+     "mode": "SPTP",
+     "dataset": "MSRS"
+    },
+    "file": "sec/3_method.tex（表1，起于第211行）",
+    "floats": [
+     "tab:feasibility"
+    ],
+    "column": "Quantity"
+   },
+   "table1.trainable.7500": {
+    "label": "表1 · 可训练数 7500",
+    "printed": "7500",
+    "type": "table",
+    "row": {
+     "mode": "UPTP",
+     "dataset": "MSRS"
+    },
+    "file": "sec/3_method.tex（表1，起于第211行）",
+    "floats": [
+     "tab:feasibility"
+    ],
+    "column": "Quantity"
+   },
+   "table1.trainable.15000": {
+    "label": "表1 · 可训练数 15000",
+    "printed": "15000",
+    "type": "table",
+    "row": {
+     "mode": "APTP",
+     "dataset": "MSRS"
+    },
+    "file": "sec/3_method.tex（表1，起于第211行）",
+    "floats": [
+     "tab:feasibility"
+    ],
+    "column": "Quantity"
+   },
+   "derived.expansion.50": {
+    "label": "扩展倍数 50×",
+    "printed": "50",
+    "type": "derived",
+    "unit": "×",
+    "value": 50,
+    "formula": "a / b",
+    "inputs": [
+     "table1.trainable.7500",
+     "table1.base.150"
+    ],
+    "note": "7500 / 150",
+    "floats": [
+     "tab:feasibility"
+    ]
+   },
+   "derived.expansion.100": {
+    "label": "扩展倍数 100×",
+    "printed": "100",
+    "type": "derived",
+    "unit": "×",
+    "value": 100,
+    "formula": "a / b",
+    "inputs": [
+     "table1.trainable.15000",
+     "table1.base.150"
+    ],
+    "note": "15000 / 150",
+    "floats": [
+     "tab:feasibility"
+    ]
+   },
+   "table3.base.15": {
+    "label": "表3 · 基础数据 15",
+    "printed": "15",
+    "type": "table",
+    "row": {
+     "mode": "SPTP"
+    },
+    "file": "sec/4_experiment.tex（表3，起于第36行）",
+    "floats": [
+     "tab:change"
+    ],
+    "column": "Quantity"
+   },
+   "table3.base.30": {
+    "label": "表3 · 基础数据 30",
+    "printed": "30",
+    "type": "table",
+    "row": {
+     "mode": "SPTP"
+    },
+    "file": "sec/4_experiment.tex（表3，起于第36行）",
+    "floats": [
+     "tab:change"
+    ],
+    "column": "Quantity"
+   },
+   "table3.base.60": {
+    "label": "表3 · 基础数据 60",
+    "printed": "60",
+    "type": "table",
+    "row": {
+     "mode": "SPTP"
+    },
+    "file": "sec/4_experiment.tex（表3，起于第36行）",
+    "floats": [
+     "tab:change"
+    ],
+    "column": "Quantity"
+   },
+   "table3.base.150": {
+    "label": "表3 · 基础数据 150",
+    "printed": "150",
+    "type": "table",
+    "row": {
+     "mode": "SPTP"
+    },
+    "file": "sec/4_experiment.tex（表3，起于第36行）",
+    "floats": [
+     "tab:change"
+    ],
+    "column": "Quantity"
+   },
+   "table3.trainable.225": {
+    "label": "表3 · APTP可训练数 225",
+    "printed": "225",
+    "type": "table",
+    "row": {
+     "mode": "APTP",
+     "base": "15"
+    },
+    "file": "sec/4_experiment.tex（表3，起于第36行）",
+    "floats": [
+     "tab:change"
+    ],
+    "column": "Quantity"
+   },
+   "table3.trainable.900": {
+    "label": "表3 · APTP可训练数 900",
+    "printed": "900",
+    "type": "table",
+    "row": {
+     "mode": "APTP",
+     "base": "30"
+    },
+    "file": "sec/4_experiment.tex（表3，起于第36行）",
+    "floats": [
+     "tab:change"
+    ],
+    "column": "Quantity"
+   },
+   "table3.trainable.3600": {
+    "label": "表3 · APTP可训练数 3600",
+    "printed": "3600",
+    "type": "table",
+    "row": {
+     "mode": "APTP",
+     "base": "60"
+    },
+    "file": "sec/4_experiment.tex（表3，起于第36行）",
+    "floats": [
+     "tab:change"
+    ],
+    "column": "Quantity"
+   },
+   "table3.trainable.22500": {
+    "label": "表3 · APTP可训练数 22500",
+    "printed": "22500",
+    "type": "table",
+    "row": {
+     "mode": "APTP",
+     "base": "150"
+    },
+    "file": "sec/4_experiment.tex（表3，起于第36行）",
+    "floats": [
+     "tab:change"
+    ],
+    "column": "Quantity"
+   }
+  },
+  "sentences": {
+   "P001-R009": {
+    "evidence": [
+     {
+      "literal": "100X",
+      "record": "derived.expansion.100"
+     }
+    ]
+   },
+   "P032-R002": {
+    "evidence": [
+     {
+      "literal": "150",
+      "record": "table1.base.150"
+     }
+    ]
+   },
+   "P034-R001": {
+    "evidence": [
+     {
+      "literal": "150",
+      "record": "table1.base.150"
+     },
+     {
+      "literal": "50X",
+      "record": "derived.expansion.50"
+     },
+     {
+      "literal": "100X",
+      "record": "derived.expansion.100"
+     }
+    ]
+   },
+   "P035-R001": {
+    "evidence": [
+     {
+      "literal": "15,000",
+      "record": "table1.trainable.15000"
+     },
+     {
+      "literal": "150",
+      "record": "table1.base.150"
+     }
+    ]
+   },
+   "P035-R004": {
+    "evidence": [
+     {
+      "literal": "100X",
+      "record": "derived.expansion.100"
+     }
+    ]
+   },
+   "P038-R001": {
+    "evidence": [
+     {
+      "literal": "15",
+      "record": "table3.base.15"
+     },
+     {
+      "literal": "30",
+      "record": "table3.base.30"
+     },
+     {
+      "literal": "60",
+      "record": "table3.base.60"
+     },
+     {
+      "literal": "150",
+      "record": "table3.base.150"
+     }
+    ]
+   },
+   "P038-R002": {
+    "evidence": [
+     {
+      "literal": "225",
+      "record": "table3.trainable.225"
+     },
+     {
+      "literal": "900",
+      "record": "table3.trainable.900"
+     },
+     {
+      "literal": "3600",
+      "record": "table3.trainable.3600"
+     },
+     {
+      "literal": "22500",
+      "record": "table3.trainable.22500"
+     }
+    ]
+   },
+   "P038-R003": {
+    "evidence": [],
+    "unresolved": [
+     "0.88MB"
+    ]
+   },
+   "P039-R001": {
+    "evidence": [
+     {
+      "literal": "150",
+      "record": "table1.base.150"
+     },
+     {
+      "literal": "15,000",
+      "record": "table1.trainable.15000"
+     }
+    ]
+   },
+   "P041-R004": {
+    "evidence": [
+     {
+      "literal": "100 times",
+      "record": "derived.expansion.100"
+     }
+    ]
+   },
+   "P049-R001": {
+    "evidence": [],
+    "unresolved": [
+     "250",
+     "361",
+     "420"
+    ]
+   }
+  }
+ }
+}

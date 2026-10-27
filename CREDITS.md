@@ -45,27 +45,27 @@ The other rules come from the authors' own revision rounds on manuscripts, and t
 
 The interface design of paperrules draws inspiration from Obsidian:
 
-- the research workbench this project grew out of uses a calm, note-like reading surface;
-- it has panes side by side and a collapsible outline;
-- items link to each other, so a sentence, its rule and its source are one click apart.
+- the workbench (`paperrules workbench`) is a calm, note-like reading surface;
+- it has panes side by side, with tabs and a collapsible outline;
+- items link to each other, so a sentence, its rule, its number and its source are one click apart.
 
 The offline HTML report keeps the outline style: findings sit under their rule along the rule tree, and each rule folds open.
 
 **Blender node editor.** https://www.blender.org
 
-The argument canvas of the research workbench, where claims and evidence are boxes joined by links, follows the node-editor
-style. The canvas is not part of this release.
+The argument canvas of the workbench, where claims and evidence are boxes joined by links, follows the node-editor
+style. No code or text of Blender is used.
 
 ## Libraries and tools
 
 | Used for | Project | License | Citation |
 |---|---|---|---|
 | sentence parsing (`W14`–`W16`, `A6`) | spaCy, https://spacy.io, and the `en_core_web_sm` model | MIT | M. Honnibal, I. Montani, S. Van Landeghem, A. Boyd, spaCy: Industrial-strength Natural Language Processing in Python, 2020, doi:10.5281/zenodo.1212303 |
-| figure-file rules `G1`–`G4` (optional extra `figures`) | PyMuPDF, https://github.com/pymupdf/PyMuPDF | GNU AGPL-3.0 or Artifex commercial license | — |
+| figure-file rules `G1`–`G4` and the PDF pane of the workbench (optional extras `figures`, `workbench`) | PyMuPDF, https://github.com/pymupdf/PyMuPDF | GNU AGPL-3.0 or Artifex commercial license | — |
 | research workflow of the workspace this project grew out of | ARIS (Auto-claude-code-research-in-sleep), https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep | see its repository | — |
 | development and testing | Claude Code (Anthropic) and Codex (OpenAI) coding agents | — | — |
 
-paperrules itself is MIT-licensed and does not bundle PyMuPDF. PyMuPDF is installed only with `pip install -e ".[figures]"`,
+paperrules itself is MIT-licensed and does not bundle PyMuPDF. PyMuPDF is installed only with `pip install -e ".[figures]"` or `".[workbench]"`,
 and that install is under PyMuPDF's own license terms.
 
 The example paper in `examples/aptp-cvpr2026/` is credited in [NOTICE](NOTICE) (CC BY 4.0).
@@ -99,17 +99,17 @@ paperrules 借鉴了以下工作的思路。它没有复制这些设计参考中
 **界面**
 
 - **Obsidian**，https://obsidian.md 。本项目的界面设计借鉴了 Obsidian：
-  - 它所源自的研究工作台采用安静、类似笔记的阅读界面；
-  - 多栏并排，有可折叠的大纲；
-  - 条目之间互相链接，从句子到规则、到来源只需点一下。
+  - 工作台（`paperrules workbench`）采用安静、类似笔记的阅读界面；
+  - 多栏并排，有标签页与可折叠的大纲；
+  - 条目之间互相链接，从句子到规则、到数字、到来源只需点一下。
 
   离线 HTML 报告保留了大纲式布局：各条结果按规则树排在对应规则之下，每条规则都可以折叠展开。
-- **Blender 节点编辑器**，https://www.blender.org 。研究工作台的论证画布采用节点编辑器风格，论点与证据是用连线相连的方框。画布不在本版发布范围内。
+- **Blender 节点编辑器**，https://www.blender.org 。工作台的论证画布采用节点编辑器风格，论点与证据是用连线相连的方框。没有使用 Blender 的任何代码或文字。
 
 **库与工具**
 
 - **spaCy**（MIT）及 `en_core_web_sm` 模型：用于句法分析（`W14`–`W16`、`A6`）。引用：M. Honnibal, I. Montani, S. Van Landeghem, A. Boyd, spaCy: Industrial-strength Natural Language Processing in Python, 2020, doi:10.5281/zenodo.1212303。
-- **PyMuPDF**（GNU AGPL-3.0 或 Artifex 商业许可）：可选依赖，用于图件规则 `G1`–`G4`。本项目采用 MIT 许可，不附带 PyMuPDF。只有用 `pip install -e ".[figures]"` 安装时才会装上它，安装后按 PyMuPDF 自己的许可使用。
+- **PyMuPDF**（GNU AGPL-3.0 或 Artifex 商业许可）：可选依赖，用于图件规则 `G1`–`G4` 与工作台的 PDF 面板。本项目采用 MIT 许可，不附带 PyMuPDF。只有用 `pip install -e ".[figures]"` 或 `".[workbench]"` 安装时才会装上它，安装后按 PyMuPDF 自己的许可使用。
 - **ARIS**（Auto-claude-code-research-in-sleep），https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep ：本项目所源自的研究工作区使用它的研究工作流。
 - **Claude Code**（Anthropic）与 **Codex**（OpenAI）编码智能体：用于开发与测试。
 - 示例论文的署名见 [NOTICE](NOTICE)（CC BY 4.0）。

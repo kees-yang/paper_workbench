@@ -203,6 +203,7 @@ These steps worked well in practice. The checker does not enforce them.
 | run the rule tests | `python -m paperrules test <dir>` |
 | keep a flagged sentence | `python -m paperrules accept <rule> "<sentence>" --reason "<why>" --project <dir>` |
 | debug the reader | `python -m paperrules sentences <dir> --grep "<regex>"` |
+| workbench page (PDF, argument canvas, analysis panels) | `python -m paperrules workbench <dir>` (`--ids`, `--skeleton`, `--check`, `--accept "label"`) |
 | package tests | `python -m unittest discover -s tests` |
 
 Exit status: `0` when no `error` rule is open; `1` otherwise, or when a warning is open under `--strict`.
@@ -217,3 +218,18 @@ settings file). Before committing:
 - Run `python -m unittest discover -s tests` and `python -m paperrules test examples/aptp-cvpr2026`. Regenerate
   `examples/aptp-cvpr2026/expected/` and `docs/rules.md` if the rules changed.
 - Search the diff for e-mail addresses, personal names, local paths, unpublished titles and API keys before you push.
+
+## 10. The workbench (optional reading surface)
+
+`python -m paperrules workbench <dir>` builds one HTML page with the PDF, an argument canvas and analysis panels
+([docs/workbench.md](docs/workbench.md)). When you annotate a paper for it:
+
+- **The page embeds the whole manuscript and the author's notes.** Never commit or publish the page of an unpublished paper.
+  The example's page is public only because its paper is CC BY.
+- **Start from `--ids`** (or `--skeleton`), write `workbench.json`, and run `--check` until it is clean. A quote that is not in
+  the sentence is wrong, not a formatting detail.
+- **Invent nothing.** A rendering of a sentence is a translation of that sentence and adds no content. A number record points at a
+  table cell of the paper or at a formula over other records; a number without a source stays in `unresolved`.
+- **Say who wrote the annotations.** Claims, links and the storyline written by an assistant are proposals for the author to
+  review, as in the example.
+- **After reading the refresh queue,** run `--accept "<label>"` so the next build lists only what changed since.

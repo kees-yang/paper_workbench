@@ -199,7 +199,7 @@ class LocalOverrides(unittest.TestCase):
 class ExampleProject(unittest.TestCase):
     def test_example_reads_and_core_numbers_are_stable(self):
         res = runner.run(load_project(EXAMPLE))
-        self.assertEqual(res['paper']['sentences'], 199)
+        self.assertEqual(res['paper']['sentences'], 196)
         self.assertEqual((res['paper']['figures'], res['paper']['tables']), (7, 4))
         by = {r['id']: r for r in res['rules']}
         self.assertEqual(by['B1']['status'], 'pass')

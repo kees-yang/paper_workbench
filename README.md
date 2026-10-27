@@ -88,27 +88,42 @@ Everything is merged from the pack in `paperrules/packs/default/` and a local fi
 
 Then run `python -m paperrules test my-paper` (R1 runs every test sentence of every rule, including yours) and `python -m paperrules check my-paper --only U1`. A glossary (`glossary.json`) switches on the term rules: `A3` flags names you retired (`avoid_en`), `A6` flags subjects and objects whose head noun is not a glossary noun, `A7` flags phrases that name a concept with another noun.
 
+## The workbench
+
+`paperrules workbench <project>` builds one offline page that puts the paper's PDF, an argument canvas (abstract → introduction → body → conclusion, wired by the claims each paragraph serves) and analysis panels side by side: sentence-by-sentence analysis with subject/predicate/object marks and links to the text before, the storyline of each claim through the paper, the glossary, and views for the rules, the argument tree, the evidence behind each number, the figures and tables, and the sentences that changed since you last accepted the page. You keep your notes next to each sentence.
+
+<p align="center"><img src="docs/img/workbench-overview.png" alt="The workbench on the example paper: PDF pane, argument canvas and sentence analysis" width="900"></p>
+
+```bash
+pip install -e ".[workbench]"                       # PyMuPDF for the PDF pane
+python -m paperrules workbench examples/aptp-cvpr2026
+# open examples/aptp-cvpr2026/out/workbench.html     (a built copy: examples/aptp-cvpr2026/expected/workbench.html)
+```
+
+The reader, the rules, the PDF alignment and the English marks are automatic. The rendering of each sentence (Chinese in the example), the links, the claims and the storyline come from an annotation file, `workbench.json`, that you or an assistant write; `--ids`, `--skeleton` and `--check` help. The interface is in Chinese. The page embeds the whole paper: keep the page of an unpublished paper private. The example's annotations were written for this repository and may contain errors. Details, the annotation format and the data contract: [`docs/workbench.md`](docs/workbench.md).
+
 ## What the checker does not do
 
 * **It does not judge the science or the argument.** It reads sentences and structure. A clean report is not a good paper, and the findings on a good paper are not criticism of it.
 * **It reads the LaTeX source, not the compiled PDF.** Float order is the order in the source; page layout and overfull boxes are not checked. Figure files are the exception: `G1`–`G4` open them and measure fonts, text sizes and line weights at the printed size.
 * **English only.** The sentence rules and the spaCy model are English. The report is bilingual; the paper is not.
 * **Parser mistakes happen.** `W14`–`W16` and `A6` use a small spaCy model and sometimes misread a sentence. Accept the finding with a reason.
-* **Not included in this release:** a number-to-source evidence registry (every number in the text traced to a result file), a storyline/flow checker across sections, Chinese–English sentence alignment, and PDF layout checks. They exist in the research workspace this project grew out of and are candidates for later releases.
+* **Not included:** an automatic evidence registry (the workbench shows the number records you write; nothing traces a number to a result file by itself), automatic checks of a translation against its sentence, and PDF layout checks. They exist in the research workspace this project grew out of and are candidates for later releases.
 
 ## Layout
 
 ```
 paperrules/             package (reader, rules, runner, report, CLI) and packs/default/*.json (the rules)
+paperrules/workbench/   the workbench: page template, data builder, PDF alignment
 examples/aptp-cvpr2026/ a CC BY 4.0 paper, a glossary, local rules, exceptions, expected/ output
 AGENTS.md               guide for agents: setup, revision loop, author feedback → rules, figures
-docs/                   customizing-rules (EN, 中文), rules.md, screenshots
-tests/                  python -m unittest discover -s tests   (36 tests)
+docs/                   customizing-rules and workbench (EN, 中文), rules.md, screenshots
+tests/                  python -m unittest discover -s tests   (45 tests)
 ```
 
 ## Credits
 
-The sentence rules adapt ASD-STE100 Simplified Technical English, following A. Karpathy's “80% of the way to ASD-STE100” suggestion. The interface design draws inspiration from Obsidian. Parsing uses spaCy, and the figure rules use PyMuPDF. Sources, licenses and citations are in [`CREDITS.md`](CREDITS.md).
+The sentence rules adapt ASD-STE100 Simplified Technical English, following A. Karpathy's “80% of the way to ASD-STE100” suggestion. The interface design draws inspiration from Obsidian, and the argument canvas from the Blender node editor. Parsing uses spaCy, and the figure rules use PyMuPDF. Sources, licenses and citations are in [`CREDITS.md`](CREDITS.md).
 
 ## License
 

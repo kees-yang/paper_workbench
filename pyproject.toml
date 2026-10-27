@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paperrules"
-version = "0.3.0"
+version = "0.4.0"
 description = "Rule-based writing checks for LaTeX papers: a customizable rule tree, sentence/paragraph/document rules, and offline reports."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -13,12 +13,14 @@ dependencies = ["spacy>=3.7,<4"]
 
 [project.optional-dependencies]
 figures = ["pymupdf>=1.23"]
+workbench = ["pymupdf>=1.23"]
 
 [project.scripts]
 paperrules = "paperrules.cli:main"
 
 [tool.setuptools]
-packages = ["paperrules"]
+packages = ["paperrules", "paperrules.workbench"]
 
 [tool.setuptools.package-data]
 paperrules = ["packs/*/*.json"]
+"paperrules.workbench" = ["template/*"]

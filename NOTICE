@@ -13,3 +13,11 @@ The paper is licensed under the Creative Commons Attribution 4.0 International l
 (https://creativecommons.org/licenses/by/4.0/), as stated on its arXiv page. The sources are included unchanged;
 figures and the CVPR style files (cvpr.sty, ieeenat_fullname.bst) are omitted. The authors of the paper do not endorse
 this repository. The sentences of the paper also appear in examples/aptp-cvpr2026/expected/ (the reference output).
+
+examples/aptp-cvpr2026/paper/paper.pdf is the arXiv PDF of the same paper (arXiv:2603.21820v1). The only change is that the embedded
+raster images were downsampled to about 110 dpi to reduce the file size (PyMuPDF rewrite_images); text and layout are unchanged.
+
+examples/aptp-cvpr2026/workbench.json contains Chinese renderings of the paper's sentences and short annotations (claims, links,
+storyline, number records). They are adaptations (translations and summaries) written for this repository by an assistant, under the
+same CC BY 4.0 license and with the same attribution. They were not written or reviewed by the authors of the paper and may contain
+errors. The sentences and renderings also appear in examples/aptp-cvpr2026/expected/workbench.html.

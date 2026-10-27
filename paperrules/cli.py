@@ -131,6 +131,30 @@ def cmd_accept(a):
     print(f'recorded in {path}')
 
 
+def cmd_workbench(a):
+    from .workbench import annot, page
+    proj = load_project(a.project)
+    if a.ids or a.skeleton or a.check:
+        paper = texread.read(proj.main_tex)
+        st = page.settings(proj)
+        if a.ids:
+            print(annot.listing(paper))
+        elif a.skeleton:
+            out = Path(a.out) if a.out else proj.root / (st['annotations'] + '.skeleton')
+            dump_json(out, annot.skeleton(paper))
+            print(f'wrote {out}: fill in what you have; every field is optional')
+        else:
+            problems = annot.check(annot.load(proj.root / st['annotations']), paper)
+            print('\n'.join(problems) or 'annotations are consistent with the paper')
+            sys.exit(1 if problems else 0)
+        return
+    res = page.build(proj, a.out, accept=a.accept)
+    for p in res['problems']:
+        print('annotation:', p)
+    print(f'workbench: {res["path"]} ({res["size"] / 1e6:.1f} MB) · {res["paragraphs"]} paragraphs, {res["rows"]} sentences, {res["pages"]} PDF pages, '
+          f'{res["located"]} paragraphs located on the pages')
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog='paperrules', description='Rule-based writing checks for LaTeX papers.')
     ap.add_argument('--version', action='version', version=f'paperrules {__version__}')
@@ -171,6 +195,14 @@ def main(argv=None):
     p.add_argument('--word', help='for A6: the head noun the exception covers')
     p.add_argument('--project', default='.')
     p.set_defaults(fn=cmd_accept)
+    p = sub.add_parser('workbench', help='build the workbench page: PDF pages, argument canvas, analysis panels')
+    p.add_argument('project', nargs='?', default='.')
+    p.add_argument('--out', help='output file (default: workbench.output of the project, out/workbench.html)')
+    p.add_argument('--ids', action='store_true', help='print every paragraph and sentence id with its English text (to write the annotations)')
+    p.add_argument('--skeleton', action='store_true', help='write an annotation file with every id and empty fields (workbench.json.skeleton)')
+    p.add_argument('--check', action='store_true', help='check the annotation file against the paper (ids, quotes) and exit')
+    p.add_argument('--accept', nargs='?', const='', default=None, metavar='LABEL', help='after reviewing the refresh queue, record the present state as the new baseline')
+    p.set_defaults(fn=cmd_workbench)
     a = ap.parse_args(argv)
     a.fn(a)
 

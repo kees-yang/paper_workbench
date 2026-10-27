@@ -88,27 +88,42 @@ python -m paperrules check my-paper --strict      # 有提示也以状态码1退
 
 然后运行 `python -m paperrules test my-paper`（R1 会运行每条规则的全部测试句，包括你的）和 `python -m paperrules check my-paper --only U1`。术语表（`glossary.json`）会启用术语类规则：`A3` 标出你已弃用的名称（`avoid_en`），`A6` 标出中心名词不在术语表中的主语与宾语，`A7` 标出用别的名词指称同一概念的短语。
 
+## 工作台
+
+`paperrules workbench <项目>` 生成一个离线页面，把论文的 PDF、论证画布（摘要 → 引言 → 正文 → 结论，由各段所服务的主张连线）和分析面板并排放在一起：逐句分析（主谓宾标记、与前文的链接）、每条主张在全文中的故事线、术语表，以及规则、论证树、每个数字背后的证据、图表、自上次确认以来改变的句子等视图。批注就写在每句旁边。
+
+<p align="center"><img src="docs/img/workbench-overview.png" alt="示例论文的工作台：PDF 面板、论证画布与逐句分析" width="900"></p>
+
+```bash
+pip install -e ".[workbench]"                       # PDF 面板需要 PyMuPDF
+python -m paperrules workbench examples/aptp-cvpr2026
+# 打开 examples/aptp-cvpr2026/out/workbench.html     （已生成的副本：examples/aptp-cvpr2026/expected/workbench.html）
+```
+
+读取、规则、PDF 对齐和英文标记是自动的。每句的标注语言（示例为中文）、句间链接、主张与故事线来自标注文件 `workbench.json`，由你或助手撰写；`--ids`、`--skeleton`、`--check` 可以帮忙。界面文字是中文。页面嵌入了整篇论文：未发表论文的页面请保密。示例的标注是为本仓库写的，可能有错。细节、标注格式与数据约定见 [`docs/workbench.zh-CN.md`](docs/workbench.zh-CN.md)。
+
 ## 检查器不做什么
 
 * **它不评判科学内容或论证。** 它读句子与结构。报告干净不等于论文好；一篇好论文上的标出项也不是对它的批评。
 * **它读 LaTeX 源文件，不读编译后的 PDF。** 图表顺序指源文件中的顺序；页面版式和溢出盒不检查。图件文件例外：`G1`–`G4` 打开图件，按印刷尺寸测量字体、字号和线宽。
 * **只支持英文。** 句子规则与 spaCy 模型针对英文。报告是双语的，论文不是。
 * **句法解析会出错。** `W14`–`W16` 与 `A6` 使用小型 spaCy 模型，有时会读错句子。写明理由后接受即可。
-* **本版不包含：** 数字到来源的证据登记（正文每个数字追溯到结果文件）、跨章节的故事线与语义流检查、中英文逐句对齐、PDF 版式检查。它们存在于本项目所源自的研究工作区中，是后续版本的候选。
+* **不包含：** 自动的证据登记（工作台只显示你写的数字记录，没有任何东西会自己把数字追溯到结果文件）、译文与原句的自动核对、PDF 版式检查。它们存在于本项目所源自的研究工作区中，是后续版本的候选。
 
 ## 目录
 
 ```
 paperrules/             包（读取、规则、运行、报告、命令行）与 packs/default/*.json（规则）
+paperrules/workbench/   工作台：页面模板、数据生成、PDF 对齐
 examples/aptp-cvpr2026/ 一篇 CC BY 4.0 论文、术语表、本地规则、例外、expected/ 输出
 AGENTS.md               智能体指南：设置、修改循环、作者意见→规则、图件
-docs/                   自定义规则（English、中文）、rules.md、截图
-tests/                  python -m unittest discover -s tests   （36 个测试）
+docs/                   自定义规则与工作台（English、中文）、rules.md、截图
+tests/                  python -m unittest discover -s tests   （45 个测试）
 ```
 
 ## 致谢与参考
 
-句子规则改写自 ASD-STE100 简化技术英语，并参照 A. Karpathy 关于“80% of the way to ASD-STE100”的建议。界面设计借鉴了 Obsidian。句法分析使用 spaCy，图件规则使用 PyMuPDF。来源、许可与引用见 [`CREDITS.md`](CREDITS.md)。
+句子规则改写自 ASD-STE100 简化技术英语，并参照 A. Karpathy 关于“80% of the way to ASD-STE100”的建议。界面设计借鉴了 Obsidian，论证画布借鉴了 Blender 节点编辑器。句法分析使用 spaCy，图件规则使用 PyMuPDF。来源、许可与引用见 [`CREDITS.md`](CREDITS.md)。
 
 ## 许可
 

@@ -10,7 +10,7 @@ The paper in `paper/` is
 > [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 It was chosen because arXiv lists it under CC BY 4.0, which allows redistribution with attribution.
-**Changes:** none to the LaTeX sources (`paper/main.tex`, `preamble.tex`, `sec/*.tex`, `main.bib` are the files of the arXiv source package). The figures and the CVPR style files (`cvpr.sty`, `ieeenat_fullname.bst`) are left out; the checker reads the text, not the PDF, so the paper does not need to compile here. Everything else in this directory (configuration, glossary, local rules, exceptions, reports) was written for this repository and is not endorsed by the authors of the paper.
+**Changes:** `paper/paper.pdf` has its raster images downsampled; the Chinese renderings and annotations are adaptations written for this repository, not reviewed by the authors; none to the LaTeX sources (`paper/main.tex`, `preamble.tex`, `sec/*.tex`, `main.bib` are the files of the arXiv source package). The figures and the CVPR style files (`cvpr.sty`, `ieeenat_fullname.bst`) are left out; the checker reads the text, not the PDF, so the paper does not need to compile here. Everything else in this directory (configuration, glossary, local rules, exceptions, reports) was written for this repository and is not endorsed by the authors of the paper.
 
 **What the reports are.** The output applies the writing rules of this repository to the paper. The rules are one author's preferences (see the top-level README); a finding is a question, not a criticism of the paper.
 
@@ -22,7 +22,10 @@ It was chosen because arXiv lists it under CC BY 4.0, which allows redistributio
 | `rules.local.json` | local rules: switches on `J1` (abstract 150–250 words), `T5` (“Fig.”) and `A6`; adds dataset and metric names and general nouns; two rules of its own, `U1` and `U2`, with tests |
 | `glossary.json` | a small **illustrative** glossary (terms for rules `A3`, `A6`) — not the authors' terminology |
 | `exceptions.json` | one accepted finding, with the reason |
-| `expected/` | the reference output (`report.html`, `report.json`, `report.txt`) |
+| `paper/paper.pdf` | the arXiv PDF with its raster images downsampled (for the workbench's PDF pane) |
+| `workbench.json` | **illustrative** annotations for the workbench: Chinese renderings of the 196 sentences, sentence links, claims, storyline, number records (written for this repository, not by the authors) |
+| `workbench.baseline.json` | the accepted state, so the refresh queue starts empty |
+| `expected/` | the reference output (`report.html`, `report.json`, `report.txt`, `workbench.html`) |
 
 ## Run it
 
@@ -30,6 +33,7 @@ It was chosen because arXiv lists it under CC BY 4.0, which allows redistributio
 python -m paperrules test  examples/aptp-cvpr2026       # R0 and R1: 42 test sentences
 python -m paperrules check examples/aptp-cvpr2026       # writes examples/aptp-cvpr2026/out/
 python -m paperrules check examples/aptp-cvpr2026 --only W15,A3 -v
+python -m paperrules workbench examples/aptp-cvpr2026   # the workbench page: out/workbench.html (needs PyMuPDF)
 ```
 
 ## What to look at
@@ -49,7 +53,7 @@ python -m paperrules check examples/aptp-cvpr2026 --only W15,A3 -v
 > *Beyond Strict Pairing: Arbitrarily Paired Training for High-Performance Infrared and Visible Image Fusion*。
 > CVPR 2026。[arXiv:2603.21820](https://arxiv.org/abs/2603.21820)，授权 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。
 
-选它是因为 arXiv 将它列为 CC BY 4.0，允许注明出处后再分发。**改动：** LaTeX 源文件未作任何修改（`paper/main.tex`、`preamble.tex`、`sec/*.tex`、`main.bib` 即 arXiv 源码包中的文件）。图片和 CVPR 样式文件（`cvpr.sty`、`ieeenat_fullname.bst`）已省略；检查器读文本而不读 PDF，所以这里不需要编译论文。本目录中的其余内容（配置、术语表、本地规则、例外、报告）为本仓库而写，并未得到该论文作者的认可。
+选它是因为 arXiv 将它列为 CC BY 4.0，允许注明出处后再分发。**改动：** LaTeX 源文件未作任何修改（`paper/main.tex`、`preamble.tex`、`sec/*.tex`、`main.bib` 即 arXiv 源码包中的文件）；`paper/paper.pdf` 只缩小了位图分辨率；中文译文与标注是为本仓库写的改编，未经作者审阅。图片和 CVPR 样式文件（`cvpr.sty`、`ieeenat_fullname.bst`）已省略；检查器读文本而不读 PDF，所以这里不需要编译论文。本目录中的其余内容（配置、术语表、本地规则、例外、报告）为本仓库而写，并未得到该论文作者的认可。
 
 **报告是什么。** 输出是把本仓库的写作规则应用到这篇论文上的结果。规则是一位作者的偏好（见顶层 README）；标出的项是问题，不是对论文的批评。
 
@@ -61,7 +65,10 @@ python -m paperrules check examples/aptp-cvpr2026 --only W15,A3 -v
 | `rules.local.json` | 本地规则：打开 `J1`（摘要150–250词）、`T5`（“Fig.”）与 `A6`；加入数据集与指标名称、通用名词；两条自带测试的新规则 `U1`、`U2` |
 | `glossary.json` | 一个小型**示意**术语表（供规则 `A3`、`A6` 使用）——不是作者的术语 |
 | `exceptions.json` | 一条已接受的结果及其理由 |
-| `expected/` | 参考输出（`report.html`、`report.json`、`report.txt`） |
+| `paper/paper.pdf` | arXiv 的 PDF，仅缩小了其中位图的分辨率（供工作台的 PDF 面板使用） |
+| `workbench.json` | 工作台的**示意**标注：196 个句子的中文译文、句间链接、主张、故事线、数字记录（为本仓库而写，不是作者所写） |
+| `workbench.baseline.json` | 已确认的状态，使刷新队列起始为空 |
+| `expected/` | 参考输出（`report.html`、`report.json`、`report.txt`、`workbench.html`） |
 
 ### 运行
 
@@ -69,6 +76,7 @@ python -m paperrules check examples/aptp-cvpr2026 --only W15,A3 -v
 python -m paperrules test  examples/aptp-cvpr2026       # R0 与 R1：42 个测试句
 python -m paperrules check examples/aptp-cvpr2026       # 写入 examples/aptp-cvpr2026/out/
 python -m paperrules check examples/aptp-cvpr2026 --only W15,A3 -v
+python -m paperrules workbench examples/aptp-cvpr2026   # 工作台页面：out/workbench.html（需要 PyMuPDF）
 ```
 
 ### 看什么
