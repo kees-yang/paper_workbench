@@ -256,6 +256,16 @@ class FigureRules(unittest.TestCase):
         ids, _ = self.run_fig(252, 5, 0.2)                      # Helvetica, 5 pt, 0.2 pt line, not embedded
         self.assertTrue({'G1', 'G2', 'G3', 'G4'} <= ids, ids)
 
+    def test_figure_findings_in_report(self):
+        """Figure findings carry the document-finding fields, so the HTML and text reports can be written."""
+        import tempfile
+        from paperrules import report
+        _, res = self.run_fig(252, 5, 0.2)
+        figs = [f for f in res['findings'] if f['rule'].startswith('G')]
+        self.assertTrue(figs and all(f['en'] == '' and f['kind'] == 'document' for f in figs), figs)
+        out = report.write_all(res, tempfile.mkdtemp())
+        self.assertIn('G1', (out / 'report.html').read_text(encoding='utf-8'))
+
     def test_shrunk_figure_text(self):
         ids, _ = self.run_fig(504, 9, 1.0)                      # 9 pt text in a 504 bp drawing printed 252 pt wide
         self.assertIn('G3', ids)

@@ -57,7 +57,7 @@ def run_group(name, c, force=False):
     if name == 'floats':
         return _doc_findings(RD.float_rules(p))
     if name == 'figures':
-        return RF.figure_rules(p, proj, proj.rules['document']) if RF.available() else None
+        return _doc_findings(RF.figure_rules(p, proj, proj.rules['document'])) if RF.available() else None
     if name == 'abstract_structure':
         return _doc_findings(RD.abstract_structure(p, proj.rules['document']))
     if name == 'table_order':
