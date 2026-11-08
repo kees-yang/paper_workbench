@@ -155,6 +155,29 @@ def cmd_workbench(a):
           f'{res["located"]} paragraphs located on the pages')
 
 
+def cmd_review(a):
+    from .workbench import review
+    pages = []
+    for spec in a.pages:
+        name, _, path = spec.rpartition('=')
+        path = Path(path)
+        if path.is_dir():                                   # a project folder: its built page
+            path = path / 'out' / 'workbench.html'
+        if not path.is_file():
+            sys.exit(f'review: no workbench page at {path} (build it with: paperrules workbench <project>)')
+        pages.append((name or path.parent.parent.name or path.stem, str(path)))
+    papers = review.build(pages, a.out, names=review.read_names(a.names), scores=a.scores, title=a.title,
+                          supp_from=a.supp_from, supp_page=a.supp_page)
+    for p in papers:
+        s = p['stats']
+        print(f"{p['name']} {p['version']}: {s['rows']} sentences, {s['paras']} paragraphs, {s['prev']} links to the previous sentence, "
+              f"{s['earl']} earlier links, {s['located']} paragraphs located, {s['undefined']} undefined abbreviations")
+        for x in p['abbr']:
+            if x['status'] == 'undefined':
+                print(f"   undefined  {x['scope']:<10} {x['abbr']:<10} {x['row']}  {x['text'][:100]}")
+    print(f'review page: {a.out}')
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog='paperrules', description='Rule-based writing checks for LaTeX papers.')
     ap.add_argument('--version', action='version', version=f'paperrules {__version__}')
@@ -203,6 +226,15 @@ def main(argv=None):
     p.add_argument('--check', action='store_true', help='check the annotation file against the paper (ids, quotes) and exit')
     p.add_argument('--accept', nargs='?', const='', default=None, metavar='LABEL', help='after reviewing the refresh queue, record the present state as the new baseline')
     p.set_defaults(fn=cmd_workbench)
+    p = sub.add_parser('review', help='build one review page from built workbench pages: sentence links, abbreviations, notes, scores')
+    p.add_argument('pages', nargs='+', metavar='[NAME=]PAGE', help='a built workbench.html or a project folder; NAME labels its tab')
+    p.add_argument('--out', default='review.html', help='output file (default: review.html)')
+    p.add_argument('--names', action='append', metavar='LIST|@FILE', help='names that need no definition (methods, datasets, tools); repeatable')
+    p.add_argument('--scores', metavar='FILE', help='review score log (JSON) for the Scores view; format in docs/review.md')
+    p.add_argument('--supp-from', metavar='TEXT', help='the supplement starts at the first chapter or section that starts with TEXT')
+    p.add_argument('--supp-page', type=int, metavar='N', help='rows on PDF page N or later belong to the supplement')
+    p.add_argument('--title', default='Review Workbench', help='page title')
+    p.set_defaults(fn=cmd_review)
     a = ap.parse_args(argv)
     a.fn(a)
 

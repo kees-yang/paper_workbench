@@ -137,3 +137,41 @@ class ExampleWorkbench(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class Review(unittest.TestCase):
+    """The review page reads built workbench pages and adds sentence links, an abbreviation check and a score log."""
+    PAGE = EXAMPLE / 'expected' / 'workbench.html'
+
+    def test_review_page(self):
+        from paperrules.workbench import review
+        d = Path(tempfile.mkdtemp())
+        scores = d / 'scores.json'
+        scores.write_text(json.dumps({'target': 8, 'rounds': [{'line': 'main', 'round': 'R1', 'version': 'v1', 'score': 5},
+                                                             {'line': 'main', 'round': 'R2', 'version': 'v2', 'score': 6}]}), encoding='utf-8')
+        out = d / 'review.html'
+        papers = review.build([('one', str(self.PAGE)), ('two', str(self.PAGE))], out, names={'APTP'}, scores=str(scores))
+        html = out.read_text(encoding='utf-8')
+        self.assertEqual(len(papers), 2)
+        self.assertNotIn('__DATA__', html)
+        self.assertNotIn('__SCORES__', html)
+        p = papers[0]
+        self.assertGreater(p['stats']['rows'], 100)
+        self.assertGreater(p['stats']['prev'], 0)
+        st = {x['abbr']: x['status'] for x in p['abbr'] if x['scope'] == 'Body'}
+        self.assertEqual(st.get('APTP'), 'name')
+        self.assertEqual(st.get('GPU'), 'name')
+        self.assertNotIn('Quantitative', st)
+
+    def test_definition_forms(self):
+        from paperrules.workbench import review
+        rows = [dict(id='P001-R001', kind='paragraph', en_source='We use the structural similarity (SSIM) and EN (entropy of the image).'),
+                dict(id='P001-R002', kind='paragraph', en_source='VIF is the visual information fidelity. AG rises.')]
+        st = {x['abbr']: x['status'] for x in review.abbreviations(rows, set())}
+        self.assertEqual(st, {'SSIM': 'defined', 'EN': 'defined', 'VIF': 'defined', 'AG': 'undefined'})
+
+    def test_cli(self):
+        from paperrules import cli
+        out = Path(tempfile.mkdtemp()) / 'r.html'
+        cli.main(['review', f'example={self.PAGE}', '--out', str(out), '--names', 'APTP,MSRS'])
+        self.assertTrue(out.is_file())

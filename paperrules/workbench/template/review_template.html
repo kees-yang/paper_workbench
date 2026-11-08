@@ -1,0 +1,140 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__TITLE__</title>
+<style>
+:root{--bg:#fbfaf8;--panel:#ffffff;--ink:#1d1d1f;--ink2:#55565c;--mute:#8a8b91;--line:#e4e2dd;--acc:#2f6fb3;--acc2:#e9f1fa;--warn:#a5541b;--warnbg:#fbefe4;--ok:#2d7a4b;--okbg:#e8f4ec;--hl:rgba(242,194,0,.28);--chip:#f1efea}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181a;--panel:#1f2023;--ink:#ececee;--ink2:#b5b6bb;--mute:#86878d;--line:#33343a;--acc:#7fb0e6;--acc2:#1f2b3a;--warn:#e6a06a;--warnbg:#3a2a1c;--ok:#7cc796;--okbg:#1c3226;--hl:rgba(242,194,0,.22);--chip:#2a2b30}}
+:root[data-theme="dark"]{--bg:#17181a;--panel:#1f2023;--ink:#ececee;--ink2:#b5b6bb;--mute:#86878d;--line:#33343a;--acc:#7fb0e6;--acc2:#1f2b3a;--warn:#e6a06a;--warnbg:#3a2a1c;--ok:#7cc796;--okbg:#1c3226;--hl:rgba(242,194,0,.22);--chip:#2a2b30}
+*{box-sizing:border-box}html,body{margin:0;height:100%}body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:13px/1.45 -apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}
+header{display:flex;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+header h1{font-size:14px;margin:0 8px 0 0;font-weight:600}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}.seg button{border:0;background:transparent;color:var(--ink2);padding:5px 10px;cursor:pointer;font:inherit}
+.seg button[aria-pressed=true]{background:var(--acc2);color:var(--acc);font-weight:600}
+input[type=search]{border:1px solid var(--line);border-radius:7px;padding:5px 8px;background:var(--bg);color:var(--ink);min-width:260px}
+label.t{color:var(--ink2);display:inline-flex;gap:4px;align-items:center;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;padding:5px 10px;cursor:pointer;font:inherit}
+.stats{margin-left:auto;color:var(--mute);font-size:12px}
+main{display:grid;grid-template-columns:230px minmax(0,1fr) minmax(0,38%);flex:1;min-height:0}
+main.nopage{grid-template-columns:230px minmax(0,1fr) 0}
+nav{border-right:1px solid var(--line);overflow:auto;padding:6px 0;background:var(--panel)}
+nav .ch{font-weight:600;color:var(--ink2);padding:8px 12px 2px;font-size:12px}
+nav a{display:flex;gap:6px;padding:3px 12px;color:var(--ink);text-decoration:none;cursor:pointer;font-size:12px}
+nav a .pid{color:var(--mute);font-variant-numeric:tabular-nums}nav a[aria-current=true]{background:var(--acc2);color:var(--acc)}
+nav a .dot{margin-left:auto;width:7px;height:7px;border-radius:50%;background:transparent;align-self:center}nav a .dot.w{background:var(--warn)}nav a .dot.n{background:var(--acc)}
+#mid{overflow-y:auto;overflow-x:hidden;padding:12px 16px}#pg{overflow:auto;border-left:1px solid var(--line);background:var(--bg);padding:8px}
+.ph{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-bottom:10px}
+.ph .crumb{color:var(--mute);font-size:12px}.ph h2{font-size:15px;margin:2px 0 6px}
+.ph dl{display:grid;grid-template-columns:76px 1fr;gap:3px 10px;margin:0}.ph dt{color:var(--mute)}.ph dd{margin:0}
+table.s{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+table.s th{font-size:11px;text-align:left;color:var(--mute);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line);background:var(--bg)}
+table.s td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.s tr:last-child td{border-bottom:0}table.s tr.sel td{background:var(--acc2)}
+td.n{color:var(--mute);font-variant-numeric:tabular-nums;width:34px;white-space:nowrap}
+td.tx .en{color:var(--ink)}td.tx .zh{color:var(--ink2);font-size:12px;margin-top:2px}.hidezh td.tx .zh{display:none}
+td.lk{width:34%;font-size:12px}
+.link{display:grid;grid-template-columns:auto 1fr;gap:2px 6px;align-items:baseline}
+.rel{display:inline-block;padding:0 6px;border-radius:9px;background:var(--chip);color:var(--ink2);font-size:11px;white-space:nowrap}
+.rel.none{background:var(--warnbg);color:var(--warn)}.rel.earl{background:var(--acc2);color:var(--acc)}
+.q{color:var(--ink2)}.q b{color:var(--ink);font-weight:600}.arrow{color:var(--mute)}
+.jump{color:var(--acc);cursor:pointer;font-variant-numeric:tabular-nums}
+.note{width:100%;margin-top:4px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit;font-size:12px;padding:4px 6px;min-height:28px;resize:vertical}
+.has-note td.n::after{content:"✎";color:var(--warn);margin-left:3px}
+.pgwrap{position:relative;margin:0 auto 10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}.pgwrap img{display:block;width:100%}
+.box{position:absolute;background:var(--hl);border:1.5px solid #F2C200;border-radius:2px;pointer-events:none}
+.pglabel{color:var(--mute);font-size:11px;text-align:center;margin:-6px 0 10px}
+.tab{display:none}.tab.on{display:block}
+table.ab{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line)}table.ab td,table.ab th{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:12px;vertical-align:top}
+.st{padding:0 6px;border-radius:9px;font-size:11px}.st.undefined{background:var(--warnbg);color:var(--warn)}.st.defined{background:var(--okbg);color:var(--ok)}.st.name{background:var(--chip);color:var(--ink2)}
+.legend{color:var(--mute);font-size:12px;margin:0 0 8px}mark{background:var(--hl);color:inherit}
+@media (max-width:900px){main,main.nopage{grid-template-columns:1fr;height:auto}nav,#pg{display:none}}
+</style></head><body>
+<header>
+ <h1>__TITLE__</h1>
+ <div class="seg" id="papers"></div>
+ <div class="seg" id="views"><button data-v="sent" aria-pressed="true">Sentences</button><button data-v="abbr">Abbreviations</button><button data-v="notes">Notes</button><button data-v="scores">Scores</button></div>
+ <input type="search" id="q" placeholder="Search sentences, English or 中文">
+ <label class="t"><input type="checkbox" id="zh" checked> 中文</label>
+ <label class="t"><input type="checkbox" id="page" checked> Page</label>
+ <button class="btn" id="exp">Export notes</button>
+ <span class="stats" id="stats"></span>
+</header>
+<main id="main"><nav id="nav"></nav><section id="mid"></section><aside id="pg"></aside></main>
+<script type="application/json" id="data">__DATA__</script>
+<script type="application/json" id="scores">__SCORES__</script>
+<script>
+const DATA=JSON.parse(document.getElementById('data').textContent);
+const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let pi=0, view='sent', cur=null, sel=null, query='';
+const store={get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}},set(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}};
+const nk=(p,id)=>'wbnote|'+p.name+'|'+p.version+'|'+id;
+function P(){return DATA[pi]}
+function paperTabs(){$('#papers').innerHTML=DATA.map((p,i)=>`<button data-i="${i}" aria-pressed="${i===pi}" title="${esc(p.title)}">${esc(p.name)} · ${esc(p.version)}</button>`).join('');
+ document.querySelectorAll('#papers button').forEach(b=>b.onclick=()=>{pi=+b.dataset.i;cur=null;sel=null;render()})}
+function stats(){const s=P().stats;$('#stats').textContent=`${s.rows} sentences · ${s.paras} paragraphs · link to previous ${s.prev} · earlier links ${s.earl} · ${s.undefined} undefined abbreviations`}
+function nav(){const p=P();let h='',ch='';const nlink=pp=>pp.rows.some(r=>p.R[r]&&!p.R[r].prev&&pp.rows.indexOf(r)>0);
+ for(const pp of p.P){if(pp.ch!==ch){ch=pp.ch;h+=`<div class="ch">${esc(ch)}</div>`}
+  const hasNote=pp.rows.some(r=>store.get(nk(p,r)));
+  h+=`<a data-p="${pp.id}" aria-current="${pp.id===cur}"><span class="pid">${pp.id.slice(1)}</span><span>${esc(pp.title||pp.sec)}</span><span class="dot ${hasNote?'n':nlink(pp)?'w':''}" title="${hasNote?'has notes':nlink(pp)?'a sentence without a link to the previous one':''}"></span></a>`}
+ $('#nav').innerHTML=h;document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>{cur=a.dataset.p;sel=null;view='sent';render()})}
+function hl(t){if(!query)return esc(t);const i=t.toLowerCase().indexOf(query.toLowerCase());return i<0?esc(t):esc(t.slice(0,i))+'<mark>'+esc(t.slice(i,i+query.length))+'</mark>'+esc(t.slice(i+query.length))}
+function linkCell(p,id,r,i){let h='';
+ if(r.prev){h+=`<div class="link"><span class="rel">${esc(r.prev.relation||'link')}</span><span class="q"><span class="jump" data-j="${r.prev.anchor_id}">${r.prev.anchor_id.slice(5)}</span> <b>${esc(r.prev.anchor_quote)}</b> <span class="arrow">→</span> <b>${esc(r.prev.target_quote)}</b></span></div>`}
+ else if(i>0){h+=`<div class="link"><span class="rel none">no link</span><span class="q">does not pick up the previous sentence</span></div>`}
+ else{h+=`<div class="link"><span class="rel">opens</span><span class="q">first sentence of the paragraph</span></div>`}
+ if(r.earl){h+=`<div class="link" style="margin-top:3px"><span class="rel earl">${esc(r.earl.relation||'earlier')}</span><span class="q"><span class="jump" data-j="${r.earl.anchor_id}">${r.earl.anchor_id}</span> <b>${esc(r.earl.anchor_quote)}</b> <span class="arrow">→</span> <b>${esc(r.earl.target_quote)}</b></span></div>`}
+ return h}
+function rowsTable(p,ids){return `<table class="s"><thead><tr><th>#</th><th>Sentence</th><th>Link to the previous sentence · earlier link</th></tr></thead><tbody>`+
+ ids.map((id,i)=>{const r=p.R[id];if(!r)return '';const note=store.get(nk(p,id));
+ return `<tr id="r-${id}" data-id="${id}" class="${sel===id?'sel':''} ${note?'has-note':''}"><td class="n">${id.slice(5)}</td><td class="tx"><div class="en">${hl(r.en)}</div><div class="zh">${hl(r.zh)}</div>${sel===id?`<textarea class="note" data-n="${id}" placeholder="Note on this sentence">${esc(note)}</textarea>`:''}</td><td class="lk">${linkCell(p,id,r,i)}</td></tr>`}).join('')+'</tbody></table>'}
+function sentView(){const p=P();
+ if(query){const ids=Object.keys(p.R).filter(id=>(p.R[id].en+' '+p.R[id].zh).toLowerCase().includes(query.toLowerCase()));
+  $('#mid').innerHTML=`<div class="legend">${ids.length} sentences match “${esc(query)}”.</div>`+rowsTable(p,ids);bindRows();return}
+ const pp=p.P.find(x=>x.id===cur)||p.P[0];cur=pp.id;
+ const i=p.P.indexOf(pp);
+ $('#mid').innerHTML=`<div class="ph"><div class="crumb">${esc(pp.ch)} · ${esc(pp.sec)} · ${pp.id}</div><h2>${esc(pp.title||'(untitled paragraph)')}</h2><dl>
+ ${pp.q?`<dt>Question</dt><dd>${esc(pp.q)}</dd>`:''}<dt>Claim</dt><dd>${esc(pp.claim||'—')}</dd><dt>Follows</dt><dd class="q">${esc(pp.prev||'—')}</dd></dl></div>`+rowsTable(p,pp.rows)+
+ `<div style="display:flex;justify-content:space-between;margin-top:8px"><button class="btn" id="pp" ${i?'':'disabled'}>‹ Previous paragraph</button><button class="btn" id="np" ${i<p.P.length-1?'':'disabled'}>Next paragraph ›</button></div>`;
+ $('#pp').onclick=()=>{cur=p.P[i-1].id;sel=null;render()};$('#np').onclick=()=>{cur=p.P[i+1].id;sel=null;render()};bindRows();page(pp)}
+function bindRows(){document.querySelectorAll('table.s tr[data-id]').forEach(tr=>tr.onclick=e=>{if(e.target.closest('textarea,.jump'))return;sel=tr.dataset.id;if(query){cur=P().R[sel].p;query='';$('#q').value=''}render();const t=document.querySelector('textarea.note');t&&t.focus()});
+ document.querySelectorAll('.jump').forEach(j=>j.onclick=()=>{const id=j.dataset.j,r=P().R[id];if(!r)return;cur=r.p;sel=id;query='';$('#q').value='';render();document.getElementById('r-'+id)?.scrollIntoView({block:'center'})});
+ document.querySelectorAll('textarea.note').forEach(t=>t.oninput=()=>{store.set(nk(P(),t.dataset.n),t.value.trim());t.closest('tr').classList.toggle('has-note',!!t.value.trim())})}
+function page(pp){const p=P(),el=$('#pg');if(!$('#page').checked){el.innerHTML='';return}
+ const pages=[...new Set((pp.areas||[]).map(a=>a.page))];if(!pages.length){el.innerHTML='<div class="legend">This paragraph is not located on a PDF page.</div>';return}
+ el.innerHTML=pages.map(n=>{const d=p.dims[n-1]||{width:612,height:792},src=p.imgs[n-1]||'';
+  const boxes=pp.areas.filter(a=>a.page===n).map(a=>{const[x0,y0,x1,y1]=a.rect;return `<div class="box" style="left:${x0/d.width*100}%;top:${y0/d.height*100}%;width:${(x1-x0)/d.width*100}%;height:${(y1-y0)/d.height*100}%"></div>`}).join('');
+  return `<div class="pgwrap"><img src="${src}" alt="Page ${n}">${boxes}</div><div class="pglabel">Page ${n}</div>`}).join('');
+ const b=el.querySelector('.box');b&&b.scrollIntoView({block:'center'})}
+function abbrView(){const p=P();const order={undefined:0,defined:1,name:2};const L=[...p.abbr].sort((a,b)=>order[a.status]-order[b.status]||a.scope.localeCompare(b.scope));
+ $('#pg').innerHTML='';$('#mid').innerHTML=`<div class="legend">First use of each abbreviation in each scope (Abstract, Body, Supplement). <span class="st undefined">undefined</span> needs a definition at this first use. <span class="st name">name</span> is a dataset, method or tool name. The check is automatic, so read each flagged sentence.</div>
+ <table class="ab"><thead><tr><th>Status</th><th>Abbreviation</th><th>Scope</th><th>Uses</th><th>First sentence</th></tr></thead><tbody>${L.map(x=>`<tr><td><span class="st ${x.status}">${x.status}</span></td><td><b>${esc(x.abbr)}</b></td><td>${x.scope}</td><td>${x.n}</td><td><span class="jump" data-j="${x.row}">${x.row}</span> ${esc(x.text)}</td></tr>`).join('')}</tbody></table>`;bindRows()}
+function notesView(){const p=P();const ids=Object.keys(p.R).filter(id=>store.get(nk(p,id)));
+ $('#pg').innerHTML='';$('#mid').innerHTML=ids.length?`<div class="legend">${ids.length} notes in ${esc(p.name)}. Click a sentence number to open it.</div>`+ids.map(id=>`<div class="ph"><div class="crumb"><span class="jump" data-j="${id}">${id}</span></div><div>${esc(p.R[id].en)}</div><div style="margin-top:4px;color:var(--warn)">${esc(store.get(nk(p,id)))}</div></div>`).join(''):'<div class="legend">No notes yet. Click a sentence to add one.</div>';bindRows()}
+function scoresView(){const S=JSON.parse(document.getElementById('scores').textContent||'{}');$('#pg').innerHTML='';if(!S.rounds||!S.rounds.length){$('#mid').innerHTML='<div class="legend">No score log. Build the page with <code>--scores score_log.json</code> to track review rounds (format in docs/review.md).</div>';return}
+ const R=S.rounds,lines=[...new Set(R.map(r=>r.line||'paper'))],pal=['var(--acc)','#d9822b','#2d7a4b','#8a5bc4','#6b6d73'],col=Object.fromEntries(lines.map((l,i)=>[l,pal[i%pal.length]]));
+ const sc=R.map(r=>+r.score),tg=S.target!=null?+S.target:null,lo=Math.max(0,Math.floor(Math.min(...sc,tg??99)-1)),hi=Math.min(S.max??10,Math.ceil(Math.max(...sc,tg??0)+0.5));
+ const W=760,H=230,L=44,B=34,T=14,y=v=>T+(hi-v)/Math.max(1,hi-lo)*(H-T-B),x=i=>L+i*(W-L-14)/Math.max(1,R.length-1);let g='';
+ for(let v=lo;v<=hi;v++)g+=`<line x1="${L}" x2="${W-6}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--mute)">${v}</text>`;
+ if(tg!=null)g+=`<line x1="${L}" x2="${W-6}" y1="${y(tg)}" y2="${y(tg)}" stroke="var(--ok)" stroke-dasharray="4 3"/><text x="${W-8}" y="${y(tg)-5}" text-anchor="end" font-size="11" fill="var(--ok)">target ${tg}</text>`;
+ R.forEach((r,i)=>{if(i&&r.model&&R[i-1].model&&r.model!==R[i-1].model){const m=(x(i-1)+x(i))/2;g+=`<line x1="${m}" x2="${m}" y1="${T}" y2="${H-B}" stroke="var(--mute)" stroke-dasharray="2 3"/><text x="${m+4}" y="${T+10}" font-size="10" fill="var(--mute)">reviewer: ${esc(r.model)}</text>`}});
+ for(const ln of lines){const pts=R.map((r,i)=>[r,i]).filter(([r])=>(r.line||'paper')===ln);
+  g+=`<polyline fill="none" stroke="${col[ln]}" stroke-width="2" points="${pts.map(([r,i])=>x(i)+','+y(r.score)).join(' ')}"/>`;
+  g+=pts.map(([r,i])=>`<circle cx="${x(i)}" cy="${y(r.score)}" r="5" fill="${col[ln]}" stroke="var(--panel)" stroke-width="2"><title>${esc(ln+' '+(r.round||'')+' '+(r.version||'')+': '+r.score+(r.verdict?', '+r.verdict:''))}</title></circle>`).join('')}
+ g+=R.map((r,i)=>`<text x="${x(i)}" y="${H-B+16}" text-anchor="middle" font-size="10" fill="var(--mute)">${esc(r.version||r.round||'')}</text>`).join('');
+ const last=ln=>R.filter(r=>(r.line||'paper')===ln).slice(-1)[0];
+ $('#mid').innerHTML=`<div class="ph"><h2>Review score log</h2><div class="legend">Latest: ${lines.map(ln=>{const r=last(ln);return `<b style="color:${col[ln]}">${esc(ln)} ${r.score}</b> (${esc(r.round||'')}${r.version?', '+esc(r.version):''}${r.verdict?', '+esc(r.verdict):''})`}).join(' · ')}. ${esc(S.note||'')}</div>
+ <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Review scores by round">${g}</svg>
+ <div class="legend">${lines.map(ln=>`<span style="color:${col[ln]}">●</span> ${esc(ln)}`).join(' &nbsp; ')}</div></div>
+ <h3 style="font-size:14px">Rounds</h3><table class="ab"><thead><tr><th>Line</th><th>Round</th><th>Version</th><th>Score</th><th>Δ</th><th>Changes before this round</th><th>Top finding</th></tr></thead><tbody>${R.map((r,i)=>{const ln=r.line||'paper',pv=R.slice(0,i).filter(q=>(q.line||'paper')===ln).slice(-1)[0];const d=pv?r.score-pv.score:0;
+  return `<tr><td>${esc(ln)}</td><td>${esc(r.round||'')}</td><td>${esc(r.version||'')}</td><td><b>${r.score}</b> <span class="q">${esc(r.verdict||'')}</span></td><td style="color:${d>0?'var(--ok)':d<0?'var(--warn)':'var(--mute)'}">${pv?(d>0?'▲ +'+d:d<0?'▼ '+d:'='):'—'}</td><td>${esc(r.changes||'')}</td><td class="q">${esc(r.top||'')}</td></tr>`}).join('')}</tbody></table>
+ ${(S.unreviewed||[]).length?`<h3 style="font-size:14px">Not yet reviewed</h3><table class="ab"><tbody>${S.unreviewed.map(u=>`<tr><td>${esc(u.line||'')}</td><td>${esc(u.versions||'')}</td><td>${esc(u.changes||'')}</td></tr>`).join('')}</tbody></table>`:''}
+ ${(S.bottlenecks||[]).length?`<h3 style="font-size:14px">Bottlenecks</h3><table class="ab"><thead><tr><th>Issue</th><th>Raised in</th><th>Status</th><th>Evidence now</th></tr></thead><tbody>${S.bottlenecks.map(b=>`<tr><td><b>${esc(b.issue)}</b></td><td>${esc(b.rounds||'')}</td><td><span class="st ${/^Open/i.test(b.status||'')?'undefined':/^Addressed/i.test(b.status||'')?'defined':'name'}">${esc(b.status||'')}</span></td><td>${esc(b.evidence||'')}</td></tr>`).join('')}</tbody></table>`:''}`}
+function render(){paperTabs();stats();nav();document.querySelectorAll('#views button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===view));
+ $('#main').classList.toggle('nopage',!$('#page').checked||view!=='sent');document.body.classList.toggle('hidezh',!$('#zh').checked);
+ view==='abbr'?abbrView():view==='notes'?notesView():view==='scores'?scoresView():sentView();
+ if(sel){document.getElementById('r-'+sel)?.scrollIntoView({block:'nearest'})}
+ document.querySelector('#nav a[aria-current=true]')?.scrollIntoView({block:'nearest'})}
+document.querySelectorAll('#views button').forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
+$('#q').oninput=e=>{query=e.target.value.trim();view='sent';render()};$('#zh').onchange=render;$('#page').onchange=render;
+$('#exp').onclick=()=>{const L=[];for(const p of DATA){for(const id of Object.keys(p.R)){const n=store.get(nk(p,id));if(n)L.push(`## ${p.name} ${p.version} ${id}\n${p.R[id].en}\n> ${n}\n`)}}
+ const b=new Blob([L.join('\n')||'No notes.\n'],{type:'text/markdown'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='review_notes.md';a.click()};
+render();
+</script></body></html>

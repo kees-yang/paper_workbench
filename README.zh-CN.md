@@ -102,6 +102,15 @@ python -m paperrules workbench examples/aptp-cvpr2026
 
 读取、规则、PDF 对齐和英文标记是自动的。每句的标注语言（示例为中文）、句间链接、主张与故事线来自标注文件 `workbench.json`，由你或助手撰写；`--ids`、`--skeleton`、`--check` 可以帮忙。界面文字是中文。页面嵌入了整篇论文：未发表论文的页面请保密。示例的标注是为本仓库写的，可能有错。细节、标注格式与数据约定见 [`docs/workbench.zh-CN.md`](docs/workbench.zh-CN.md)。
 
+
+### 审阅页
+
+`paperrules review <页面或项目> [...]` 读取已生成的工作台页面，生成一个紧凑的审阅页：每段一张表，列出每句的原文、译文及其与上一句的衔接（红色标签标出没有承接的句子），旁边是 PDF 页面；检查每个缩写在摘要、正文和补充材料中首次出现时是否有定义；每句可写笔记并导出为 Markdown；还可记录每轮审稿分数。多篇论文或多个版本以标签页并排。详见 [`docs/review.zh-CN.md`](docs/review.zh-CN.md)。
+
+```bash
+python -m paperrules review main=examples/aptp-cvpr2026/expected/workbench.html --names "APTP,MSRS,TNO" --out review.html
+```
+
 ## 检查器不做什么
 
 * **它不评判科学内容或论证。** 它读句子与结构。报告干净不等于论文好；一篇好论文上的标出项也不是对它的批评。
@@ -118,7 +127,7 @@ paperrules/workbench/   工作台：页面模板、数据生成、PDF 对齐
 examples/aptp-cvpr2026/ 一篇 CC BY 4.0 论文、术语表、本地规则、例外、expected/ 输出
 AGENTS.md               智能体指南：设置、修改循环、作者意见→规则、图件
 docs/                   自定义规则与工作台（English、中文）、rules.md、截图
-tests/                  python -m unittest discover -s tests   （45 个测试）
+tests/                  python -m unittest discover -s tests   （49 个测试）
 ```
 
 ## 致谢与参考
