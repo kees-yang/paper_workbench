@@ -2,7 +2,8 @@
 
 It reads the data that ``paper_workbench workbench`` already wrote into each ``workbench.html`` and builds one offline page with
   Sentences      one paragraph at a time: its question and claim, then a table of the sentences (original and rendering) with
-                 the link of each sentence to the previous one and to earlier text, and the PDF page with the paragraph box
+                 the subject, predicate and object underlined, the linked phrases tinted at both ends, the link of each sentence
+                 to the previous one and to earlier text, and the PDF page with the paragraph box
   Abbreviations  the first use of each abbreviation in the abstract, the body and the supplement, and whether a definition
                  stands there ("long form (ABBR)", "ABBR (long form)", "ABBR is the ...", or a caption label "ABBR: ...")
   Flow           the paper as one shortcut: each abstract slot followed into the introduction, the body and the conclusion; the
@@ -105,14 +106,15 @@ def paper(name, path, names, supp_from=None, supp_page=None):
               q=p.get('question', ''), claim=p.get('claim', ''), prev=p.get('previous_claim', ''), areas=p.get('areas', []),
               rows=[x if isinstance(x, str) else x.get('id') for x in p.get('rows', [])]) for p in data['paragraphs']]
     R = {}
+    spo = data.get('spo') or {}          # subject, predicate and object spans per sentence: [start, end, 'S'|'P'|'O']
     for r in rows:
         a = r.get('cn_analysis') or {}
 
         def link(f):
             x = a.get(f) or {}
-            return {k: x.get(k, '') for k in ('anchor_id', 'anchor_quote', 'target_quote', 'relation')} if x.get('anchor_id') else None
+            return {k: x.get(k, '') for k in ('anchor_id', 'anchor_quote', 'anchor_head', 'target_quote', 'target_head', 'relation')} if x.get('anchor_id') else None
         R[r['id']] = dict(en=r.get('en_source', ''), zh=r.get('zh', ''), p=r.get('paragraph_id', ''), prev=link('previous'), earl=link('earlier'),
-                          s=bool(r.get('_supp')))
+                          s=bool(r.get('_supp')), spo=(spo.get(r['id']) or {}).get('en', []), spz=(spo.get(r['id']) or {}).get('zh', []))
     ws = data.get('ws') or {}
     wp = ws.get('paragraphs') or {}
     for x in P:

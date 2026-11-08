@@ -1,9 +1,9 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>__TITLE__</title>
 <style>
-:root{--bg:#fbfaf8;--panel:#ffffff;--ink:#1d1d1f;--ink2:#55565c;--mute:#8a8b91;--line:#e4e2dd;--acc:#2f6fb3;--acc2:#e9f1fa;--warn:#a5541b;--warnbg:#fbefe4;--ok:#2d7a4b;--okbg:#e8f4ec;--hl:rgba(242,194,0,.28);--chip:#f1efea}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181a;--panel:#1f2023;--ink:#ececee;--ink2:#b5b6bb;--mute:#86878d;--line:#33343a;--acc:#7fb0e6;--acc2:#1f2b3a;--warn:#e6a06a;--warnbg:#3a2a1c;--ok:#7cc796;--okbg:#1c3226;--hl:rgba(242,194,0,.22);--chip:#2a2b30}}
-:root[data-theme="dark"]{--bg:#17181a;--panel:#1f2023;--ink:#ececee;--ink2:#b5b6bb;--mute:#86878d;--line:#33343a;--acc:#7fb0e6;--acc2:#1f2b3a;--warn:#e6a06a;--warnbg:#3a2a1c;--ok:#7cc796;--okbg:#1c3226;--hl:rgba(242,194,0,.22);--chip:#2a2b30}
+:root{--bg:#fbfaf8;--panel:#ffffff;--ink:#1d1d1f;--ink2:#55565c;--mute:#8a8b91;--line:#e4e2dd;--acc:#2f6fb3;--acc2:#e9f1fa;--warn:#a5541b;--warnbg:#fbefe4;--ok:#2d7a4b;--okbg:#e8f4ec;--hl:rgba(242,194,0,.28);--chip:#f1efea;--uS:#2f6fb3;--uP:#c8433a;--uO:#2d8a52;--lp:rgba(47,111,179,.13)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181a;--panel:#1f2023;--ink:#ececee;--ink2:#b5b6bb;--mute:#86878d;--line:#33343a;--acc:#7fb0e6;--acc2:#1f2b3a;--warn:#e6a06a;--warnbg:#3a2a1c;--ok:#7cc796;--okbg:#1c3226;--hl:rgba(242,194,0,.22);--chip:#2a2b30;--uS:#7fb0e6;--uP:#f08a80;--uO:#7cc796;--lp:rgba(127,176,230,.2)}}
+:root[data-theme="dark"]{--bg:#17181a;--panel:#1f2023;--ink:#ececee;--ink2:#b5b6bb;--mute:#86878d;--line:#33343a;--acc:#7fb0e6;--acc2:#1f2b3a;--warn:#e6a06a;--warnbg:#3a2a1c;--ok:#7cc796;--okbg:#1c3226;--hl:rgba(242,194,0,.22);--chip:#2a2b30;--uS:#7fb0e6;--uP:#f08a80;--uO:#7cc796;--lp:rgba(127,176,230,.2)}
 *{box-sizing:border-box}html,body{margin:0;height:100%}body{display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font:13px/1.45 -apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif}
 header{display:flex;gap:10px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5;flex-wrap:wrap}
 header h1{font-size:14px;margin:0 8px 0 0;font-weight:600}
@@ -47,6 +47,9 @@ table.ab{width:100%;border-collapse:collapse;background:var(--panel);border:1px 
 .fl td,.fl th{font-size:12px}.fl td{min-width:120px}.pj{color:var(--acc);cursor:pointer;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ck{display:inline-block;padding:0 5px;border-radius:8px;font-size:10.5px;margin:1px 2px 0 0}.ck.pass{background:var(--okbg);color:var(--ok)}.ck.minor{background:var(--warnbg);color:var(--warn)}.ck.major{background:var(--warn);color:var(--panel)}
 .seq{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:4px 0}.seq .s{padding:1px 7px;border-radius:9px;background:var(--chip);font-size:11.5px}.seq .a{color:var(--mute)}
+.spo{text-decoration-line:underline;text-decoration-thickness:2px;text-underline-offset:3px;text-decoration-skip-ink:none}.spo.S{text-decoration-color:var(--uS)}.spo.P{text-decoration-color:var(--uP)}.spo.O{text-decoration-color:var(--uO)}
+.lp{background:var(--lp);border-radius:3px;padding:0 1px}b.hn{font-weight:700}.lk .lp{font-weight:600}
+.spo-legend{color:var(--mute);font-size:12px;margin:0 0 6px}.spo-legend .spo{color:var(--ink2)}
 .legend{color:var(--mute);font-size:12px;margin:0 0 8px}mark{background:var(--hl);color:inherit}
 @media (max-width:900px){main,main.nopage{grid-template-columns:1fr;height:auto}nav,#pg{display:none}}
 </style></head><body>
@@ -79,15 +82,31 @@ function nav(){const p=P();let h='',ch='';const nlink=pp=>pp.rows.some(r=>p.R[r]
   h+=`<a data-p="${pp.id}" aria-current="${pp.id===cur}"><span class="pid">${pp.id.slice(1)}</span><span>${esc(pp.title||pp.sec)}</span><span class="dot ${hasNote?'n':nlink(pp)?'w':''}" title="${hasNote?'has notes':nlink(pp)?'a sentence without a link to the previous one':''}"></span></a>`}
  $('#nav').innerHTML=h;document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>{cur=a.dataset.p;sel=null;view='sent';render()})}
 function hl(t){if(!query)return esc(t);const i=t.toLowerCase().indexOf(query.toLowerCase());return i<0?esc(t):esc(t.slice(0,i))+'<mark>'+esc(t.slice(i,i+query.length))+'</mark>'+esc(t.slice(i+query.length))}
+// Sentence marks: coloured underlines for the subject (S), predicate (P) and object (O) of each clause; a tint for the phrase that
+// links to the previous sentence or to earlier text (in this sentence) and for the phrase it picks up (in the anchor sentence); head noun bold.
+function marked(text,spans,links){text=String(text||'');const n=text.length,role=new Array(n).fill(''),lk=new Array(n).fill(null),hd=new Array(n).fill(false);
+ (spans||[]).forEach(([a,b,t])=>{for(let i=Math.max(0,a);i<Math.min(n,b);i++)if(!role[i])role[i]=t});
+ (links||[]).forEach(L=>{for(let i=L.s;i<L.e;i++)lk[i]=L;if(L.h){const j=L.q.lastIndexOf(L.h);if(j>=0)for(let i=L.s+j;i<L.s+j+L.h.length;i++)hd[i]=true}});
+ let o='',i=0;while(i<n){const L=lk[i];let j=i;while(j<n&&lk[j]===L)j++;let inner='',k=i;
+  while(k<j){let m=k;while(m<j&&role[m]===role[k]&&hd[m]===hd[k])m++;let t=esc(text.slice(k,m));if(hd[k])t='<b class="hn">'+t+'</b>';if(role[k])t=`<span class="spo ${role[k]}">${t}</span>`;inner+=t;k=m}
+  o+=L?`<span class="lp" title="${esc(L.t||'')}">${inner}</span>`:inner;i=j}
+ return o}
+function phrases(text,list){const rs=[];text=String(text||'');for(const x of list){if(!x.q)continue;const i=text.indexOf(x.q),e=i+x.q.length;if(i>=0&&!rs.some(r=>i<r.e&&e>r.s))rs.push({s:i,e,q:x.q,h:x.h,t:x.t})}return rs}
+function linkMarks(p,id,which){const r=p.R[id],L=[];if(!r)return L;
+ for(const k of ['prev','earl']){const x=r[k];if(x)L.push({q:x.target_quote,h:x.target_head,t:'links to '+x.anchor_id})}
+ for(const a of (p.anchorsOf||{})[id]||[])L.push({q:a.anchor_quote,h:a.anchor_head,t:'picked up by '+a.by});
+ return L}
+const SPO_LEGEND='<div class="spo-legend"><span class="spo S">subject</span> <span class="spo P">predicate</span> <span class="spo O">object</span> · <span class="lp">tint</span>: the phrase that links two sentences, at both ends · <b>bold</b>: its head noun · hover a tint for its partner sentence</div>';
+function anchors(p){if(p.anchorsOf)return;const A={};for(const[id,r]of Object.entries(p.R))for(const k of ['prev','earl']){const x=r[k];if(x&&x.anchor_id)(A[x.anchor_id]=A[x.anchor_id]||[]).push({anchor_quote:x.anchor_quote,anchor_head:x.anchor_head,by:id})}p.anchorsOf=A}
 function linkCell(p,id,r,i){let h='';
- if(r.prev){h+=`<div class="link"><span class="rel">${esc(r.prev.relation||'link')}</span><span class="q"><span class="jump" data-j="${r.prev.anchor_id}">${r.prev.anchor_id.slice(5)}</span> <b>${esc(r.prev.anchor_quote)}</b> <span class="arrow">→</span> <b>${esc(r.prev.target_quote)}</b></span></div>`}
+ if(r.prev){h+=`<div class="link"><span class="rel">${esc(r.prev.relation||'link')}</span><span class="q"><span class="jump" data-j="${r.prev.anchor_id}">${r.prev.anchor_id.slice(5)}</span> <span class="lp">${esc(r.prev.anchor_quote)}</span> <span class="arrow">→</span> <span class="lp">${esc(r.prev.target_quote)}</span></span></div>`}
  else if(i>0){h+=`<div class="link"><span class="rel none">no link</span><span class="q">does not pick up the previous sentence</span></div>`}
  else{h+=`<div class="link"><span class="rel">opens</span><span class="q">first sentence of the paragraph</span></div>`}
- if(r.earl){h+=`<div class="link" style="margin-top:3px"><span class="rel earl">${esc(r.earl.relation||'earlier')}</span><span class="q"><span class="jump" data-j="${r.earl.anchor_id}">${r.earl.anchor_id}</span> <b>${esc(r.earl.anchor_quote)}</b> <span class="arrow">→</span> <b>${esc(r.earl.target_quote)}</b></span></div>`}
+ if(r.earl){h+=`<div class="link" style="margin-top:3px"><span class="rel earl">${esc(r.earl.relation||'earlier')}</span><span class="q"><span class="jump" data-j="${r.earl.anchor_id}">${r.earl.anchor_id}</span> <span class="lp">${esc(r.earl.anchor_quote)}</span> <span class="arrow">→</span> <span class="lp">${esc(r.earl.target_quote)}</span></span></div>`}
  return h}
-function rowsTable(p,ids){return `<table class="s"><thead><tr><th>#</th><th>Sentence</th><th>Link to the previous sentence · earlier link</th></tr></thead><tbody>`+
+function rowsTable(p,ids){anchors(p);return SPO_LEGEND+`<table class="s"><thead><tr><th>#</th><th>Sentence</th><th>Link to the previous sentence · earlier link</th></tr></thead><tbody>`+
  ids.map((id,i)=>{const r=p.R[id];if(!r)return '';const note=store.get(nk(p,id));
- return `<tr id="r-${id}" data-id="${id}" class="${sel===id?'sel':''} ${note?'has-note':''}"><td class="n">${id.slice(5)}</td><td class="tx"><div class="en">${hl(r.en)}</div><div class="zh">${hl(r.zh)}</div>${sel===id?`<textarea class="note" data-n="${id}" placeholder="Note on this sentence">${esc(note)}</textarea>`:''}</td><td class="lk">${linkCell(p,id,r,i)}</td></tr>`}).join('')+'</tbody></table>'}
+ return `<tr id="r-${id}" data-id="${id}" class="${sel===id?'sel':''} ${note?'has-note':''}"><td class="n">${id.slice(5)}</td><td class="tx"><div class="en">${query?hl(r.en):marked(r.en,r.spo,phrases(r.en,linkMarks(p,id)))}</div><div class="zh">${query?hl(r.zh):marked(r.zh,r.spz,phrases(r.zh,linkMarks(p,id)))}</div>${sel===id?`<textarea class="note" data-n="${id}" placeholder="Note on this sentence">${esc(note)}</textarea>`:''}</td><td class="lk">${linkCell(p,id,r,i)}</td></tr>`}).join('')+'</tbody></table>'}
 function sentView(){const p=P();
  if(query){const ids=Object.keys(p.R).filter(id=>(p.R[id].en+' '+p.R[id].zh).toLowerCase().includes(query.toLowerCase()));
   $('#mid').innerHTML=`<div class="legend">${ids.length} sentences match “${esc(query)}”.</div>`+rowsTable(p,ids);bindRows();return}

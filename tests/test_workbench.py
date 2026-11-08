@@ -186,3 +186,13 @@ class Review(unittest.TestCase):
         self.assertTrue(F['lines'] and F['lines'][0]['units'][0]['chain'])
         self.assertTrue(any(x['move'] == 'motivation' for x in p['P']))
         self.assertIn('function flowView', review.TEMPLATE.read_text(encoding='utf-8'))
+
+    def test_sentence_marks(self):
+        """Subject, predicate and object spans and the link phrases reach the review page."""
+        from paper_workbench.workbench import review
+        p = review.build([('one', str(self.PAGE))], Path(tempfile.mkdtemp()) / 'r.html')[0]
+        marked = [r for r in p['R'].values() if r['spo']]
+        self.assertGreater(len(marked), 100)
+        self.assertTrue(all(t in 'SPO' for r in marked for _, _, t in r['spo']))
+        self.assertTrue(any(r['prev'] and r['prev']['target_head'] for r in p['R'].values()))
+        self.assertIn('function marked', review.TEMPLATE.read_text(encoding='utf-8'))

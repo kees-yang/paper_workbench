@@ -129,7 +129,7 @@ paper_workbench/workbench/ the workbench: page template, data builder, PDF align
 examples/aptp-cvpr2026/ a CC BY 4.0 paper, a glossary, local rules, exceptions, expected/ output
 AGENTS.md               guide for agents: setup, revision loop, author feedback → rules, figures
 docs/                   customizing-rules, workbench and review (EN, 中文), rules.md, screenshots
-tests/                  python -m unittest discover -s tests   (53 tests)
+tests/                  python -m unittest discover -s tests   (54 tests)
 ```
 
 ## Credits

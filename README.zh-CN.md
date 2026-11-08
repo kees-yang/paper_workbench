@@ -130,7 +130,7 @@ paper_workbench/workbench/ 工作台：页面模板、数据生成、PDF 对齐
 examples/aptp-cvpr2026/ 一篇 CC BY 4.0 论文、术语表、本地规则、例外、expected/ 输出
 AGENTS.md               智能体指南：设置、修改循环、作者意见→规则、图件
 docs/                   自定义规则与工作台（English、中文）、rules.md、截图
-tests/                  python -m unittest discover -s tests   （53 个测试）
+tests/                  python -m unittest discover -s tests   （54 个测试）
 ```
 
 ## 致谢与参考
