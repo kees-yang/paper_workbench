@@ -39,7 +39,7 @@ td.lk{width:34%;font-size:12px}
 .note{width:100%;margin-top:4px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit;font-size:12px;padding:4px 6px;min-height:28px;resize:vertical}
 .has-note td.n::after{content:"✎";color:var(--warn);margin-left:3px}
 .pgwrap{position:relative;margin:0 auto 10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}.pgwrap img{display:block;width:100%}
-.box{position:absolute;background:var(--hl);border:1.5px solid #F2C200;border-radius:2px;pointer-events:none}
+.box{position:absolute;background:var(--hl);border:1.5px solid #F2C200;border-radius:2px}.hit{position:absolute;cursor:pointer;border-radius:2px}.hit:not(.box):hover{outline:1.5px solid var(--acc);background:var(--acc2);opacity:.55}
 .pglabel{color:var(--mute);font-size:11px;text-align:center;margin:-6px 0 10px}
 .tab{display:none}.tab.on{display:block}
 table.ab{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line)}table.ab td,table.ab th{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:12px;vertical-align:top}
@@ -119,11 +119,22 @@ function sentView(){const p=P();
 function bindRows(){document.querySelectorAll('table.s tr[data-id]').forEach(tr=>tr.onclick=e=>{if(e.target.closest('textarea,.jump'))return;sel=tr.dataset.id;if(query){cur=P().R[sel].p;query='';$('#q').value=''}render();const t=document.querySelector('textarea.note');t&&t.focus()});
  document.querySelectorAll('.jump').forEach(j=>j.onclick=()=>{const id=j.dataset.j,r=P().R[id];if(!r)return;cur=r.p;sel=id;query='';$('#q').value='';render();document.getElementById('r-'+id)?.scrollIntoView({block:'center'})});
  document.querySelectorAll('textarea.note').forEach(t=>t.oninput=()=>{store.set(nk(P(),t.dataset.n),t.value.trim());t.closest('tr').classList.toggle('has-note',!!t.value.trim())})}
+// PDF pane: the pages of the paragraph, with every located paragraph on them clickable. A click opens that paragraph and selects
+// the sentence at the click: the sentence whose share of the paragraph's text matches the click's share of the paragraph's lines.
+function hitRows(p,pp,pg,y){const A=(pp.areas||[]).filter(a=>a.rect[3]-a.rect[1]>12).sort((a,b)=>a.page-b.page||a.rect[1]-b.rect[1]);
+ const tot=A.reduce((t,a)=>t+a.rect[3]-a.rect[1],0);let before=0;for(const a of A){if(a.page===pg&&y>=a.rect[1]&&y<=a.rect[3]){before+=y-a.rect[1];break}before+=a.rect[3]-a.rect[1]}
+ const f=tot?before/tot:0,len=pp.rows.map(r=>(p.R[r]?.en||'').length),T=len.reduce((a,b)=>a+b,0)||1;let c=0;
+ for(let k=0;k<pp.rows.length;k++){c+=len[k];if(c/T>=f)return pp.rows[k]}return pp.rows[pp.rows.length-1]}
 function page(pp){const p=P(),el=$('#pg');if(!$('#page').checked){el.innerHTML='';return}
  const pages=[...new Set((pp.areas||[]).map(a=>a.page))];if(!pages.length){el.innerHTML='<div class="legend">This paragraph is not located on a PDF page.</div>';return}
- el.innerHTML=pages.map(n=>{const d=p.dims[n-1]||{width:612,height:792},src=p.imgs[n-1]||'';
-  const boxes=pp.areas.filter(a=>a.page===n).map(a=>{const[x0,y0,x1,y1]=a.rect;return `<div class="box" style="left:${x0/d.width*100}%;top:${y0/d.height*100}%;width:${(x1-x0)/d.width*100}%;height:${(y1-y0)/d.height*100}%"></div>`}).join('');
-  return `<div class="pgwrap"><img src="${src}" alt="Page ${n}">${boxes}</div><div class="pglabel">Page ${n}</div>`}).join('');
+ el.innerHTML='<div class="legend">Click any paragraph on the page to open its sentences.</div>'+pages.map(n=>{const d=p.dims[n-1]||{width:612,height:792},src=p.imgs[n-1]||'';
+  const box=(a,cls,id)=>{const[x0,y0,x1,y1]=a.rect;return `<div class="${cls}" ${id?`data-hp="${id}" title="${id}"`:''} style="left:${x0/d.width*100}%;top:${y0/d.height*100}%;width:${(x1-x0)/d.width*100}%;height:${(y1-y0)/d.height*100}%"></div>`};
+  const hits=p.P.filter(q=>q.id!==pp.id).flatMap(q=>(q.areas||[]).filter(a=>a.page===n&&a.rect[3]-a.rect[1]>12).map(a=>box(a,'hit',q.id))).join('');
+  const own=pp.areas.filter(a=>a.page===n&&a.rect[3]-a.rect[1]>12).map(a=>box(a,'box hit cur',pp.id)).join('');
+  return `<div class="pgwrap" data-page="${n}"><img src="${src}" alt="Page ${n}">${hits}${own}</div><div class="pglabel">Page ${n}</div>`}).join('');
+ el.querySelectorAll('.hit').forEach(h=>h.onclick=e=>{const w=h.closest('.pgwrap'),n=+w.dataset.page,d=p.dims[n-1]||{width:612,height:792},r=w.getBoundingClientRect();
+  const y=(e.clientY-r.top)/r.height*d.height,q=p.P.find(x=>x.id===h.dataset.hp);if(!q)return;cur=q.id;sel=hitRows(p,q,n,y);view='sent';query='';$('#q').value='';render();
+  const t=document.getElementById('r-'+sel);t&&t.scrollIntoView({block:'center'})});
  const b=el.querySelector('.box');b&&b.scrollIntoView({block:'center'})}
 function abbrView(){const p=P();const order={undefined:0,defined:1,name:2};const L=[...p.abbr].sort((a,b)=>order[a.status]-order[b.status]||a.scope.localeCompare(b.scope));
  $('#pg').innerHTML='';$('#mid').innerHTML=`<div class="legend">First use of each abbreviation in each scope (Abstract, Body, Supplement). <span class="st undefined">undefined</span> needs a definition at this first use. <span class="st name">name</span> is a dataset, method or tool name. The check is automatic, so read each flagged sentence.</div>
