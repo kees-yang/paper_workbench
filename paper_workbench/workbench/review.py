@@ -5,6 +5,9 @@ It reads the data that ``paper_workbench workbench`` already wrote into each ``w
                  the link of each sentence to the previous one and to earlier text, and the PDF page with the paragraph box
   Abbreviations  the first use of each abbreviation in the abstract, the body and the supplement, and whether a definition
                  stands there ("long form (ABBR)", "ABBR (long form)", "ABBR is the ...", or a caption label "ABBR: ...")
+  Flow           the paper as one shortcut: each abstract slot followed into the introduction, the body and the conclusion; the
+                 structure of the abstract, the introduction and the conclusion against the expected parts; and the storylines
+                 with their checks (expands, not a copy, key concepts kept, echoes)
   Notes          a note per sentence (kept in the browser), exported as Markdown
   Scores         an optional review score log: rounds per line, change per round, open issues
 Nothing in the source pages changes.
@@ -108,11 +111,30 @@ def paper(name, path, names, supp_from=None, supp_page=None):
         def link(f):
             x = a.get(f) or {}
             return {k: x.get(k, '') for k in ('anchor_id', 'anchor_quote', 'target_quote', 'relation')} if x.get('anchor_id') else None
-        R[r['id']] = dict(en=r.get('en_source', ''), zh=r.get('zh', ''), p=r.get('paragraph_id', ''), prev=link('previous'), earl=link('earlier'))
+        R[r['id']] = dict(en=r.get('en_source', ''), zh=r.get('zh', ''), p=r.get('paragraph_id', ''), prev=link('previous'), earl=link('earlier'),
+                          s=bool(r.get('_supp')))
+    ws = data.get('ws') or {}
+    wp = ws.get('paragraphs') or {}
+    for x in P:
+        m = wp.get(x['id']) or {}
+        x.update(move=m.get('move', ''), serves=m.get('serves', []), words=(m.get('budget') or {}).get('words', 0))
+    F = data.get('flow') or {}
+    flow = dict(
+        slots=[dict(id=s.get('id'), name=s.get('name', ''), name_zh=s.get('name_zh', ''), scope=s.get('scope', ''),
+                    claim=s.get('claim_en') or s.get('claim_zh', ''), rows=s.get('rows', []), points=s.get('points', []))
+               for s in ws.get('slots', [])],
+        conclusion=[dict(id=c.get('id'), claim=c.get('claim_en') or c.get('zh', ''), rows=c.get('rows', []), mirrors=c.get('mirrors', []),
+                         supported_by=c.get('supported_by', [])) for c in ws.get('conclusion', [])],
+        lines=[dict(id=L.get('id'), name=L.get('name', ''), story=L.get('story', ''), levels=[n.get('level') for n in L.get('nodes', [])],
+                    units=[dict(key=u.get('key'), text=u.get('zh', ''),
+                                chain=[dict(level=c.get('level'), role=c.get('role'), carrier=c.get('carrier'), rows=c.get('text_rows', []),
+                                            checks=c.get('checks', {}), excluded=c.get('excluded', False)) for c in u.get('chain', [])])
+                           for u in L.get('units', [])]) for L in F.get('lines', [])],
+        issues=F.get('issues', []), uncovered=F.get('uncovered_paragraphs', []))
     stats = dict(rows=len(R), paras=len(P), prev=sum(1 for v in R.values() if v['prev']), earl=sum(1 for v in R.values() if v['earl']),
                  located=sum(1 for p in P if p['areas']), undefined=sum(1 for x in ab if x['status'] == 'undefined'))
     return dict(name=name, title=data.get('title', ''), version=data.get('pdf_version', ''), P=P, R=R, imgs=imgs,
-                dims=data.get('page_dimensions', []), abbr=ab, stats=stats)
+                dims=data.get('page_dimensions', []), abbr=ab, flow=flow, stats=stats)
 
 
 def build(pages, out, names=(), scores=None, title='Review Workbench', supp_from=None, supp_page=None):

@@ -44,13 +44,16 @@ td.lk{width:34%;font-size:12px}
 .tab{display:none}.tab.on{display:block}
 table.ab{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line)}table.ab td,table.ab th{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left;font-size:12px;vertical-align:top}
 .st{padding:0 6px;border-radius:9px;font-size:11px}.st.undefined{background:var(--warnbg);color:var(--warn)}.st.defined{background:var(--okbg);color:var(--ok)}.st.name{background:var(--chip);color:var(--ink2)}
+.fl td,.fl th{font-size:12px}.fl td{min-width:120px}.pj{color:var(--acc);cursor:pointer;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ck{display:inline-block;padding:0 5px;border-radius:8px;font-size:10.5px;margin:1px 2px 0 0}.ck.pass{background:var(--okbg);color:var(--ok)}.ck.minor{background:var(--warnbg);color:var(--warn)}.ck.major{background:var(--warn);color:var(--panel)}
+.seq{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin:4px 0}.seq .s{padding:1px 7px;border-radius:9px;background:var(--chip);font-size:11.5px}.seq .a{color:var(--mute)}
 .legend{color:var(--mute);font-size:12px;margin:0 0 8px}mark{background:var(--hl);color:inherit}
 @media (max-width:900px){main,main.nopage{grid-template-columns:1fr;height:auto}nav,#pg{display:none}}
 </style></head><body>
 <header>
  <h1>__TITLE__</h1>
  <div class="seg" id="papers"></div>
- <div class="seg" id="views"><button data-v="sent" aria-pressed="true">Sentences</button><button data-v="abbr">Abbreviations</button><button data-v="notes">Notes</button><button data-v="scores">Scores</button></div>
+ <div class="seg" id="views"><button data-v="sent" aria-pressed="true">Sentences</button><button data-v="abbr">Abbreviations</button><button data-v="flow">Flow</button><button data-v="notes">Notes</button><button data-v="scores">Scores</button></div>
  <input type="search" id="q" placeholder="Search sentences, English or 中文">
  <label class="t"><input type="checkbox" id="zh" checked> 中文</label>
  <label class="t"><input type="checkbox" id="page" checked> Page</label>
@@ -106,6 +109,56 @@ function page(pp){const p=P(),el=$('#pg');if(!$('#page').checked){el.innerHTML='
 function abbrView(){const p=P();const order={undefined:0,defined:1,name:2};const L=[...p.abbr].sort((a,b)=>order[a.status]-order[b.status]||a.scope.localeCompare(b.scope));
  $('#pg').innerHTML='';$('#mid').innerHTML=`<div class="legend">First use of each abbreviation in each scope (Abstract, Body, Supplement). <span class="st undefined">undefined</span> needs a definition at this first use. <span class="st name">name</span> is a dataset, method or tool name. The check is automatic, so read each flagged sentence.</div>
  <table class="ab"><thead><tr><th>Status</th><th>Abbreviation</th><th>Scope</th><th>Uses</th><th>First sentence</th></tr></thead><tbody>${L.map(x=>`<tr><td><span class="st ${x.status}">${x.status}</span></td><td><b>${esc(x.abbr)}</b></td><td>${x.scope}</td><td>${x.n}</td><td><span class="jump" data-j="${x.row}">${x.row}</span> ${esc(x.text)}</td></tr>`).join('')}</tbody></table>`;bindRows()}
+const PART={background:/background|state of the art|current state|context|necessity|研究现状|背景|现状|必要/i,related:/related|prior work|existing|相关工作|现有/i,
+ question:/problem|gap|question|challenge|limitation|不足|问题|挑战|局限/i,motivation:/motivation|insight|observation|thesis|idea|动机|观察|论点|洞察/i,
+ method:/method|approach|propos|design|方法|提出|设计/i,contribution:/contribution|novel|贡献|创新/i,result:/result|finding|evidence|experiment|结果|实验|证据/i};
+const CHAP=[['Introduction',/introduction|引言|绪论/i],['Related work',/related|相关工作/i],['Method',/method|approach|方法/i],['Experiments',/experiment|result|evaluation|实验|结果/i],['Conclusion',/conclusion|结论|总结/i]];
+function partOf(pp){if(pp.kind==='abstract')return 'Abstract';const r=P().R[pp.rows[0]];if(r&&r.s)return 'Supplement';for(const[n,rx]of CHAP)if(rx.test(pp.ch))return n;return 'Body'}
+const pj=id=>`<span class="pj" data-pj="${id}">${id}</span>`, ck=c=>Object.entries(c||{}).map(([k,v])=>`<span class="ck ${v[0]}" title="${esc(v[1]||'')}">${esc(k)}</span>`).join('');
+function flowView(){const p=P(),F=p.flow||{};$('#pg').innerHTML='';
+ if(!(F.slots||[]).length&&!(F.lines||[]).length){$('#mid').innerHTML='<div class="legend">This page has no flow data. Write the abstract slots, the conclusion and the storyline in the annotation file (workbench.json) and rebuild the workbench.</div>';return}
+ const parts=Object.fromEntries(p.P.map(pp=>[pp.id,partOf(pp)])),slotTxt=s=>[s.name,s.name_zh,s.scope].join(' ');
+ const servesSlot=(pp,s)=>(pp.serves||[]).some(x=>x===s.id||String(x).startsWith(s.id+'.'));
+ const mirrors=(c,s)=>(c.mirrors||[]).some(x=>x===s.id||String(x).startsWith(s.id+'.'));
+ // 1. skeleton
+ let h=`<div class="ph"><h2>The paper as one shortcut</h2><div class="legend">Each abstract slot, then the paragraphs that expand it in the introduction and the body, and the conclusion items that answer it. A gap in a row is a part of the abstract that the paper does not carry through.</div>
+ <table class="ab fl"><thead><tr><th>Abstract slot</th><th>Introduction</th><th>Body</th><th>Conclusion</th></tr></thead><tbody>`;
+ for(const s of F.slots){const intro=p.P.filter(pp=>parts[pp.id]==='Introduction'&&servesSlot(pp,s)),body=p.P.filter(pp=>!['Abstract','Introduction','Conclusion'].includes(parts[pp.id])&&servesSlot(pp,s)),con=(F.conclusion||[]).filter(c=>mirrors(c,s));
+  const cell=L=>L.length?L.map(pp=>`${pj(pp.id)} <span class="q">${esc(pp.move||pp.title||'')}</span>`).join('<br>'):'<span class="rel none">none</span>';
+  h+=`<tr><td><b>${esc(s.id)} ${esc(s.name||s.name_zh)}</b><div class="q">${esc(s.claim)}</div>${(s.points||[]).length?`<div class="q">${s.points.length} points</div>`:''}</td><td>${cell(intro)}</td><td>${cell(body)}</td><td>${con.length?con.map(c=>`<b>${esc(c.id)}</b> <span class="q">${esc(c.claim)}</span>`).join('<br>'):'<span class="rel none">none</span>'}</td></tr>`}
+ h+='</tbody></table></div>';
+ // 2. structure of each part
+ const find=(L,txt,k)=>{const byName=L.filter(x=>PART[k].test([x.name,x.name_zh].join(' ')));return byName.length?byName:L.filter(x=>PART[k].test(txt(x)))};   // a slot's name decides; its scope text only when no name matches
+ const absParts=[['background','Background or necessity'],['question','Question'],['motivation','Motivation'],['method','Novel points'],['result','Result']];
+ const absRow=absParts.map(([k,lab])=>{let m=find(F.slots,slotTxt,k);if(k==='method')m=m.concat(find(F.slots,slotTxt,'contribution').filter(x=>!m.includes(x)));
+  const n=k==='method'?m.reduce((a,s)=>a+((s.points||[]).length||1),0):0;
+  return `<tr><td>${lab}</td><td>${m.length?m.map(s=>`<b>${esc(s.id)}</b> ${esc(s.name||s.name_zh)}`).join(', '):'<span class="rel none">missing</span>'}${k==='method'&&m.length?` · <span class="${n===3?'q':'rel none'}">${n} novel point${n===1?'':'s'}${n===3?'':' (expected 3)'}</span>`:''}</td></tr>`});
+ const order=absParts.map(([k])=>{const m=find(F.slots,slotTxt,k);return m.length?F.slots.indexOf(m[0]):-1}).filter(i=>i>=0),absOrdered=order.every((v,i)=>!i||v>=order[i-1]);
+ const intro=p.P.filter(pp=>parts[pp.id]==='Introduction'),iw=intro.reduce((a,pp)=>a+(pp.words||0),0);
+ const inParts=[['background','Background'],['related','Related work'],['question','Question'],['motivation','Motivation'],['method','Method'],['contribution','Contribution']];
+ const relCh=p.P.filter(pp=>parts[pp.id]==='Related work');
+ const inRow=inParts.map(([k,lab])=>{const m=intro.filter(pp=>PART[k].test(pp.move||''));const w=m.reduce((a,pp)=>a+(pp.words||0),0);
+  return `<tr><td>${lab}</td><td>${m.length?m.map(pp=>pj(pp.id)).join(' '):k==='related'&&relCh.length?`in its own chapter: ${relCh.map(pp=>pj(pp.id)).join(' ')}`:'<span class="rel none">missing</span>'}</td><td>${m.length?w+' words'+(iw?` (${Math.round(100*w/iw)}%)`:''):''}</td></tr>`});
+ const qs=find(F.slots,slotTxt,'question'),ans=(F.conclusion||[]).filter(c=>qs.some(s=>mirrors(c,s)));
+ const chw=n=>p.P.filter(pp=>parts[pp.id]===n).reduce((a,pp)=>a+(pp.words||0),0);
+ h+=`<div class="ph"><h2>Structure of each part</h2><div class="legend">Parts are found from the slot names and the paragraph moves of the annotation file, so read each match.</div>
+ <h3 style="font-size:13px;margin:6px 0 2px">Abstract: the shortcut of the paper</h3><div class="seq">${F.slots.map((s,i)=>`${i?'<span class="a">→</span>':''}<span class="s">${esc(s.name||s.name_zh)}</span>`).join('')}</div>
+ <table class="ab fl"><tbody>${absRow.join('')}<tr><td>Order</td><td>${absOrdered?'background → question → motivation → method → result':'<span class="rel none">out of order</span>'}</td></tr></tbody></table>
+ <h3 style="font-size:13px;margin:10px 0 2px">Introduction: the abstract expanded (${intro.length} paragraphs, ${iw} words)</h3><div class="seq">${intro.map((pp,i)=>`${i?'<span class="a">→</span>':''}<span class="s pj" data-pj="${pp.id}">${esc(pp.move||'?')}</span>`).join('')}</div>
+ <table class="ab fl"><tbody>${inRow.join('')}</tbody></table>
+ <h3 style="font-size:13px;margin:10px 0 2px">Conclusion: the answer to the research question</h3>
+ <table class="ab fl"><tbody><tr><td>Question slot</td><td>${qs.length?qs.map(s=>`<b>${esc(s.id)}</b> ${esc(s.claim)}`).join('<br>'):'<span class="rel none">no question slot</span>'}</td></tr>
+ <tr><td>Answered by</td><td>${ans.length?ans.map(c=>`<b>${esc(c.id)}</b> ${esc(c.claim)}`).join('<br>'):'<span class="rel none">no conclusion item mirrors the question</span>'}</td></tr></tbody></table>
+ <h3 style="font-size:13px;margin:10px 0 2px">Words per part</h3><table class="ab fl"><tbody><tr>${['Abstract','Introduction','Related work','Method','Experiments','Conclusion','Supplement'].map(n=>`<td><b>${n}</b><br>${chw(n)}</td>`).join('')}</tr></tbody></table></div>`;
+ // 3. storylines
+ const iss=F.issues||[];
+ h+=`<div class="ph"><h2>Storylines</h2><div class="legend">Each claim followed from the abstract to the conclusion. Checks per step: <span class="ck pass">pass</span> <span class="ck minor">minor</span> <span class="ck major">major</span>. Hover a check for its reason.</div>
+ ${iss.length?`<table class="ab fl"><thead><tr><th>Issue</th><th>Line</th><th>Level</th><th>Sentences</th></tr></thead><tbody>${iss.map(i=>`<tr><td><span class="ck ${i.severity}">${esc(i.rule)}</span> ${esc(i.msg)}</td><td>${esc(i.line)} ${esc(i.point||'')}</td><td>${esc(i.level||'')}</td><td>${(i.rows||[]).map(r=>`<span class="jump" data-j="${r}">${r}</span>`).join(' ')}</td></tr>`).join('')}</tbody></table>`:'<div class="legend">No storyline issues.</div>'}
+ ${(F.lines||[]).map(L=>`<h3 style="font-size:13px;margin:10px 0 2px">${esc(L.id)} · ${esc(L.name)}</h3><div class="q">${esc(L.story)}</div>
+  <table class="ab fl"><thead><tr><th>Point</th>${L.levels.map(l=>`<th>${esc(l)}</th>`).join('')}</tr></thead><tbody>${L.units.map(u=>`<tr><td><b>${esc(u.key)}</b> <span class="q">${esc(u.text)}</span></td>${L.levels.map(l=>{const c=u.chain.find(x=>x.level===l);
+   return `<td>${c&&c.carrier?`<span class="jump" data-j="${c.carrier}">${c.carrier}</span> <span class="q">${esc(c.role||'')}</span><br>${ck(c.checks)}`:'<span class="rel none">none</span>'}</td>`}).join('')}</tr>`).join('')}</tbody></table>`).join('')}</div>`;
+ $('#mid').innerHTML=h;bindRows();
+ document.querySelectorAll('.pj').forEach(x=>x.onclick=()=>{cur=x.dataset.pj;sel=null;view='sent';render()})}
 function notesView(){const p=P();const ids=Object.keys(p.R).filter(id=>store.get(nk(p,id)));
  $('#pg').innerHTML='';$('#mid').innerHTML=ids.length?`<div class="legend">${ids.length} notes in ${esc(p.name)}. Click a sentence number to open it.</div>`+ids.map(id=>`<div class="ph"><div class="crumb"><span class="jump" data-j="${id}">${id}</span></div><div>${esc(p.R[id].en)}</div><div style="margin-top:4px;color:var(--warn)">${esc(store.get(nk(p,id)))}</div></div>`).join(''):'<div class="legend">No notes yet. Click a sentence to add one.</div>';bindRows()}
 function scoresView(){const S=JSON.parse(document.getElementById('scores').textContent||'{}');$('#pg').innerHTML='';if(!S.rounds||!S.rounds.length){$('#mid').innerHTML='<div class="legend">No score log. Build the page with <code>--scores score_log.json</code> to track review rounds (format in docs/review.md).</div>';return}
@@ -129,7 +182,7 @@ function scoresView(){const S=JSON.parse(document.getElementById('scores').textC
  ${(S.bottlenecks||[]).length?`<h3 style="font-size:14px">Bottlenecks</h3><table class="ab"><thead><tr><th>Issue</th><th>Raised in</th><th>Status</th><th>Evidence now</th></tr></thead><tbody>${S.bottlenecks.map(b=>`<tr><td><b>${esc(b.issue)}</b></td><td>${esc(b.rounds||'')}</td><td><span class="st ${/^Open/i.test(b.status||'')?'undefined':/^Addressed/i.test(b.status||'')?'defined':'name'}">${esc(b.status||'')}</span></td><td>${esc(b.evidence||'')}</td></tr>`).join('')}</tbody></table>`:''}`}
 function render(){paperTabs();stats();nav();document.querySelectorAll('#views button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===view));
  $('#main').classList.toggle('nopage',!$('#page').checked||view!=='sent');document.body.classList.toggle('hidezh',!$('#zh').checked);
- view==='abbr'?abbrView():view==='notes'?notesView():view==='scores'?scoresView():sentView();
+ view==='abbr'?abbrView():view==='flow'?flowView():view==='notes'?notesView():view==='scores'?scoresView():sentView();
  if(sel){document.getElementById('r-'+sel)?.scrollIntoView({block:'nearest'})}
  document.querySelector('#nav a[aria-current=true]')?.scrollIntoView({block:'nearest'})}
 document.querySelectorAll('#views button').forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});

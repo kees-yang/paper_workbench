@@ -175,3 +175,14 @@ class Review(unittest.TestCase):
         out = Path(tempfile.mkdtemp()) / 'r.html'
         cli.main(['review', f'example={self.PAGE}', '--out', str(out), '--names', 'APTP,MSRS'])
         self.assertTrue(out.is_file())
+
+    def test_flow_data(self):
+        """The Flow view gets the abstract slots, the conclusion items, the storylines and each paragraph's move."""
+        from paper_workbench.workbench import review
+        p = review.build([('one', str(self.PAGE))], Path(tempfile.mkdtemp()) / 'r.html')[0]
+        F = p['flow']
+        self.assertEqual([s['id'] for s in F['slots']][:2], ['S1', 'S2'])
+        self.assertTrue(F['conclusion'] and F['conclusion'][0]['mirrors'])
+        self.assertTrue(F['lines'] and F['lines'][0]['units'][0]['chain'])
+        self.assertTrue(any(x['move'] == 'motivation' for x in p['P']))
+        self.assertIn('function flowView', review.TEMPLATE.read_text(encoding='utf-8'))
