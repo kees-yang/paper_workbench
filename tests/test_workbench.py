@@ -196,3 +196,36 @@ class Review(unittest.TestCase):
         self.assertTrue(all(t in 'SPO' for r in marked for _, _, t in r['spo']))
         self.assertTrue(any(r['prev'] and r['prev']['target_head'] for r in p['R'].values()))
         self.assertIn('function marked', review.TEMPLATE.read_text(encoding='utf-8'))
+
+
+class Fluency(unittest.TestCase):
+    """Sentence flow marks: old before new, topic chain, logical relation and rhythm."""
+
+    def test_chain_and_old_before_new(self):
+        from paper_workbench.workbench import fluency
+        S = [('A', 'The camera records the street at night.', [[0, 10, 'S'], [11, 18, 'P'], [19, 38, 'O']]),
+             ('B', 'This street has little light.', [[0, 11, 'S'], [12, 15, 'P'], [16, 28, 'O']]),
+             ('C', 'A bakery sells bread every morning.', [[0, 8, 'S'], [9, 14, 'P'], [15, 20, 'O']])]
+        m, summ = fluency.analyse(S)
+        self.assertEqual(m['A']['pos'], 'opens')
+        self.assertEqual((m['B']['pos'], m['B']['chain']), ('old first', 'linear'))
+        self.assertEqual((m['C']['pos'], m['C']['chain']), ('no old words', 'new'))
+        self.assertEqual(summ['jumps'], 1)
+        self.assertEqual(summ['first'][1], 'This street has')
+
+    def test_relations(self):
+        from paper_workbench.workbench import fluency
+        r = fluency.relation
+        self.assertEqual(r('Because the road was closed, the bus took another route.')['type'], 'cause')
+        self.assertEqual(r('We therefore moved the meeting.')['type'], 'result')
+        self.assertEqual(r('The old bridge therefore needs repair.')['type'], 'result')
+        x = r('The north side gets sun, whereas the south side stays in shade all day.')
+        self.assertEqual((x['type'], x['inside'], x['inside_word']), ('implicit', 'contrast', 'whereas'))
+        self.assertEqual(r('However, the price stayed high.')['type'], 'contrast')
+        self.assertEqual(r('First, we clean the floor.')['type'], 'sequence')
+
+    def test_flat_rhythm(self):
+        from paper_workbench.workbench import fluency
+        S = [(k, t, []) for k, t in (('a', 'The shop opens at nine every day.'), ('b', 'The bank opens at ten every day.'),
+                                     ('c', 'The park opens at six every day.'))]
+        self.assertEqual(fluency.analyse(S)[1]['flat'], ['a'])

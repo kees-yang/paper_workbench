@@ -27,6 +27,20 @@ python -m paper_workbench review main=my-paper alt=other-paper --out review.html
 
 搜索覆盖每句的原文和译文。
 
+## 流标记
+
+语法标记显示每句说了什么；流标记显示它如何承接上一句。每句下方一行（用 **Flow marks** 开关隐藏，**?** 在页面中打开定义），每段卡片给出汇总。
+
+| 标记 | 检查什么 | 取值 |
+|---|---|---|
+| **old→new（旧→新）** | 旧信息（与上一句共有的词，或回指词：this、these、such、it）在前，句子以新信息结尾。 | *old first*（第一个旧词在前五分之二内）、*old late*、*no old words*；并列出旧词与新的结尾 |
+| **topic（主题链）** | 本句主语与上一句的关系。 | *linear*（承接上一句的谓语或宾语）、*constant*（主语相同）、*new*（毫无共享：跳跃） |
+| **relation（逻辑关系）** | 与前文的逻辑关系及标示它的词（在句中加框）。 | 因果、结果、对比、让步、递进、举例、阐释、顺序、目的、条件、总结，或 *implicit*（无标示词）；*inside* 指同一句内各分句之间的关系 |
+| **rhythm（节奏）** | 句子的开头方式与长度。 | *subject*、*connective*、*clause*、*phrase*、*ordinal* 及词数；连续三句开头相同且长度相差不超过三个词即为 *flat run* |
+
+段落卡片还给出每句的前三个词（单独连读，应能讲清故事）、各项计数及句长柱状图。连词（but、whereas、because、although 等）只在句首时才承接上一句；副词（therefore、however、also 等）可以在主语之后。这些标记是基于英文句子与工作台主语范围的启发式规则（`paper_workbench/workbench/fluency.py`）：逐条阅读，再做判断。
+
+
 ## 选项
 
 | 选项 | 含义 |

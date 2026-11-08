@@ -106,7 +106,7 @@ The reader, the rules, the PDF alignment and the English marks are automatic. Th
 
 ### The review page
 
-`paper_workbench review <page or project> [...]` reads built workbench pages and makes one compact page for review: a table per paragraph with each sentence, its rendering and its link to the previous sentence (a red chip marks a sentence that picks up nothing), the PDF page beside it, a check that every abbreviation is defined at its first use in the abstract, the body and the supplement, the flow of the paper (each abstract slot carried through the introduction, body and conclusion, and the structure of each part), per-sentence notes exported as Markdown, and an optional log of review scores per round. Several papers or versions sit in tabs. Details: [`docs/review.md`](docs/review.md).
+`paper_workbench review <page or project> [...]` reads built workbench pages and makes one compact page for review: a table per paragraph with each sentence, its rendering and its link to the previous sentence (a red chip marks a sentence that picks up nothing), the PDF page beside it, a check that every abbreviation is defined at its first use in the abstract, the body and the supplement, the flow of the paper (each abstract slot carried through the introduction, body and conclusion, and the structure of each part), flow marks under each sentence (old before new, topic chain, logical relation, rhythm), per-sentence notes exported as Markdown, and an optional log of review scores per round. Several papers or versions sit in tabs. Details: [`docs/review.md`](docs/review.md).
 
 ```bash
 python -m paper_workbench review main=examples/aptp-cvpr2026/expected/workbench.html --names "APTP,MSRS,TNO" --out review.html
@@ -129,7 +129,7 @@ paper_workbench/workbench/ the workbench: page template, data builder, PDF align
 examples/aptp-cvpr2026/ a CC BY 4.0 paper, a glossary, local rules, exceptions, expected/ output
 AGENTS.md               guide for agents: setup, revision loop, author feedback → rules, figures
 docs/                   customizing-rules, workbench and review (EN, 中文), rules.md, screenshots
-tests/                  python -m unittest discover -s tests   (54 tests)
+tests/                  python -m unittest discover -s tests   (57 tests)
 ```
 
 ## Credits

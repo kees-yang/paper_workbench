@@ -6,6 +6,7 @@ It reads the data that ``paper_workbench workbench`` already wrote into each ``w
                  to the previous one and to earlier text, and the PDF page with the paragraph box
   Abbreviations  the first use of each abbreviation in the abstract, the body and the supplement, and whether a definition
                  stands there ("long form (ABBR)", "ABBR (long form)", "ABBR is the ...", or a caption label "ABBR: ...")
+                 and, per sentence, its flow: old before new, topic chain, logical relation and rhythm (fluency.py)
   Flow           the paper as one shortcut: each abstract slot followed into the introduction, the body and the conclusion; the
                  structure of the abstract, the introduction and the conclusion against the expected parts; and the storylines
                  with their checks (expands, not a copy, key concepts kept, echoes)
@@ -17,6 +18,8 @@ import json
 import re
 from collections import OrderedDict
 from pathlib import Path
+
+from . import fluency
 
 TEMPLATE = Path(__file__).resolve().parent / 'template' / 'review_template.html'
 
@@ -115,6 +118,11 @@ def paper(name, path, names, supp_from=None, supp_page=None):
             return {k: x.get(k, '') for k in ('anchor_id', 'anchor_quote', 'anchor_head', 'target_quote', 'target_head', 'relation')} if x.get('anchor_id') else None
         R[r['id']] = dict(en=r.get('en_source', ''), zh=r.get('zh', ''), p=r.get('paragraph_id', ''), prev=link('previous'), earl=link('earlier'),
                           s=bool(r.get('_supp')), spo=(spo.get(r['id']) or {}).get('en', []), spz=(spo.get(r['id']) or {}).get('zh', []))
+    for x in P:                          # sentence flow per paragraph (fluency.py): old before new, topic chain, relation, rhythm
+        sents = [(i, R[i]['en'], R[i]['spo']) for i in x['rows'] if i in R]
+        marks, x['fl'] = fluency.analyse(sents)
+        for i, m in marks.items():
+            R[i]['fl'] = m
     ws = data.get('ws') or {}
     wp = ws.get('paragraphs') or {}
     for x in P:
@@ -147,7 +155,7 @@ def build(pages, out, names=(), scores=None, title='Review Workbench', supp_from
     sc = safe(json.loads(Path(scores).read_text(encoding='utf-8'))) if scores else '{}'
     html = TEMPLATE.read_text(encoding='utf-8')
     esc = title.replace('&', '&amp;').replace('<', '&lt;')
-    html = html.replace('__TITLE__', esc).replace('__SCORES__', sc).replace('__DATA__', safe(papers))
+    html = html.replace('__RELATIONS__', safe(fluency.RELATIONS)).replace('__TITLE__', esc).replace('__SCORES__', sc).replace('__DATA__', safe(papers))
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding='utf-8')

@@ -30,6 +30,25 @@ Each argument is `NAME=PAGE`: `PAGE` is a built `workbench.html` or a project fo
 
 Search covers the original and the rendering of every sentence.
 
+## Flow marks
+
+Grammar marks show what each sentence says; flow marks show how it hands over to the sentence before it. Each sentence gets one
+line (switch it off with **Flow marks**; **?** opens the definitions on the page), and each paragraph card gets a summary.
+
+| Mark | What it checks | Values |
+|---|---|---|
+| **old→new** | Old information (words shared with the previous sentence, or a word that points back: this, these, such, it) comes first; the sentence ends on new information. | *old first* (first old word in the first two fifths), *old late*, *no old words*; the old words and the new ending are listed |
+| **topic** | The subject against the previous sentence. | *linear* (picks up the previous predicate or object), *constant* (same subject), *new* (shares nothing: a jump) |
+| **relation** | The logical relation to the previous text and the word that signals it, boxed in the sentence. | cause, result, contrast, concession, addition, example, elaboration, sequence, purpose, condition, summary, or *implicit*; *inside* names a relation between clauses of the same sentence |
+| **rhythm** | How the sentence opens and its length. | *subject*, *connective*, *clause*, *phrase*, *ordinal*, and the word count; three sentences in a row with the same opening and lengths within three words are a *flat run* |
+
+The paragraph card adds the first three words of every sentence in order (read them alone: they should tell the story), the counts
+(old first, new-subject jumps, unsignalled relations, flat runs) and the sentence lengths as bars. Conjunctions (but, whereas,
+because, although, …) link back only as the first word; adverbs (therefore, however, also, …) may follow the subject. The marks are
+a heuristic over the English sentence and the workbench's subject spans (`paper_workbench/workbench/fluency.py`): read each mark,
+then decide.
+
+
 ## Options
 
 | Option | Meaning |

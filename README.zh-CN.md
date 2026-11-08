@@ -107,7 +107,7 @@ python -m paper_workbench workbench examples/aptp-cvpr2026
 
 ### 审阅页
 
-`paper_workbench review <页面或项目> [...]` 读取已生成的工作台页面，生成一个紧凑的审阅页：每段一张表，列出每句的原文、译文及其与上一句的衔接（红色标签标出没有承接的句子），旁边是 PDF 页面；检查每个缩写在摘要、正文和补充材料中首次出现时是否有定义；显示论文的流（每个摘要槽位如何贯穿引言、正文和结论，以及各部分的结构）；每句可写笔记并导出为 Markdown；还可记录每轮审稿分数。多篇论文或多个版本以标签页并排。详见 [`docs/review.zh-CN.md`](docs/review.zh-CN.md)。
+`paper_workbench review <页面或项目> [...]` 读取已生成的工作台页面，生成一个紧凑的审阅页：每段一张表，列出每句的原文、译文及其与上一句的衔接（红色标签标出没有承接的句子），旁边是 PDF 页面；检查每个缩写在摘要、正文和补充材料中首次出现时是否有定义；显示论文的流（每个摘要槽位如何贯穿引言、正文和结论，以及各部分的结构）；每句下方给出流标记（旧信息在前、主题链、逻辑关系、节奏）；每句可写笔记并导出为 Markdown；还可记录每轮审稿分数。多篇论文或多个版本以标签页并排。详见 [`docs/review.zh-CN.md`](docs/review.zh-CN.md)。
 
 ```bash
 python -m paper_workbench review main=examples/aptp-cvpr2026/expected/workbench.html --names "APTP,MSRS,TNO" --out review.html
@@ -130,7 +130,7 @@ paper_workbench/workbench/ 工作台：页面模板、数据生成、PDF 对齐
 examples/aptp-cvpr2026/ 一篇 CC BY 4.0 论文、术语表、本地规则、例外、expected/ 输出
 AGENTS.md               智能体指南：设置、修改循环、作者意见→规则、图件
 docs/                   自定义规则与工作台（English、中文）、rules.md、截图
-tests/                  python -m unittest discover -s tests   （54 个测试）
+tests/                  python -m unittest discover -s tests   （57 个测试）
 ```
 
 ## 致谢与参考

@@ -50,6 +50,13 @@ table.ab{width:100%;border-collapse:collapse;background:var(--panel);border:1px 
 .spo{text-decoration-line:underline;text-decoration-thickness:2px;text-underline-offset:3px;text-decoration-skip-ink:none}.spo.S{text-decoration-color:var(--uS)}.spo.P{text-decoration-color:var(--uP)}.spo.O{text-decoration-color:var(--uO)}
 .lp{background:var(--lp);border-radius:3px;padding:0 1px}b.hn{font-weight:700}.lk .lp{font-weight:600}
 .spo-legend{color:var(--mute);font-size:12px;margin:0 0 6px}.spo-legend .spo{color:var(--ink2)}
+.flw{display:flex;flex-wrap:wrap;gap:3px 6px;margin-top:4px;font-size:11px;color:var(--ink2)}.noflw .flw,.noflw .pflw{display:none}
+.fc{display:inline-flex;gap:3px;align-items:baseline;padding:0 6px;border-radius:9px;background:var(--chip)}.fc b{font-weight:600;color:var(--ink)}
+.fc.ok{background:var(--okbg)}.fc.ok b{color:var(--ok)}.fc.w{background:var(--warnbg)}.fc.w b{color:var(--warn)}.fc .k{color:var(--mute)}
+.conn{outline:1.5px solid var(--warn);border-radius:3px;padding:0 1px}
+.pflw .bars{display:inline-flex;gap:2px;align-items:flex-end;height:18px;vertical-align:middle;margin-left:6px}.pflw .bars i{display:block;width:5px;background:var(--acc);border-radius:2px 2px 0 0;opacity:.7}.pflw .bars i.f{background:var(--warn)}
+.helpbox{position:fixed;right:16px;top:56px;width:min(620px,calc(100vw - 32px));max-height:calc(100vh - 80px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.18);padding:12px 16px;z-index:20;font-size:12.5px}
+.helpbox h3{font-size:13px;margin:10px 0 4px}.helpbox table{border-collapse:collapse;width:100%}.helpbox td,.helpbox th{border-bottom:1px solid var(--line);padding:3px 6px;text-align:left;vertical-align:top}
 .legend{color:var(--mute);font-size:12px;margin:0 0 8px}mark{background:var(--hl);color:inherit}
 @media (max-width:900px){main,main.nopage{grid-template-columns:1fr;height:auto}nav,#pg{display:none}}
 </style></head><body>
@@ -59,13 +66,15 @@ table.ab{width:100%;border-collapse:collapse;background:var(--panel);border:1px 
  <div class="seg" id="views"><button data-v="sent" aria-pressed="true">Sentences</button><button data-v="abbr">Abbreviations</button><button data-v="flow">Flow</button><button data-v="notes">Notes</button><button data-v="scores">Scores</button></div>
  <input type="search" id="q" placeholder="Search sentences, English or 中文">
  <label class="t"><input type="checkbox" id="zh" checked> 中文</label>
- <label class="t"><input type="checkbox" id="page" checked> Page</label>
+ <label class="t"><input type="checkbox" id="page" checked> Page</label> <label class="t"><input type="checkbox" id="flw" checked> Flow marks</label> <button class="btn" id="help" title="What the flow marks mean">?</button>
  <button class="btn" id="exp">Export notes</button>
  <span class="stats" id="stats"></span>
 </header>
 <main id="main"><nav id="nav"></nav><section id="mid"></section><aside id="pg"></aside></main>
 <script type="application/json" id="data">__DATA__</script>
 <script type="application/json" id="scores">__SCORES__</script>
+<script type="application/json" id="relations">__RELATIONS__</script>
+<div id="helpbox" class="helpbox" hidden></div>
 <script>
 const DATA=JSON.parse(document.getElementById('data').textContent);
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -89,15 +98,36 @@ function marked(text,spans,links){text=String(text||'');const n=text.length,role
  (links||[]).forEach(L=>{for(let i=L.s;i<L.e;i++)lk[i]=L;if(L.h){const j=L.q.lastIndexOf(L.h);if(j>=0)for(let i=L.s+j;i<L.s+j+L.h.length;i++)hd[i]=true}});
  let o='',i=0;while(i<n){const L=lk[i];let j=i;while(j<n&&lk[j]===L)j++;let inner='',k=i;
   while(k<j){let m=k;while(m<j&&role[m]===role[k]&&hd[m]===hd[k])m++;let t=esc(text.slice(k,m));if(hd[k])t='<b class="hn">'+t+'</b>';if(role[k])t=`<span class="spo ${role[k]}">${t}</span>`;inner+=t;k=m}
-  o+=L?`<span class="lp" title="${esc(L.t||'')}">${inner}</span>`:inner;i=j}
+  o+=L?`<span class="${L.cls||'lp'}" title="${esc(L.t||'')}">${inner}</span>`:inner;i=j}
  return o}
 function phrases(text,list){const rs=[];text=String(text||'');for(const x of list){if(!x.q)continue;const i=text.indexOf(x.q),e=i+x.q.length;if(i>=0&&!rs.some(r=>i<r.e&&e>r.s))rs.push({s:i,e,q:x.q,h:x.h,t:x.t})}return rs}
 function linkMarks(p,id,which){const r=p.R[id],L=[];if(!r)return L;
  for(const k of ['prev','earl']){const x=r[k];if(x)L.push({q:x.target_quote,h:x.target_head,t:'links to '+x.anchor_id})}
  for(const a of (p.anchorsOf||{})[id]||[])L.push({q:a.anchor_quote,h:a.anchor_head,t:'picked up by '+a.by});
  return L}
-const SPO_LEGEND='<div class="spo-legend"><span class="spo S">subject</span> <span class="spo P">predicate</span> <span class="spo O">object</span> · <span class="lp">tint</span>: the phrase that links two sentences, at both ends · <b>bold</b>: its head noun · hover a tint for its partner sentence</div>';
+const SPO_LEGEND='<div class="spo-legend"><span class="spo S">subject</span> <span class="spo P">predicate</span> <span class="spo O">object</span> · <span class="lp">tint</span>: the phrase that links two sentences, at both ends · <b>bold</b>: its head noun · hover a tint for its partner sentence · <span class="conn">box</span>: the word that signals the relation · the line under each sentence: its flow (press ?)</div>';
 function anchors(p){if(p.anchorsOf)return;const A={};for(const[id,r]of Object.entries(p.R))for(const k of ['prev','earl']){const x=r[k];if(x&&x.anchor_id)(A[x.anchor_id]=A[x.anchor_id]||[]).push({anchor_quote:x.anchor_quote,anchor_head:x.anchor_head,by:id})}p.anchorsOf=A}
+// ---- sentence flow (fluency.py): old before new, topic chain, logical relation, rhythm
+const REL=JSON.parse(document.getElementById('relations').textContent||'[]');
+function flowLine(r,flat){const m=r.fl;if(!m)return '';if(m.pos==='opens')return `<div class="flw"><span class="fc"><span class="k">opens the paragraph</span></span><span class="fc"><span class="k">rhythm</span> <b>${m.open}</b> ${m.words} words</span></div>`;
+ const posC=m.pos==='old first'?'ok':'w',chC=m.chain==='new'?'w':'ok',relC=m.rel.type==='implicit'?'':'ok';
+ return `<div class="flw"><span class="fc ${posC}" title="Old information (shared with or pointing back to the previous sentence) should come first, new information last."><span class="k">old→new</span> <b>${m.pos}</b>${m.old.length?` ${esc(m.old.slice(0,3).join(', '))}`:''}${m.new?` <span class="k">→</span> ${esc(m.new)}`:''}</span>`+
+ `<span class="fc ${chC}" title="linear: the subject picks up the previous predicate or object. constant: same subject as before. new: the subject shares nothing with the previous sentence."><span class="k">topic</span> <b>${m.chain}</b></span>`+
+ `<span class="fc ${relC}" title="${esc((REL.find(x=>x[0]===m.rel.type)||['','no signal word: the reader infers the relation'])[1])}"><span class="k">relation</span> <b>${m.rel.type}</b>${m.rel.word?` “${esc(m.rel.word)}”`:''}${m.rel.inside?` <span class="k">· inside:</span> ${m.rel.inside} “${esc(m.rel.inside_word)}”`:''}</span>`+
+ `<span class="fc ${flat?'w':''}" title="Opening type and length. Three sentences in a row with the same opening and nearly the same length read flat."><span class="k">rhythm</span> <b>${m.open}</b> ${m.words} words${flat?' · flat run':''}</span></div>`}
+function connMark(r){const m=r.fl;if(!m||!m.rel.word)return [];const i=r.en.toLowerCase().indexOf(m.rel.word.toLowerCase());return i<0||i>40?[]:[{s:i,e:i+m.rel.word.length,q:'',cls:'conn',t:'relation: '+m.rel.type}]}
+function paraFlow(p,pp){const f=pp.fl;if(!f||pp.rows.length<2)return '';const mx=Math.max(...f.lengths,1);
+ return `<dt class="pflw">Flow</dt><dd class="pflw"><div>${f.first.map(esc).join(' <span class="arrow">→</span> ')}</div><div class="q">old first ${f.old_first}/${f.linked} · new-subject jumps ${f.jumps} · unsignalled ${f.implicit} · flat runs ${f.flat.length}<span class="bars" title="sentence lengths">${f.lengths.map((n,i)=>`<i class="${f.flat.some(id=>{const k=pp.rows.indexOf(id);return i>=k&&i<k+3})?'f':''}" style="height:${Math.max(3,18*n/mx)}px" title="${n} words"></i>`).join('')}</span></div></dd>`}
+function helpBox(){const h=$('#helpbox');if(!h.hidden){h.hidden=true;return}
+ h.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><b>How to read the flow marks</b><button class="btn" id="hclose">Close</button></div>
+ <p class="q">Grammar marks (underlines) show what each sentence says. Flow marks show how it hands over to the sentence before it. They come from a heuristic over the English text: read each mark, then decide.</p>
+ <h3>1. Old before new</h3><p>Start a sentence with what the reader already knows: words from the previous sentence, or a word that points back (this, these, such, it). End it with the new point, where the stress falls. <b>old first</b>: the first old word sits in the first two fifths. <b>old late</b>: later. <b>no old words</b>: the sentence starts afresh.</p>
+ <h3>2. Topic chain</h3><p>The subject against the previous sentence. <b>linear</b>: the subject picks up the previous predicate or object, so the argument moves forward. <b>constant</b>: the same subject continues. <b>new</b>: the subject shares nothing with the previous sentence. Mix linear and constant. A run of new subjects reads as a list, not an argument.</p>
+ <h3>3. Logical relation</h3><p>How a sentence relates to the text before it, and the word that signals it (boxed in the sentence). <b>implicit</b>: no signal word. That is fine when the relation is obvious; add a word where the reader must guess. <b>inside</b>: a relation between clauses of one sentence, not a link to the previous one.</p>
+ <table><thead><tr><th>Relation</th><th>Meaning</th><th>Signal words</th></tr></thead><tbody>${REL.map(([t,d,w])=>`<tr><td><b>${t}</b></td><td>${esc(d)}</td><td class="q">${w.map(x=>esc(x.trim())).join(', ')}</td></tr>`).join('')}</tbody></table>
+ <h3>4. Rhythm</h3><p>How the sentence opens (<b>subject</b>, <b>connective</b>, <b>clause</b> such as “Because …”, <b>phrase</b> such as “Under these conditions, …”, <b>ordinal</b>) and its length. Three sentences in a row with the same opening and lengths within three words read flat. Vary the opening or merge two sentences that carry one thought.</p>
+ <h3>The paragraph line</h3><p>The first three words of each sentence in order (read them alone: they should tell the story), the counts above, and the sentence lengths as bars, flat runs in amber.</p>`;
+ h.hidden=false;$('#hclose').onclick=()=>{h.hidden=true}}
 function linkCell(p,id,r,i){let h='';
  if(r.prev){h+=`<div class="link"><span class="rel">${esc(r.prev.relation||'link')}</span><span class="q"><span class="jump" data-j="${r.prev.anchor_id}">${r.prev.anchor_id.slice(5)}</span> <span class="lp">${esc(r.prev.anchor_quote)}</span> <span class="arrow">→</span> <span class="lp">${esc(r.prev.target_quote)}</span></span></div>`}
  else if(i>0){h+=`<div class="link"><span class="rel none">no link</span><span class="q">does not pick up the previous sentence</span></div>`}
@@ -106,14 +136,14 @@ function linkCell(p,id,r,i){let h='';
  return h}
 function rowsTable(p,ids){anchors(p);return SPO_LEGEND+`<table class="s"><thead><tr><th>#</th><th>Sentence</th><th>Link to the previous sentence · earlier link</th></tr></thead><tbody>`+
  ids.map((id,i)=>{const r=p.R[id];if(!r)return '';const note=store.get(nk(p,id));
- return `<tr id="r-${id}" data-id="${id}" class="${sel===id?'sel':''} ${note?'has-note':''}"><td class="n">${id.slice(5)}</td><td class="tx"><div class="en">${query?hl(r.en):marked(r.en,r.spo,phrases(r.en,linkMarks(p,id)))}</div><div class="zh">${query?hl(r.zh):marked(r.zh,r.spz,phrases(r.zh,linkMarks(p,id)))}</div>${sel===id?`<textarea class="note" data-n="${id}" placeholder="Note on this sentence">${esc(note)}</textarea>`:''}</td><td class="lk">${linkCell(p,id,r,i)}</td></tr>`}).join('')+'</tbody></table>'}
+ return `<tr id="r-${id}" data-id="${id}" class="${sel===id?'sel':''} ${note?'has-note':''}"><td class="n">${id.slice(5)}</td><td class="tx"><div class="en">${query?hl(r.en):marked(r.en,r.spo,phrases(r.en,linkMarks(p,id)).concat(connMark(r)))}</div><div class="zh">${query?hl(r.zh):marked(r.zh,r.spz,phrases(r.zh,linkMarks(p,id)))}</div>${query?'':flowLine(r,(p.P.find(x=>x.id===r.p)?.fl?.flat||[]).some(k=>{const R_=p.P.find(x=>x.id===r.p).rows;const a_=R_.indexOf(k),b_=R_.indexOf(id);return b_>=a_&&b_<a_+3}))}${sel===id?`<textarea class="note" data-n="${id}" placeholder="Note on this sentence">${esc(note)}</textarea>`:''}</td><td class="lk">${linkCell(p,id,r,i)}</td></tr>`}).join('')+'</tbody></table>'}
 function sentView(){const p=P();
  if(query){const ids=Object.keys(p.R).filter(id=>(p.R[id].en+' '+p.R[id].zh).toLowerCase().includes(query.toLowerCase()));
   $('#mid').innerHTML=`<div class="legend">${ids.length} sentences match “${esc(query)}”.</div>`+rowsTable(p,ids);bindRows();return}
  const pp=p.P.find(x=>x.id===cur)||p.P[0];cur=pp.id;
  const i=p.P.indexOf(pp);
  $('#mid').innerHTML=`<div class="ph"><div class="crumb">${esc(pp.ch)} · ${esc(pp.sec)} · ${pp.id}</div><h2>${esc(pp.title||'(untitled paragraph)')}</h2><dl>
- ${pp.q?`<dt>Question</dt><dd>${esc(pp.q)}</dd>`:''}<dt>Claim</dt><dd>${esc(pp.claim||'—')}</dd><dt>Follows</dt><dd class="q">${esc(pp.prev||'—')}</dd></dl></div>`+rowsTable(p,pp.rows)+
+ ${pp.q?`<dt>Question</dt><dd>${esc(pp.q)}</dd>`:''}<dt>Claim</dt><dd>${esc(pp.claim||'—')}</dd><dt>Follows</dt><dd class="q">${esc(pp.prev||'—')}</dd>${paraFlow(p,pp)}</dl></div>`+rowsTable(p,pp.rows)+
  `<div style="display:flex;justify-content:space-between;margin-top:8px"><button class="btn" id="pp" ${i?'':'disabled'}>‹ Previous paragraph</button><button class="btn" id="np" ${i<p.P.length-1?'':'disabled'}>Next paragraph ›</button></div>`;
  $('#pp').onclick=()=>{cur=p.P[i-1].id;sel=null;render()};$('#np').onclick=()=>{cur=p.P[i+1].id;sel=null;render()};bindRows();page(pp)}
 function bindRows(){document.querySelectorAll('table.s tr[data-id]').forEach(tr=>tr.onclick=e=>{if(e.target.closest('textarea,.jump'))return;sel=tr.dataset.id;if(query){cur=P().R[sel].p;query='';$('#q').value=''}render();const t=document.querySelector('textarea.note');t&&t.focus()});
@@ -211,12 +241,12 @@ function scoresView(){const S=JSON.parse(document.getElementById('scores').textC
  ${(S.unreviewed||[]).length?`<h3 style="font-size:14px">Not yet reviewed</h3><table class="ab"><tbody>${S.unreviewed.map(u=>`<tr><td>${esc(u.line||'')}</td><td>${esc(u.versions||'')}</td><td>${esc(u.changes||'')}</td></tr>`).join('')}</tbody></table>`:''}
  ${(S.bottlenecks||[]).length?`<h3 style="font-size:14px">Bottlenecks</h3><table class="ab"><thead><tr><th>Issue</th><th>Raised in</th><th>Status</th><th>Evidence now</th></tr></thead><tbody>${S.bottlenecks.map(b=>`<tr><td><b>${esc(b.issue)}</b></td><td>${esc(b.rounds||'')}</td><td><span class="st ${/^Open/i.test(b.status||'')?'undefined':/^Addressed/i.test(b.status||'')?'defined':'name'}">${esc(b.status||'')}</span></td><td>${esc(b.evidence||'')}</td></tr>`).join('')}</tbody></table>`:''}`}
 function render(){paperTabs();stats();nav();document.querySelectorAll('#views button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===view));
- $('#main').classList.toggle('nopage',!$('#page').checked||view!=='sent');document.body.classList.toggle('hidezh',!$('#zh').checked);
+ $('#main').classList.toggle('nopage',!$('#page').checked||view!=='sent');document.body.classList.toggle('hidezh',!$('#zh').checked);document.body.classList.toggle('noflw',!$('#flw').checked);
  view==='abbr'?abbrView():view==='flow'?flowView():view==='notes'?notesView():view==='scores'?scoresView():sentView();
  if(sel){document.getElementById('r-'+sel)?.scrollIntoView({block:'nearest'})}
  document.querySelector('#nav a[aria-current=true]')?.scrollIntoView({block:'nearest'})}
 document.querySelectorAll('#views button').forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
-$('#q').oninput=e=>{query=e.target.value.trim();view='sent';render()};$('#zh').onchange=render;$('#page').onchange=render;
+$('#q').oninput=e=>{query=e.target.value.trim();view='sent';render()};$('#zh').onchange=render;$('#page').onchange=render;$('#flw').onchange=render;$('#help').onclick=helpBox;
 $('#exp').onclick=()=>{const L=[];for(const p of DATA){for(const id of Object.keys(p.R)){const n=store.get(nk(p,id));if(n)L.push(`## ${p.name} ${p.version} ${id}\n${p.R[id].en}\n> ${n}\n`)}}
  const b=new Blob([L.join('\n')||'No notes.\n'],{type:'text/markdown'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='review_notes.md';a.click()};
 render();
