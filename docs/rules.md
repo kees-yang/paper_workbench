@@ -1,10 +1,10 @@
 # Rule reference · 规则一览
 
-The rules of the `default` pack, generated with `python -m paperrules rules markdown`. *Default* shows whether a rule is on out of the box.
+The rules of the `default` pack, generated with `python -m paper_workbench rules markdown`. *Default* shows whether a rule is on out of the box.
 Stages S1–S6 are the stages of the rule tree (read top-down). **Scope** is the unit the rule reads; **Method** says who decides:
 `auto` the checker decides, `partial` the checker flags and the author decides, `manual` a person checks (the rule appears on the report's checklist).
 
-`default` 规则包的全部规则，由 `python -m paperrules rules markdown` 生成。*Default* 表示开箱是否启用。S1–S6 是规则树的层（自上而下读）。
+`default` 规则包的全部规则，由 `python -m paper_workbench rules markdown` 生成。*Default* 表示开箱是否启用。S1–S6 是规则树的层（自上而下读）。
 **Scope** 是规则读取的单位；**Method** 说明由谁判断：`auto` 由检查器判定，`partial` 检查器标出、作者判断，`manual` 由人检查（出现在报告的核对清单里）。
 
 | ID | Stage | Scope | Method | Default | Rule | 规则 |

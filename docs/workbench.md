@@ -2,9 +2,9 @@
 
 **English** · [简体中文](workbench.zh-CN.md)
 
-`paperrules workbench` builds one self-contained HTML page for a paper: the PDF pages, an argument canvas, and the analysis panels
+`paper_workbench workbench` builds one self-contained HTML page for a paper: the PDF pages, an argument canvas, and the analysis panels
 side by side, plus six views (rules, argument tree, evidence, figures and tables, refresh queue). It is the reading surface of the
-writing workflow that paperrules came out of: you read a sentence, see where it sits in the argument, what it links to, which
+writing workflow that paper_workbench came out of: you read a sentence, see where it sits in the argument, what it links to, which
 number it rests on and which rules it breaks, and you write your notes next to it.
 
 <p align="center"><img src="img/workbench-overview.png" alt="The workbench: PDF pane, argument canvas and the sentence panel of the example paper" width="900"></p>
@@ -15,7 +15,7 @@ GitHub shows HTML as text), or build it yourself:
 
 ```bash
 pip install -e ".[workbench]"                      # adds PyMuPDF for the PDF pane
-python -m paperrules workbench examples/aptp-cvpr2026
+python -m paper_workbench workbench examples/aptp-cvpr2026
 # open examples/aptp-cvpr2026/out/workbench.html
 ```
 
@@ -32,7 +32,7 @@ python -m paperrules workbench examples/aptp-cvpr2026
 | right | **Sentences** | Each sentence in the rendering you annotate (Chinese in the example) with the original beneath; subject, predicate and object underlined; the phrase that links it to the previous sentence or to earlier text, with its head noun in bold; the numbers it uses with their sources; a note box. |
 | right | **Semantic flow** | The storyline view: one claim followed through the levels (abstract → introduction → body → conclusion) as cards, each with four checks (expands, not a copy, key concepts kept, echoes). |
 | right | **Glossary** | The project glossary, with the terms the selected paragraph uses on top. |
-| header | **Rules** | The rule tree and every rule with its findings (the same result as `paperrules check`). |
+| header | **Rules** | The rule tree and every rule with its findings (the same result as `paper_workbench check`). |
 | header | **Argument tree** | Abstract slots with their sub-claims, the conclusion claims and what supports them, and the paragraph tree. |
 | header | **Evidence** | Every recorded number with its source (a table cell of the paper, or a formula over other records) and every sentence that uses it. |
 | header | **Figures and tables** | The paper's own tables (read from the LaTeX, best values in bold) and figures, each with the paragraph that first cites it. |
@@ -48,7 +48,7 @@ summarises them. A note can be copied together with the analysis it is about, to
 | Layer | Source | Without it |
 |---|---|---|
 | sentences, paragraphs, sections, figures, tables, citations | the LaTeX reader (automatic) | – |
-| rule findings, rule tree | `paperrules check` (automatic) | – |
+| rule findings, rule tree | `paper_workbench check` (automatic) | – |
 | subject / predicate / object marks of the English sentence | spaCy (automatic) | – |
 | PDF pages and paragraph rectangles | the `pdf` file and PyMuPDF (automatic) | the PDF pane is hidden |
 | tables of the paper | parsed from the `tabular` (automatic; plain tables only) | caption only |
@@ -62,21 +62,21 @@ argument canvas are only as good as the annotations.**
 ## Commands
 
 ```bash
-python -m paperrules workbench <project>                  # build → <project>/out/workbench.html
-python -m paperrules workbench <project> --ids            # every paragraph and sentence id with its text, to write the annotations
-python -m paperrules workbench <project> --skeleton       # a workbench.json with every id and empty fields
-python -m paperrules workbench <project> --check          # the annotations against the paper: ids, quotes, evidence literals
-python -m paperrules workbench <project> --accept "v2"    # after reading the refresh queue: this state is the new baseline
-python -m paperrules workbench <project> --out page.html  # another output file
+python -m paper_workbench workbench <project>                  # build → <project>/out/workbench.html
+python -m paper_workbench workbench <project> --ids            # every paragraph and sentence id with its text, to write the annotations
+python -m paper_workbench workbench <project> --skeleton       # a workbench.json with every id and empty fields
+python -m paper_workbench workbench <project> --check          # the annotations against the paper: ids, quotes, evidence literals
+python -m paper_workbench workbench <project> --accept "v2"    # after reading the refresh queue: this state is the new baseline
+python -m paper_workbench workbench <project> --out page.html  # another output file
 ```
 
-Project settings, in `paperrules.json`:
+Project settings, in `paper_workbench.json`:
 
 ```json
 {"workbench": {"annotations": "workbench.json", "pdf": "paper/paper.pdf", "output": "out/workbench.html", "baseline": "workbench.baseline.json"}}
 ```
 
-`pdf` is the compiled paper (build it yourself; paperrules does not compile). Reduce its size with
+`pdf` is the compiled paper (build it yourself; paper_workbench does not compile). Reduce its size with
 `doc.rewrite_images(dpi_threshold=150, dpi_target=110, quality=60)` in PyMuPDF if it is large: the page embeds an image of every page.
 
 ## The annotation file
@@ -122,7 +122,7 @@ back in an expanding node; an *echo* node must repeat at least one core concept.
 
 ## For people who change the page
 
-The page is `paperrules/workbench/template/` (`main_template.html`, `main.js`, `ws_views.js`; no framework, no network) filled by
+The page is `paper_workbench/workbench/template/` (`main_template.html`, `main.js`, `ws_views.js`; no framework, no network) filled by
 `page.py`. All data is one object `D`, built by `model.py`. The keys the page reads:
 
 | key | content |

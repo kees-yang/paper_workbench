@@ -2,12 +2,12 @@
 
 [English](review.md) · **简体中文**
 
-`paperrules review` 把一个或多个已生成的工作台页面合成一个紧凑的审阅页。用它逐句阅读论文，并排比较两个版本或两篇候选论文，并记录审稿分数。
-它读取 `paperrules workbench` 已写入的数据，所以先为每篇论文生成工作台。
+`paper_workbench review` 把一个或多个已生成的工作台页面合成一个紧凑的审阅页。用它逐句阅读论文，并排比较两个版本或两篇候选论文，并记录审稿分数。
+它读取 `paper_workbench workbench` 已写入的数据，所以先为每篇论文生成工作台。
 
 ```bash
-python -m paperrules workbench my-paper                           # 生成 my-paper/out/workbench.html
-python -m paperrules review main=my-paper alt=other-paper --out review.html \
+python -m paper_workbench workbench my-paper                           # 生成 my-paper/out/workbench.html
+python -m paper_workbench review main=my-paper alt=other-paper --out review.html \
        --names "MyNet,MSRS,TNO" --scores review/score_log.json
 ```
 

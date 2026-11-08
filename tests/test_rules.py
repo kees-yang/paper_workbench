@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 import unittest
 
-from paperrules import runner
-from paperrules.config import load_project, merge
+from paper_workbench import runner
+from paper_workbench.config import load_project, merge
 from helpers import BIB, DOC, EXAMPLE, make_project
 
 
@@ -122,7 +122,7 @@ Algorithm~\ref{alg:main} gives the steps.
 \end{document}""")
 
     def test_algorithm_float_is_numbered_and_cited(self):
-        from paperrules import texread
+        from paper_workbench import texread
         d = make_project({'main.tex': self.ALG})
         p = texread.read(d / 'main.tex')
         self.assertEqual([(f['env'], f['number'], f['label']) for f in p.floats], [('algorithm', 1, 'alg:main')])
@@ -230,7 +230,7 @@ class ExtraPacks(unittest.TestCase):
 SERIF = Path('/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf')
 
 
-@unittest.skipUnless(__import__('paperrules.rules_figure', fromlist=['x']).available(), 'PyMuPDF not installed')
+@unittest.skipUnless(__import__('paper_workbench.rules_figure', fromlist=['x']).available(), 'PyMuPDF not installed')
 class FigureRules(unittest.TestCase):
     """G1–G4 measure the included figure files at their printed size (0.3.0)."""
 
@@ -259,7 +259,7 @@ class FigureRules(unittest.TestCase):
     def test_figure_findings_in_report(self):
         """Figure findings carry the document-finding fields, so the HTML and text reports can be written."""
         import tempfile
-        from paperrules import report
+        from paper_workbench import report
         _, res = self.run_fig(252, 5, 0.2)
         figs = [f for f in res['findings'] if f['rule'].startswith('G')]
         self.assertTrue(figs and all(f['en'] == '' and f['kind'] == 'document' for f in figs), figs)

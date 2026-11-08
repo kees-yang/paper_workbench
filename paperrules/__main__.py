@@ -1,3 +1,3 @@
-from .cli import main
+from paper_workbench.cli import main
 
 main()

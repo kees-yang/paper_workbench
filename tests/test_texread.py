@@ -1,5 +1,5 @@
 import unittest
-from paperrules import texread
+from paper_workbench import texread
 from helpers import DOC, make_project
 
 

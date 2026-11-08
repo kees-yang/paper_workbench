@@ -37,7 +37,7 @@ def bi(pair):
 def text_report(res, verbose=False, limit=5):
     L = []
     s = res['summary']
-    L.append(f'paperrules {res["checked_at"]} · {res["project"]["main_tex"]} · {res["paper"]["sentences"]} sentences, '
+    L.append(f'paper_workbench {res["checked_at"]} · {res["project"]["main_tex"]} · {res["paper"]["sentences"]} sentences, '
              f'{res["paper"]["figures"]} figures, {res["paper"]["tables"]} tables, {res["paper"]["citations"]} citations')
     L.append(f'rules: {s["pass"]} pass, {s["warn"]} warn, {s["fail"]} fail, {s["manual"]} manual, {s["skip"]} skipped, {s["off"]} off')
     by_id = {r['id']: r for r in res['rules']}

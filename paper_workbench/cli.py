@@ -1,4 +1,4 @@
-"""Command line: paperrules init | check | rules | test | sentences | accept."""
+"""Command line: paper_workbench init | check | rules | test | sentences | accept."""
 import argparse
 import json
 import re
@@ -39,7 +39,7 @@ def cmd_init(a):
     for name, obj in (('rules.local.json', LOCAL_TEMPLATE), ('glossary.json', GLOSSARY_TEMPLATE), ('exceptions.json', {"exceptions": []})):
         if not (d / name).exists() or a.force:
             dump_json(d / name, obj)
-    print(f'created {pf} and starter files; next: paperrules check {d}')
+    print(f'created {pf} and starter files; next: paper_workbench check {d}')
 
 
 def cmd_check(a):
@@ -164,7 +164,7 @@ def cmd_review(a):
         if path.is_dir():                                   # a project folder: its built page
             path = path / 'out' / 'workbench.html'
         if not path.is_file():
-            sys.exit(f'review: no workbench page at {path} (build it with: paperrules workbench <project>)')
+            sys.exit(f'review: no workbench page at {path} (build it with: paper_workbench workbench <project>)')
         pages.append((name or path.parent.parent.name or path.stem, str(path)))
     papers = review.build(pages, a.out, names=review.read_names(a.names), scores=a.scores, title=a.title,
                           supp_from=a.supp_from, supp_page=a.supp_page)
@@ -179,10 +179,10 @@ def cmd_review(a):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog='paperrules', description='Rule-based writing checks for LaTeX papers.')
-    ap.add_argument('--version', action='version', version=f'paperrules {__version__}')
+    ap = argparse.ArgumentParser(prog='paper_workbench', description='Rule-based writing checks for LaTeX papers.')
+    ap.add_argument('--version', action='version', version=f'paper_workbench {__version__}')
     sub = ap.add_subparsers(dest='cmd', required=True)
-    p = sub.add_parser('init', help='create a project (paperrules.json and starter files)')
+    p = sub.add_parser('init', help='create a project (paper_workbench.json and starter files)')
     p.add_argument('dir')
     p.add_argument('--main', default='main.tex', help='main LaTeX file, relative to the project directory')
     p.add_argument('--bib', default=None, help='.bib file, relative to the project directory (default: from \\bibliography)')

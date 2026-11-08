@@ -15,13 +15,13 @@ def make_project(files, settings=None, local=None, glossary=None, exceptions=Non
         p.write_text(text, encoding='utf-8')
     s = {'main_tex': 'main.tex'}
     s.update(settings or {})
-    (d / 'paperrules.json').write_text(json.dumps(s), encoding='utf-8')
+    (d / 'paper_workbench.json').write_text(json.dumps(s), encoding='utf-8')
     if local is not None:
         (d / 'rules.local.json').write_text(json.dumps(local), encoding='utf-8')
     if glossary is not None:
         (d / 'glossary.json').write_text(json.dumps({'terms': glossary}), encoding='utf-8')
         s['glossary'] = 'glossary.json'
-        (d / 'paperrules.json').write_text(json.dumps(s), encoding='utf-8')
+        (d / 'paper_workbench.json').write_text(json.dumps(s), encoding='utf-8')
     if exceptions is not None:
         (d / 'exceptions.json').write_text(json.dumps({'exceptions': exceptions}), encoding='utf-8')
     return d

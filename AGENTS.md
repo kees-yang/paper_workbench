@@ -1,4 +1,4 @@
-# Agent guide: writing a paper with paperrules
+# Agent guide: writing a paper with paper_workbench
 
 This file is for coding and writing agents (Claude Code, Codex and similar) that help authors revise a LaTeX paper. It says how
 to set the checker up in a new paper project, how to run the revision loop, and how to turn an author's feedback into rules
@@ -18,7 +18,7 @@ These come before any finding of the checker.
    report does not make a good paper. The checker does not judge the science.
 4. **Keep the author's files.** Do not delete, reset or overwrite sources, figures, data or earlier versions. Write each
    revision as a new version and leave earlier versions as they were delivered.
-5. **Never edit the pack in place.** Project settings go in the paper's `rules.local.json`. Change `paperrules/packs/default/`
+5. **Never edit the pack in place.** Project settings go in the paper's `rules.local.json`. Change `paper_workbench/packs/default/`
    only for a change meant for every user, with its tests.
 6. **Keep private material out of public repositories.** Unpublished text, results, author data and local paths stay in the
    paper's own repository. See §9.
@@ -26,20 +26,20 @@ These come before any finding of the checker.
 ## 2. Set up a paper project
 
 ```bash
-git clone https://github.com/kees-yang/paperrules && cd paperrules
+git clone https://github.com/kees-yang/paper_workbench && cd paper_workbench
 pip install -e ".[figures]"                      # spaCy + PyMuPDF (PyMuPDF is only for the figure rules G1–G4)
 python -m spacy download en_core_web_sm
-python -m paperrules test examples/aptp-cvpr2026  # the install works: R0 and R1 pass
+python -m paper_workbench test examples/aptp-cvpr2026  # the install works: R0 and R1 pass
 
-python -m paperrules init <paper-dir> --main main.tex --bib refs.bib
+python -m paper_workbench init <paper-dir> --main main.tex --bib refs.bib
 ```
 
-`init` writes `paperrules.json` and starter files into `<paper-dir>`. All paths in it are relative to that file, so
+`init` writes `paper_workbench.json` and starter files into `<paper-dir>`. All paths in it are relative to that file, so
 `"main_tex": "../manuscript/main.tex"` works. `\input` and `\include` are followed.
 
 | File in `<paper-dir>` | Holds |
 |---|---|
-| `paperrules.json` | main `.tex`, `.bib`, packs, glossary, `limitation_sections` (where self-critical wording is allowed), output directory |
+| `paper_workbench.json` | main `.tex`, `.bib`, packs, glossary, `limitation_sections` (where self-critical wording is allowed), output directory |
 | `rules.local.json` | rules switched on or off, severities, numbers of rules, extra patterns, new rules with test sentences |
 | `glossary.json` | one English term per concept, with aliases and retired names. It switches on `A3`, `A6` and `A7` |
 | `exceptions.json` | flagged sentences or keys that stay, each with a reason and a date (written by `accept`) |
@@ -62,10 +62,10 @@ author asks for it. `docs/customizing-rules.md` gives the schema of every file.
 ## 3. The revision loop
 
 ```bash
-python -m paperrules check <paper-dir>            # summary + out/report.html, report.json, report.txt
-python -m paperrules check <paper-dir> -v         # every open finding in the terminal
-python -m paperrules check <paper-dir> --json     # machine-readable, for an agent
-python -m paperrules check <paper-dir> --only W10,W14
+python -m paper_workbench check <paper-dir>            # summary + out/report.html, report.json, report.txt
+python -m paper_workbench check <paper-dir> -v         # every open finding in the terminal
+python -m paper_workbench check <paper-dir> --json     # machine-readable, for an agent
+python -m paper_workbench check <paper-dir> --only W10,W14
 ```
 
 1. **Work top-down along the rule tree.** Go S1 sources → S2 thread → S3 paragraphs → S4 sentences → S5 format → S6 rules.
@@ -73,16 +73,16 @@ python -m paperrules check <paper-dir> --only W10,W14
 2. **For each finding, choose one action:**
    - rewrite the sentence (the usual case);
    - accept it with a reason:
-     `python -m paperrules accept W12 "<exact sentence>" --reason "<why>" --project <paper-dir>`
+     `python -m paper_workbench accept W12 "<exact sentence>" --reason "<why>" --project <paper-dir>`
      (with `--key` for a label or citation key, and `--word` for an A6 head noun);
    - change the rule in `rules.local.json` when it is wrong for this paper.
 3. **Keep the meaning.** A rewrite must not change a number, a claim, a citation or a term. Check each changed sentence against
    the one it replaces.
 4. **Re-run until the check passes.** Exit status `0` means no `error` rule is open. Use `--strict` to make warnings fail too,
-   for CI or a final pass. Then run `python -m paperrules test <paper-dir>`, so the rules still pass their own tests.
+   for CI or a final pass. Then run `python -m paper_workbench test <paper-dir>`, so the rules still pass their own tests.
 5. **Compile the PDF and look at it.** The checker reads the source. Float placement, blank space and page breaks need the PDF.
 
-If a finding looks wrong, run `python -m paperrules sentences <paper-dir> --grep "<regex>"` to print the sentence as the
+If a finding looks wrong, run `python -m paper_workbench sentences <paper-dir> --grep "<regex>"` to print the sentence as the
 checker reads it. The structure rules `W14`–`W16` and `A6` use a small parser. When it misreads a sentence, accept the
 finding and give that as the reason.
 
@@ -196,32 +196,32 @@ These steps worked well in practice. The checker does not enforce them.
 
 | Task | Command |
 |---|---|
-| list rules / the tree / one rule | `python -m paperrules rules list\|tree\|show W14 --project <dir>` |
-| rules as Markdown | `python -m paperrules rules markdown --project <dir>` |
-| check, report files in `out/` | `python -m paperrules check <dir>` |
-| check for CI | `python -m paperrules check <dir> --strict --no-files` |
-| run the rule tests | `python -m paperrules test <dir>` |
-| keep a flagged sentence | `python -m paperrules accept <rule> "<sentence>" --reason "<why>" --project <dir>` |
-| debug the reader | `python -m paperrules sentences <dir> --grep "<regex>"` |
-| workbench page (PDF, argument canvas, analysis panels) | `python -m paperrules workbench <dir>` (`--ids`, `--skeleton`, `--check`, `--accept "label"`) |
+| list rules / the tree / one rule | `python -m paper_workbench rules list\|tree\|show W14 --project <dir>` |
+| rules as Markdown | `python -m paper_workbench rules markdown --project <dir>` |
+| check, report files in `out/` | `python -m paper_workbench check <dir>` |
+| check for CI | `python -m paper_workbench check <dir> --strict --no-files` |
+| run the rule tests | `python -m paper_workbench test <dir>` |
+| keep a flagged sentence | `python -m paper_workbench accept <rule> "<sentence>" --reason "<why>" --project <dir>` |
+| debug the reader | `python -m paper_workbench sentences <dir> --grep "<regex>"` |
+| workbench page (PDF, argument canvas, analysis panels) | `python -m paper_workbench workbench <dir>` (`--ids`, `--skeleton`, `--check`, `--accept "label"`) |
 | package tests | `python -m unittest discover -s tests` |
 
 Exit status: `0` when no `error` rule is open; `1` otherwise, or when a warning is open under `--strict`.
 
 ## 9. Contributing back
 
-You can generalize a rule learned on one paper into the default pack (`paperrules/packs/default/register.json` and the matching
+You can generalize a rule learned on one paper into the default pack (`paper_workbench/packs/default/register.json` and the matching
 settings file). Before committing:
 
 - Make the statement general. Remove the paper's method names, datasets, numbers and author names.
 - Write test sentences in invented, neutral wording.
-- Run `python -m unittest discover -s tests` and `python -m paperrules test examples/aptp-cvpr2026`. Regenerate
+- Run `python -m unittest discover -s tests` and `python -m paper_workbench test examples/aptp-cvpr2026`. Regenerate
   `examples/aptp-cvpr2026/expected/` and `docs/rules.md` if the rules changed.
 - Search the diff for e-mail addresses, personal names, local paths, unpublished titles and API keys before you push.
 
 ## 10. The workbench (optional reading surface)
 
-`python -m paperrules workbench <dir>` builds one HTML page with the PDF, an argument canvas and analysis panels
+`python -m paper_workbench workbench <dir>` builds one HTML page with the PDF, an argument canvas and analysis panels
 ([docs/workbench.md](docs/workbench.md)). When you annotate a paper for it:
 
 - **The page embeds the whole manuscript and the author's notes.** Never commit or publish the page of an unpublished paper.

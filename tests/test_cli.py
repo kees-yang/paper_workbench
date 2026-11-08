@@ -3,7 +3,11 @@ import json
 import unittest
 from contextlib import redirect_stdout
 
-from paperrules import cli
+import tempfile
+from pathlib import Path
+
+from paper_workbench import cli
+from paper_workbench.config import load_project
 from helpers import BIB, DOC, make_project
 
 
@@ -27,7 +31,7 @@ class CliTest(unittest.TestCase):
         (d / 'refs.bib').write_text(BIB)
         code, out = run('init', str(d), '--main', 'main.tex')
         self.assertEqual(code, 0)
-        self.assertTrue((d / 'paperrules.json').exists() and (d / 'rules.local.json').exists())
+        self.assertTrue((d / 'paper_workbench.json').exists() and (d / 'rules.local.json').exists())
         code, out = run('check', str(d))
         self.assertEqual(code, 1)                      # B1 fails (cited key b is missing)
         self.assertTrue((d / 'out' / 'report.html').exists())
@@ -59,3 +63,32 @@ class CliTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class FormerName(unittest.TestCase):
+    """paper_workbench was paperrules before 0.5.0: old imports, the old command and old project files keep working."""
+
+    def test_old_imports_reach_the_same_modules(self):
+        import paperrules
+        import paper_workbench
+        from paperrules.workbench import review as old
+        from paper_workbench.workbench import review as new
+        from paperrules.config import load_project as old_load
+        self.assertIs(old, new)
+        self.assertIs(old_load, load_project)
+        self.assertEqual(paperrules.__version__, paper_workbench.__version__)
+        self.assertEqual(new.__spec__.name, 'paper_workbench.workbench.review')
+
+    def test_old_command(self):
+        import subprocess
+        import sys
+        root = Path(__file__).resolve().parents[1]
+        r = subprocess.run([sys.executable, '-m', 'paperrules', '--version'], capture_output=True, text=True, cwd=root)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn('paper_workbench', r.stdout)
+
+    def test_old_project_file(self):
+        d = Path(tempfile.mkdtemp(prefix='paperrules-old-'))
+        (d / 'main.tex').write_text(DOC, encoding='utf-8')
+        (d / 'paperrules.json').write_text(json.dumps({'main_tex': 'main.tex'}), encoding='utf-8')
+        self.assertEqual(load_project(d).main_tex.name, 'main.tex')

@@ -2,13 +2,13 @@
 
 **English** · [简体中文](review.zh-CN.md)
 
-`paperrules review` puts one or more built workbench pages into one compact page for reading and review. Use it to read a paper
+`paper_workbench review` puts one or more built workbench pages into one compact page for reading and review. Use it to read a paper
 sentence by sentence, to compare two versions or two candidate papers side by side, and to keep a log of review scores.
-It reads the data that `paperrules workbench` already wrote, so build the workbench of each paper first.
+It reads the data that `paper_workbench workbench` already wrote, so build the workbench of each paper first.
 
 ```bash
-python -m paperrules workbench my-paper                           # writes my-paper/out/workbench.html
-python -m paperrules review main=my-paper alt=other-paper --out review.html \
+python -m paper_workbench workbench my-paper                           # writes my-paper/out/workbench.html
+python -m paper_workbench review main=my-paper alt=other-paper --out review.html \
        --names "MyNet,MSRS,TNO" --scores review/score_log.json
 ```
 

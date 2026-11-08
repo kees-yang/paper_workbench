@@ -2,8 +2,8 @@
 
 [English](workbench.md) · **简体中文**
 
-`paperrules workbench` 为一篇论文生成一个自包含的 HTML 页面：PDF 页面、论证画布和各分析面板并排，另有六个视图（规则核查、论证树、证据、图表、刷新队列）。
-它是 paperrules 所源自的写作流程的阅读界面：读一句话，就能看到它在论证中的位置、与什么相连、依据哪个数字、违反了哪些规则，并把批注写在旁边。
+`paper_workbench workbench` 为一篇论文生成一个自包含的 HTML 页面：PDF 页面、论证画布和各分析面板并排，另有六个视图（规则核查、论证树、证据、图表、刷新队列）。
+它是 paper_workbench 所源自的写作流程的阅读界面：读一句话，就能看到它在论证中的位置、与什么相连、依据哪个数字、违反了哪些规则，并把批注写在旁边。
 
 <p align="center"><img src="img/workbench-overview.png" alt="工作台：示例论文的 PDF 面板、论证画布与句子面板" width="900"></p>
 
@@ -12,7 +12,7 @@
 
 ```bash
 pip install -e ".[workbench]"                      # 加装 PyMuPDF，用于 PDF 面板
-python -m paperrules workbench examples/aptp-cvpr2026
+python -m paper_workbench workbench examples/aptp-cvpr2026
 # 打开 examples/aptp-cvpr2026/out/workbench.html
 ```
 
@@ -29,7 +29,7 @@ python -m paperrules workbench examples/aptp-cvpr2026
 | 右 | **句子** | 每句的标注语言（示例为中文）及其下的原文；主语、谓语、宾语加下划线；与前句或前文相连的短语（中心名词加粗）；句中数字及其来源；批注框。 |
 | 右 | **语义流** | 故事线视图：一条主张依次经过各层（摘要 → 引言 → 正文 → 结论）的卡片，每张卡片有四项检查（展开、不照搬、核心概念延续、呼应）。 |
 | 右 | **术语表** | 项目术语表，本段用到的术语排在前面。 |
-| 页头 | **规则核查** | 规则树与每条规则及其结果（与 `paperrules check` 相同）。 |
+| 页头 | **规则核查** | 规则树与每条规则及其结果（与 `paper_workbench check` 相同）。 |
 | 页头 | **论证树** | 摘要论证槽及其子主张、结论主张及其支撑、段落树。 |
 | 页头 | **证据** | 每个登记的数字及其来源（论文自己的表格单元格，或由其他记录算出的公式）和用到它的每个句子。 |
 | 页头 | **图表** | 论文自己的表格（读自 LaTeX，最佳值加粗）与图，并标出首次引用它们的段落。 |
@@ -44,7 +44,7 @@ python -m paperrules workbench examples/aptp-cvpr2026
 | 层 | 来源 | 没有时 |
 |---|---|---|
 | 句子、段落、章节、图、表、引用 | LaTeX 读取器（自动） | – |
-| 规则结果、规则树 | `paperrules check`（自动） | – |
+| 规则结果、规则树 | `paper_workbench check`（自动） | – |
 | 英文句子的主谓宾标记 | spaCy（自动） | – |
 | PDF 页面与段落矩形 | `pdf` 文件与 PyMuPDF（自动） | 隐藏 PDF 面板 |
 | 论文中的表格 | 从 `tabular` 解析（自动；仅限普通表格） | 只显示图注 |
@@ -57,21 +57,21 @@ python -m paperrules workbench examples/aptp-cvpr2026
 ## 命令
 
 ```bash
-python -m paperrules workbench <项目>                  # 生成 <项目>/out/workbench.html
-python -m paperrules workbench <项目> --ids            # 打印每个段落与句子的编号及原文，供撰写标注
-python -m paperrules workbench <项目> --skeleton       # 生成含全部编号和空字段的 workbench.json
-python -m paperrules workbench <项目> --check          # 核对标注与论文：编号、引文、证据中的数字
-python -m paperrules workbench <项目> --accept "v2"    # 读完刷新队列后，把当前状态设为新基线
-python -m paperrules workbench <项目> --out page.html  # 写到别的文件
+python -m paper_workbench workbench <项目>                  # 生成 <项目>/out/workbench.html
+python -m paper_workbench workbench <项目> --ids            # 打印每个段落与句子的编号及原文，供撰写标注
+python -m paper_workbench workbench <项目> --skeleton       # 生成含全部编号和空字段的 workbench.json
+python -m paper_workbench workbench <项目> --check          # 核对标注与论文：编号、引文、证据中的数字
+python -m paper_workbench workbench <项目> --accept "v2"    # 读完刷新队列后，把当前状态设为新基线
+python -m paper_workbench workbench <项目> --out page.html  # 写到别的文件
 ```
 
-项目设置写在 `paperrules.json` 中：
+项目设置写在 `paper_workbench.json` 中：
 
 ```json
 {"workbench": {"annotations": "workbench.json", "pdf": "paper/paper.pdf", "output": "out/workbench.html", "baseline": "workbench.baseline.json"}}
 ```
 
-`pdf` 是编译好的论文（自己编译；paperrules 不负责编译）。页面会嵌入每一页的图片，PDF 太大时可用 PyMuPDF 的
+`pdf` 是编译好的论文（自己编译；paper_workbench 不负责编译）。页面会嵌入每一页的图片，PDF 太大时可用 PyMuPDF 的
 `doc.rewrite_images(dpi_threshold=150, dpi_target=110, quality=60)` 缩小。
 
 ## 标注文件
@@ -113,7 +113,7 @@ python -m paperrules workbench <项目> --out page.html  # 写到别的文件
 
 ## 给要改页面的人
 
-页面是 `paperrules/workbench/template/`（`main_template.html`、`main.js`、`ws_views.js`；无框架、无网络），由 `page.py` 填充。所有数据是一个对象 `D`，由 `model.py` 生成。页面读取的键：
+页面是 `paper_workbench/workbench/template/`（`main_template.html`、`main.js`、`ws_views.js`；无框架、无网络），由 `page.py` 填充。所有数据是一个对象 `D`，由 `model.py` 生成。页面读取的键：
 
 | 键 | 内容 |
 |---|---|

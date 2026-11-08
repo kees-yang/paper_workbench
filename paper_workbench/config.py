@@ -1,6 +1,6 @@
 """Project configuration, rule packs and local overrides.
 
-A *pack* is a directory of JSON files under ``paperrules/packs/<name>/``:
+A *pack* is a directory of JSON files under ``paper_workbench/packs/<name>/``:
 
     register.json   every rule: id, stage, scope, method, severity, statement, check, tests
     tree.json       the stages (and their nodes) the rules are arranged in
@@ -9,7 +9,7 @@ A *pack* is a directory of JSON files under ``paperrules/packs/<name>/``:
     heads.json      closed noun lists and concept rules of the head-noun rules (A6, A7)
     document.json   settings of the document rules (abstract, keywords, floats, bibliography)
 
-A *project* is a ``paperrules.json`` next to the paper. It names the main LaTeX file and may add a local override file
+A *project* is a ``paper_workbench.json`` (before 0.5.0: ``paperrules.json``, still read) next to the paper. It names the main LaTeX file and may add a local override file
 (``rules.local.json``) that is merged onto the packs:
 
     key           replace the value (dicts are merged recursively)
@@ -26,7 +26,8 @@ from pathlib import Path
 
 PACK_DIR = Path(__file__).resolve().parent / 'packs'
 PACK_FILES = ('register', 'tree', 'tone', 'syntax', 'heads', 'document')
-PROJECT_FILE = 'paperrules.json'
+PROJECT_FILE = 'paper_workbench.json'
+LEGACY_PROJECT_FILE = 'paperrules.json'   # the name before 0.5.0, still read
 
 
 def load_json(path):
@@ -113,9 +114,9 @@ class Project:
 def resolve_project_file(arg):
     p = Path(arg)
     if p.is_dir():
-        p = p / PROJECT_FILE
+        p = p / PROJECT_FILE if (p / PROJECT_FILE).exists() or not (p / LEGACY_PROJECT_FILE).exists() else p / LEGACY_PROJECT_FILE
     if not p.exists():
-        raise SystemExit(f'no {PROJECT_FILE} at {p}; create one with "paperrules init <dir>"')
+        raise SystemExit(f'no {PROJECT_FILE} (or {LEGACY_PROJECT_FILE}) at {p.parent}; create one with "paper_workbench init <dir>"')
     return p
 
 

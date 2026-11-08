@@ -2,7 +2,7 @@
 
 **English** · 中文见下文
 
-paperrules borrows ideas from the work below. It copies no code or text from the design references. Libraries are used as
+paper_workbench borrows ideas from the work below. It copies no code or text from the design references. Libraries are used as
 dependencies under their own licenses. None of the people or organizations listed endorse this project.
 
 ## Writing rules
@@ -12,7 +12,7 @@ Specification ASD-STE100. https://www.asd-ste100.org/
 
 The sentence rules of the default pack adapt these STE principles to scientific prose:
 
-| STE principle | paperrules rules |
+| STE principle | paper_workbench rules |
 |---|---|
 | active voice | `W10` |
 | one topic per sentence | `W14`: one main action per sentence |
@@ -20,7 +20,7 @@ The sentence rules of the default pack adapt these STE principles to scientific 
 | one word, one meaning | `A3`, `A6`, `A7`: glossary terms and head nouns |
 | plain, approved words | `M1`: plain words and direct verbs |
 
-paperrules does not claim STE compliance. It uses no STE dictionary and does not limit sentence length. It keeps the
+paper_workbench does not claim STE compliance. It uses no STE dictionary and does not limit sentence length. It keeps the
 technical terms a paper needs. Obtain the specification from ASD.
 
 **"80% of the way to ASD-STE100."** A. Karpathy, post on X, 2 October 2026.
@@ -43,9 +43,9 @@ The other rules come from the authors' own revision rounds on manuscripts, and t
 
 **Obsidian.** https://obsidian.md
 
-The interface design of paperrules draws inspiration from Obsidian:
+The interface design of paper_workbench draws inspiration from Obsidian:
 
-- the workbench (`paperrules workbench`) is a calm, note-like reading surface;
+- the workbench (`paper_workbench workbench`) is a calm, note-like reading surface;
 - it has panes side by side, with tabs and a collapsible outline;
 - items link to each other, so a sentence, its rule, its number and its source are one click apart.
 
@@ -65,7 +65,7 @@ style. No code or text of Blender is used.
 | research workflow of the workspace this project grew out of | ARIS (Auto-claude-code-research-in-sleep), https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep | see its repository | — |
 | development and testing | Claude Code (Anthropic) and Codex (OpenAI) coding agents | — | — |
 
-paperrules itself is MIT-licensed and does not bundle PyMuPDF. PyMuPDF is installed only with `pip install -e ".[figures]"` or `".[workbench]"`,
+paper_workbench itself is MIT-licensed and does not bundle PyMuPDF. PyMuPDF is installed only with `pip install -e ".[figures]"` or `".[workbench]"`,
 and that install is under PyMuPDF's own license terms.
 
 The example paper in `examples/aptp-cvpr2026/` is credited in [NOTICE](NOTICE) (CC BY 4.0).
@@ -74,7 +74,7 @@ The example paper in `examples/aptp-cvpr2026/` is credited in [NOTICE](NOTICE) (
 
 ## 中文
 
-paperrules 借鉴了以下工作的思路。它没有复制这些设计参考中的代码或文字。依赖库按各自的许可使用。以下个人和机构均未为本项目背书。
+paper_workbench 借鉴了以下工作的思路。它没有复制这些设计参考中的代码或文字。依赖库按各自的许可使用。以下个人和机构均未为本项目背书。
 
 **写作规则**
 
@@ -99,7 +99,7 @@ paperrules 借鉴了以下工作的思路。它没有复制这些设计参考中
 **界面**
 
 - **Obsidian**，https://obsidian.md 。本项目的界面设计借鉴了 Obsidian：
-  - 工作台（`paperrules workbench`）采用安静、类似笔记的阅读界面；
+  - 工作台（`paper_workbench workbench`）采用安静、类似笔记的阅读界面；
   - 多栏并排，有标签页与可折叠的大纲；
   - 条目之间互相链接，从句子到规则、到数字、到来源只需点一下。
 

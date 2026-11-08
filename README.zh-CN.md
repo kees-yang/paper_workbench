@@ -1,8 +1,10 @@
-# paperrules
+# paper_workbench
 
 [English](README.md) · **简体中文**
 
-面向 LaTeX 论文的规则化写作检查。你把“对你的这篇论文来说什么算好的写作”写成规则；`paperrules` 读取 LaTeX 源文件，逐句、逐段、逐篇地应用这些规则，并按**规则树**输出一份离线报告，告诉你应该先改论文的哪一层。
+> **0.5.0 起更名。** 本项目原名 *paperrules*。`python -m paperrules`、`import paperrules` 和名为 `paperrules.json` 的项目文件仍然可用；新项目使用 `paper_workbench.json`。旧的 GitHub 地址会自动跳转到这里。
+
+面向 LaTeX 论文的规则化写作检查。你把“对你的这篇论文来说什么算好的写作”写成规则；`paper_workbench` 读取 LaTeX 源文件，逐句、逐段、逐篇地应用这些规则，并按**规则树**输出一份离线报告，告诉你应该先改论文的哪一层。
 
 <p align="center"><img src="docs/img/report-desktop.png" alt="示例论文的检查报告：规则树与待处理项" width="760"></p>
 
@@ -16,13 +18,13 @@
 ## 快速开始
 
 ```bash
-git clone <本仓库> && cd paperrules
+git clone <本仓库> && cd paper_workbench
 pip install -e .                                  # 会安装 spaCy
 pip install -e ".[figures]"                       # 可选：PyMuPDF，用于图件文件规则 G1–G4
 python -m spacy download en_core_web_sm           # 结构类规则使用的句法模型
 
-python -m paperrules test examples/aptp-cvpr2026  # 规则通过自身的测试（R0、R1）
-python -m paperrules check examples/aptp-cvpr2026 # 检查示例论文（几秒钟）
+python -m paper_workbench test examples/aptp-cvpr2026  # 规则通过自身的测试（R0、R1）
+python -m paper_workbench check examples/aptp-cvpr2026 # 检查示例论文（几秒钟）
 # 打开 examples/aptp-cvpr2026/out/report.html
 ```
 
@@ -31,21 +33,21 @@ python -m paperrules check examples/aptp-cvpr2026 # 检查示例论文（几秒�
 ## 检查你自己的论文
 
 ```bash
-python -m paperrules init my-paper --main main.tex --bib refs.bib   # 生成 paperrules.json 与起始文件
+python -m paper_workbench init my-paper --main main.tex --bib refs.bib   # 生成 paper_workbench.json 与起始文件
 # 把 LaTeX 源文件放进 my-paper/（或在配置里写 "main_tex": "../paper/main.tex"）
-python -m paperrules check my-paper               # 文本摘要 + out/report.html、report.json、report.txt
-python -m paperrules check my-paper -v            # 在终端列出全部待处理项
-python -m paperrules check my-paper --only W10,W14
-python -m paperrules check my-paper --strict      # 有提示也以状态码1退出（用于CI）
+python -m paper_workbench check my-paper               # 文本摘要 + out/report.html、report.json、report.txt
+python -m paper_workbench check my-paper -v            # 在终端列出全部待处理项
+python -m paper_workbench check my-paper --only W10,W14
+python -m paper_workbench check my-paper --strict      # 有提示也以状态码1退出（用于CI）
 ```
 
 自上而下读报告。对每一项，你可以：
 
 1. **改写这句话**（最常见）；
-2. **保留，并写明理由**：`python -m paperrules accept W12 "We evaluate …" --reason "作者是施事" --project my-paper`；下次这句通过，理由留在报告中；
+2. **保留，并写明理由**：`python -m paper_workbench accept W12 "We evaluate …" --reason "作者是施事" --project my-paper`；下次这句通过，理由留在报告中；
 3. **改规则**——规则不适合你的论文时：见[自定义规则](#自定义规则)。
 
-`python -m paperrules sentences my-paper --grep "正则"` 按检查器读到的样子打印句子：某条结果看起来奇怪时很有用。
+`python -m paper_workbench sentences my-paper --grep "正则"` 按检查器读到的样子打印句子：某条结果看起来奇怪时很有用。
 
 ### 退出状态
 
@@ -62,11 +64,11 @@ python -m paperrules check my-paper --strict      # 有提示也以状态码1退
 | **S5 格式** | 期刊限制、图表、引用 | 摘要字数（`J1`）、图表与算法顺序（`T1`、`T2`）、本文方法排在表格最后（`T10`，需打开）、未知标签（`B2`）；按印刷尺寸测量图件文件——嵌入字体、正文字族、字号≥8 pt、线宽（`G1`–`G4`），以及图件设计核对清单（`G5`–`G9`：统一视觉语言与颜色角色、线型语法、框图内不写公式与灰色小字、方框按内容定尺寸、真实或示意图像取自登记文件） |
 | **S6 规则系统** | 规则登记本身 | 每条规则都在树中（`R0`）；每条规则通过自身测试（`R1`） |
 
-49 条规则的中英文对照见 [`docs/rules.md`](docs/rules.md)（`python -m paperrules rules tree --lang zh` 打印规则树，`rules show W14` 看单条规则）。规则按**方法**分为：`auto`（检查器判定）、`partial`（检查器标出、由你判断）、`manual`（人工检查；这类规则出现在报告末尾的核对清单里）。
+49 条规则的中英文对照见 [`docs/rules.md`](docs/rules.md)（`python -m paper_workbench rules tree --lang zh` 打印规则树，`rules show W14` 看单条规则）。规则按**方法**分为：`auto`（检查器判定）、`partial`（检查器标出、由你判断）、`manual`（人工检查；这类规则出现在报告末尾的核对清单里）。
 
 ## 自定义规则
 
-所有设置由 `paperrules/packs/default/` 中的规则包与论文旁的本地文件 `rules.local.json` 合并而来。完整指南与各文件的格式见 [`docs/customizing-rules.zh-CN.md`](docs/customizing-rules.zh-CN.md)。常用做法：
+所有设置由 `paper_workbench/packs/default/` 中的规则包与论文旁的本地文件 `rules.local.json` 合并而来。完整指南与各文件的格式见 [`docs/customizing-rules.zh-CN.md`](docs/customizing-rules.zh-CN.md)。常用做法：
 
 ```jsonc
 // my-paper/rules.local.json
@@ -86,17 +88,17 @@ python -m paperrules check my-paper --strict      # 有提示也以状态码1退
 }
 ```
 
-然后运行 `python -m paperrules test my-paper`（R1 会运行每条规则的全部测试句，包括你的）和 `python -m paperrules check my-paper --only U1`。术语表（`glossary.json`）会启用术语类规则：`A3` 标出你已弃用的名称（`avoid_en`），`A6` 标出中心名词不在术语表中的主语与宾语，`A7` 标出用别的名词指称同一概念的短语。
+然后运行 `python -m paper_workbench test my-paper`（R1 会运行每条规则的全部测试句，包括你的）和 `python -m paper_workbench check my-paper --only U1`。术语表（`glossary.json`）会启用术语类规则：`A3` 标出你已弃用的名称（`avoid_en`），`A6` 标出中心名词不在术语表中的主语与宾语，`A7` 标出用别的名词指称同一概念的短语。
 
 ## 工作台
 
-`paperrules workbench <项目>` 生成一个离线页面，把论文的 PDF、论证画布（摘要 → 引言 → 正文 → 结论，由各段所服务的主张连线）和分析面板并排放在一起：逐句分析（主谓宾标记、与前文的链接）、每条主张在全文中的故事线、术语表，以及规则、论证树、每个数字背后的证据、图表、自上次确认以来改变的句子等视图。批注就写在每句旁边。
+`paper_workbench workbench <项目>` 生成一个离线页面，把论文的 PDF、论证画布（摘要 → 引言 → 正文 → 结论，由各段所服务的主张连线）和分析面板并排放在一起：逐句分析（主谓宾标记、与前文的链接）、每条主张在全文中的故事线、术语表，以及规则、论证树、每个数字背后的证据、图表、自上次确认以来改变的句子等视图。批注就写在每句旁边。
 
 <p align="center"><img src="docs/img/workbench-overview.png" alt="示例论文的工作台：PDF 面板、论证画布与逐句分析" width="900"></p>
 
 ```bash
 pip install -e ".[workbench]"                       # PDF 面板需要 PyMuPDF
-python -m paperrules workbench examples/aptp-cvpr2026
+python -m paper_workbench workbench examples/aptp-cvpr2026
 # 打开 examples/aptp-cvpr2026/out/workbench.html     （已生成的副本：examples/aptp-cvpr2026/expected/workbench.html）
 ```
 
@@ -105,10 +107,10 @@ python -m paperrules workbench examples/aptp-cvpr2026
 
 ### 审阅页
 
-`paperrules review <页面或项目> [...]` 读取已生成的工作台页面，生成一个紧凑的审阅页：每段一张表，列出每句的原文、译文及其与上一句的衔接（红色标签标出没有承接的句子），旁边是 PDF 页面；检查每个缩写在摘要、正文和补充材料中首次出现时是否有定义；每句可写笔记并导出为 Markdown；还可记录每轮审稿分数。多篇论文或多个版本以标签页并排。详见 [`docs/review.zh-CN.md`](docs/review.zh-CN.md)。
+`paper_workbench review <页面或项目> [...]` 读取已生成的工作台页面，生成一个紧凑的审阅页：每段一张表，列出每句的原文、译文及其与上一句的衔接（红色标签标出没有承接的句子），旁边是 PDF 页面；检查每个缩写在摘要、正文和补充材料中首次出现时是否有定义；每句可写笔记并导出为 Markdown；还可记录每轮审稿分数。多篇论文或多个版本以标签页并排。详见 [`docs/review.zh-CN.md`](docs/review.zh-CN.md)。
 
 ```bash
-python -m paperrules review main=examples/aptp-cvpr2026/expected/workbench.html --names "APTP,MSRS,TNO" --out review.html
+python -m paper_workbench review main=examples/aptp-cvpr2026/expected/workbench.html --names "APTP,MSRS,TNO" --out review.html
 ```
 
 ## 检查器不做什么
@@ -122,12 +124,13 @@ python -m paperrules review main=examples/aptp-cvpr2026/expected/workbench.html 
 ## 目录
 
 ```
-paperrules/             包（读取、规则、运行、报告、命令行）与 packs/default/*.json（规则）
-paperrules/workbench/   工作台：页面模板、数据生成、PDF 对齐
+paper_workbench/        包（读取、规则、运行、报告、命令行）与 packs/default/*.json（规则）
+paperrules/             别名包：0.5.0 之前的名称
+paper_workbench/workbench/ 工作台：页面模板、数据生成、PDF 对齐
 examples/aptp-cvpr2026/ 一篇 CC BY 4.0 论文、术语表、本地规则、例外、expected/ 输出
 AGENTS.md               智能体指南：设置、修改循环、作者意见→规则、图件
 docs/                   自定义规则与工作台（English、中文）、rules.md、截图
-tests/                  python -m unittest discover -s tests   （49 个测试）
+tests/                  python -m unittest discover -s tests   （52 个测试）
 ```
 
 ## 致谢与参考

@@ -1,6 +1,6 @@
-// paperrules workbench: PDF pages | argument canvas | analysis sidebar (paragraph · sentences · semantic flow · glossary),
+// paper_workbench workbench: PDF pages | argument canvas | analysis sidebar (paragraph · sentences · semantic flow · glossary),
 // plus the views rules · argument tree · evidence · figures and tables · refresh queue (ws_views.js).
-// All data comes from one object, D, built by paperrules/workbench/model.py (contract: docs/workbench.md). Nothing here names a paper.
+// All data comes from one object, D, built by paper_workbench/workbench/model.py (contract: docs/workbench.md). Nothing here names a paper.
 const D=JSON.parse(document.querySelector('#data').textContent),$=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const W=D.ws,C=D.canvas;
@@ -71,7 +71,7 @@ function fnum(l){const f=W.floats.tables[l]||W.floats.figures[l];if(!f)return l;
 function human(t){return String(t??'').replace(/P\d{3}-R\d{3}/g,m=>rowPos(m)).replace(/\bP\d{3}\b/g,m=>pm[m]?pm[m].title+'段':(r=>r?r+'段（已删去）':m)(((D.removed_paragraphs||[]).find(x=>x.id===m)||{}).title||((((D.removed_paragraphs||[]).find(x=>x.id===m)||{}).spec||{}).title)))}
 // ---- 语义流: anchored on the storyline (the annotation file's storyline). Each line (background, state of
 // the art, problem, motivation, method, …) runs through nodes (manuscript sections) with a role: state, expand or echo.
-// Data: D.flow (paperrules/workbench/flow.py), embedded; parallel to the sentence analysis.
+// Data: D.flow (paper_workbench/workbench/flow.py), embedded; parallel to the sentence analysis.
 const FCHK={expand:'展开',nonredundant:'不冗余',consistent:'一致',echo:'呼应',grammar:'句法',numbers:'数字'},ROLE={state:'陈述',expand:'展开',echo:'呼应'};
 const SLOT2LINE=ID.slot2line||{};
 let flowLine=null,flowFor=null;  // the line follows the selection unless a line chip was chosen for this same selection
@@ -93,7 +93,7 @@ function paraList(c){const ps=c.paragraphs.filter(x=>pm[x]);if(ps.length<2)retur
 function chainRow(L,u,ui){const cards=u.chain.map((c,ci)=>[c,ci]).filter(([c])=>c.carrier||Object.keys(c.checks||{}).length);
   return `<section class="pchain"><h4>${esc(L.units.length>1?u.zh:'主线')}<span class="kterms">${u.concepts.map(k=>`<span class="q${k.core?'':' soft'}" title="${k.core?'核心概念：每个展开节点都须出现':'呼应时计入'}">${esc(k.zh)}</span>`).join('')}</span></h4>`+
   `<div class="chain">${cards.map(([c,ci],j)=>(j?'<span class="ar" aria-hidden="true">→</span>':'')+nodeCard(c,ui,ci)).join('')}</div></section>`}
-function flowTab(){const F=D.flow;if(!F?.lines)return '<p class="hint">没有语义流：在标注文件 workbench.json 里写 storyline（见 docs/workbench.md），再重新运行 paperrules workbench。</p>';
+function flowTab(){const F=D.flow;if(!F?.lines)return '<p class="hint">没有语义流：在标注文件 workbench.json 里写 storyline（见 docs/workbench.md），再重新运行 paper_workbench workbench。</p>';
   const sel=(cur.k||'')+'|'+cur.unit;if(sel!==flowFor||!F.lines.some(L=>L.id===flowLine)){flowLine=lineFor();flowFor=sel}
   const here=new Set(linesHere().map(L=>L.id)),L=F.lines.find(x=>x.id===flowLine),iss=issuesOf(L),n=F.counts,t=F.thresholds;
   const head=`<p class="hint" title="展开：展开节点比上一节点多出术语、数字或引用；不冗余：承载句相似度≥${t.copy_major}为主要、≥${t.copy_minor}为次要，呼应≥${t.echo_copy}；递进：主线按故事线顺序、子主张按摘要顺序；一致：核心概念逐节点延续，摘要与引言的数字见于实验；句法：引言与结论承载句主语延续，节点内句句有回指；呼应：覆盖主线、不引入新数字。">故事线为锚：每条主线依次经过各节点（陈述→展开→呼应）。主要问题 ${n.major} · 次要问题 ${n.minor}</p>`;

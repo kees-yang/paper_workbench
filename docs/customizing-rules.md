@@ -2,17 +2,17 @@
 
 **English** · [简体中文](customizing-rules.zh-CN.md)
 
-How `paperrules` decides what to check, and how to change it. Nothing here needs Python: rules are JSON.
+How `paper_workbench` decides what to check, and how to change it. Nothing here needs Python: rules are JSON.
 
 ## 1. Where settings come from
 
 The effective rules of a project are merged, in this order:
 
-1. the **packs** named in `paperrules.json` (default: `["default"]`, the built-in pack in `paperrules/packs/default/`). A name that is also a directory next to `paperrules.json` is read from there, so you can keep your own pack in your repository. Later packs append their rules; a `tree.json` in a later pack replaces the stages;
+1. the **packs** named in `paper_workbench.json` (default: `["default"]`, the built-in pack in `paper_workbench/packs/default/`). A name that is also a directory next to `paper_workbench.json` is read from there, so you can keep your own pack in your repository. Later packs append their rules; a `tree.json` in a later pack replaces the stages;
 2. your **local overrides**, `rules.local.json`;
 3. the **glossary** (`glossary.json`) and the **exceptions** (`exceptions.json`), which are inputs, not rules.
 
-### `paperrules.json`
+### `paper_workbench.json`
 
 | key | meaning | default |
 |---|---|---|
@@ -63,13 +63,13 @@ An entry of the register (`rules_add`, or `register.json` of a pack):
 }
 ```
 
-* **`stage`, `node`**: where the rule sits in the rule tree (`paperrules rules tree` lists stages and nodes). `R0` fails if the pair does not exist.
+* **`stage`, `node`**: where the rule sits in the rule tree (`paper_workbench rules tree` lists stages and nodes). `R0` fails if the pair does not exist.
 * **`scope`**: `sentence`, `paragraph` or `document`: the unit the rule reads (informational; the check decides).
 * **`method`**: `auto` (the checker decides), `partial` (it flags, you decide; shown as such in the report), `manual` (a person checks; `check` is `{"type": "manual"}` and the rule appears on the checklist).
 * **`severity`**: `warn` or `error`. A rule's status is `pass`, `warn` or `fail` (open findings with severity `error`), `manual`, `skip` (input missing, e.g. no glossary) or `off`.
 * **`check.type`**:
   * `pattern`: regular expressions over each printed sentence. `pattern` (string or list), `flags` (`"i"` = case-insensitive, the default; `""` = case-sensitive), `message` (prefix of the finding), `sections` (only sections whose title matches one of these regexes), `skip_sections`, `skip_kinds` (`abstract`, `paragraph`, `item`, `figure`, `table`). A sentence is reported once per rule.
-  * `builtin`: `{"type": "builtin", "group": "voice"}`: a Python check shipped with the package. Several rules share one group (table below). Adding a new builtin check means adding a function to `paperrules/rules_sentence.py` or `rules_document.py` and a branch in `runner.run_group`; a pull request is welcome.
+  * `builtin`: `{"type": "builtin", "group": "voice"}`: a Python check shipped with the package. Several rules share one group (table below). Adding a new builtin check means adding a function to `paper_workbench/rules_sentence.py` or `rules_document.py` and a branch in `runner.run_group`; a pull request is welcome.
   * `manual`.
 * **`tests`**: sentences the rule must flag (`flag`) and must pass (`pass`). A paragraph rule takes lists of sentences (one paragraph each). **`R1` runs these tests for every rule**, including disabled ones, so a rule that stops doing what it says shows up as a failing rule system, before it touches the paper.
 
@@ -93,13 +93,13 @@ An entry of the register (`rules_add`, or `register.json` of a pack):
 ### Workflow for a new rule
 
 1. Write the statement and **two sentences it must flag and two it must pass**. Put real sentences from your paper among them.
-2. Write the pattern. `python -m paperrules test my-paper` tells you whether it does what the tests say.
-3. `python -m paperrules check my-paper --only U2 -v` shows every hit in the paper. Too many false hits? Tighten the pattern (add a pass test first).
+2. Write the pattern. `python -m paper_workbench test my-paper` tells you whether it does what the tests say.
+3. `python -m paper_workbench check my-paper --only U2 -v` shows every hit in the paper. Too many false hits? Tighten the pattern (add a pass test first).
 4. Choose the stage: the highest stage whose content the rule is about (a wording rule is S4; a rule about what the abstract must say is S2).
 
 ## 4. What the checker reads
 
-`python -m paperrules sentences my-paper` prints one line per sentence: `id paragraph kind file:line [section] text`.
+`python -m paper_workbench sentences my-paper` prints one line per sentence: `id paragraph kind file:line [section] text`.
 
 * Comments and macro definitions are dropped. Display mathematics is removed, inline mathematics becomes `X`, `\cite{…}` becomes `[n]` by order of first use, `\ref{…}` becomes the number of the figure, table, equation or section.
 * Rows are numbered in reading order: abstract, body, then captions. `kind` is `abstract`, `paragraph`, `item` (a list item), `figure` or `table` (a caption). `section` is the title of the enclosing section, `(caption)` for captions.
@@ -136,7 +136,7 @@ An entry of the register (`rules_add`, or `register.json` of a pack):
 ]}
 ```
 
-An exception matches a finding by rule and by the **exact sentence** (`sentence_en`) or, for document findings, by `key` (a label or citation key). For `A6` add `"word"` to cover one head noun only. `status: "accepted"` passes the finding and keeps it in the report with the reason; any other status (for example `pending`) leaves it open and shows the reason. `paperrules accept RULE "sentence" --reason "…"` appends an entry (`--key` for a key).
+An exception matches a finding by rule and by the **exact sentence** (`sentence_en`) or, for document findings, by `key` (a label or citation key). For `A6` add `"word"` to cover one head noun only. `status: "accepted"` passes the finding and keeps it in the report with the reason; any other status (for example `pending`) leaves it open and shows the reason. `paper_workbench accept RULE "sentence" --reason "…"` appends an entry (`--key` for a key).
 
 An exception names the sentence, so editing the sentence ends the exception: the rule looks at the new sentence again.
 

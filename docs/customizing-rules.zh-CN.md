@@ -2,17 +2,17 @@
 
 [English](customizing-rules.md) · **简体中文**
 
-说明 `paperrules` 如何决定检查什么，以及如何修改。这里的一切都不需要写 Python：规则是 JSON。
+说明 `paper_workbench` 如何决定检查什么，以及如何修改。这里的一切都不需要写 Python：规则是 JSON。
 
 ## 1. 设置从哪里来
 
 一个项目的有效规则按以下顺序合并：
 
-1. `paperrules.json` 中列出的**规则包**（默认 `["default"]`，即 `paperrules/packs/default/` 中的内置包）。如果某个名称在 `paperrules.json` 旁边也是一个目录，就从那里读取，所以你可以把自己的规则包放在自己的仓库里。后面的规则包追加规则；后面规则包里的 `tree.json` 会替换各层；
+1. `paper_workbench.json` 中列出的**规则包**（默认 `["default"]`，即 `paper_workbench/packs/default/` 中的内置包）。如果某个名称在 `paper_workbench.json` 旁边也是一个目录，就从那里读取，所以你可以把自己的规则包放在自己的仓库里。后面的规则包追加规则；后面规则包里的 `tree.json` 会替换各层；
 2. 你的**本地覆盖**，`rules.local.json`；
 3. **术语表**（`glossary.json`）与**例外**（`exceptions.json`），它们是输入，不是规则。
 
-### `paperrules.json`
+### `paper_workbench.json`
 
 | 键 | 含义 | 默认值 |
 |---|---|---|
@@ -63,13 +63,13 @@
 }
 ```
 
-* **`stage`、`node`**：规则在规则树中的位置（`paperrules rules tree` 列出各层与节点）。该组合不存在时 `R0` 未通过。
+* **`stage`、`node`**：规则在规则树中的位置（`paper_workbench rules tree` 列出各层与节点）。该组合不存在时 `R0` 未通过。
 * **`scope`**：`sentence`、`paragraph` 或 `document`，即规则读取的单位（仅作说明；由检查本身决定）。
 * **`method`**：`auto`（检查器判定）、`partial`（检查器标出、由你判断；报告中如此显示）、`manual`（人工检查；`check` 为 `{"type": "manual"}`，规则出现在核对清单里）。
 * **`severity`**：`warn` 或 `error`。规则的状态为 `pass`、`warn` 或 `fail`（严重度为 `error` 且有待处理项）、`manual`、`skip`（缺少输入，例如没有术语表）、`off`。
 * **`check.type`**：
   * `pattern`：对每个印刷句子运行正则。`pattern`（字符串或列表）、`flags`（`"i"` 表示不区分大小写，为默认；`""` 区分大小写）、`message`（结果的前缀）、`sections`（只检查标题匹配其中某个正则的章节）、`skip_sections`、`skip_kinds`（`abstract`、`paragraph`、`item`、`figure`、`table`）。同一规则对一个句子只报告一次。
-  * `builtin`：`{"type": "builtin", "group": "voice"}`，随包提供的 Python 检查。多条规则共用一个组（见下表）。新增内置检查需要在 `paperrules/rules_sentence.py` 或 `rules_document.py` 中加函数，并在 `runner.run_group` 中加一个分支；欢迎提交 pull request。
+  * `builtin`：`{"type": "builtin", "group": "voice"}`，随包提供的 Python 检查。多条规则共用一个组（见下表）。新增内置检查需要在 `paper_workbench/rules_sentence.py` 或 `rules_document.py` 中加函数，并在 `runner.run_group` 中加一个分支；欢迎提交 pull request。
   * `manual`。
 * **`tests`**：规则必须标出的句子（`flag`）和必须放过的句子（`pass`）。段落规则的测试项是句子列表（每项一个段落）。**`R1` 会为每条规则运行这些测试**（包括已关闭的规则），所以规则不再做它声称的事时，会在碰到论文之前表现为规则系统未通过。
 
@@ -93,13 +93,13 @@
 ### 新增一条规则的流程
 
 1. 写出规则表述，以及**两个必须标出的句子和两个必须放过的句子**。其中要有你论文里的真实句子。
-2. 写模式。`python -m paperrules test my-paper` 会告诉你它是否做了测试所说的事。
-3. `python -m paperrules check my-paper --only U2 -v` 列出论文中的每一处命中。误报太多？收紧模式（先加一个 pass 测试）。
+2. 写模式。`python -m paper_workbench test my-paper` 会告诉你它是否做了测试所说的事。
+3. `python -m paper_workbench check my-paper --only U2 -v` 列出论文中的每一处命中。误报太多？收紧模式（先加一个 pass 测试）。
 4. 选择层：规则所涉内容所在的最高层（用词规则属于 S4；摘要必须写什么的规则属于 S2）。
 
 ## 4. 检查器读到什么
 
-`python -m paperrules sentences my-paper` 每句输出一行：`编号 段落 类型 文件:行 [章节] 文本`。
+`python -m paper_workbench sentences my-paper` 每句输出一行：`编号 段落 类型 文件:行 [章节] 文本`。
 
 * 注释与宏定义被丢弃。行间公式被删除，行内公式变成 `X`，`\cite{…}` 按首次引用顺序变成 `[n]`，`\ref{…}` 变成图、表、公式或章节的编号。
 * 句子按阅读顺序编号：摘要、正文、最后是图表标题。`kind` 为 `abstract`、`paragraph`、`item`（列表项）、`figure` 或 `table`（标题）。`section` 是所在章节的标题，标题行记为 `(caption)`。
@@ -136,7 +136,7 @@
 ]}
 ```
 
-例外按规则，并按**完全相同的句子**（`sentence_en`）匹配结果；文档级结果按 `key`（标签或引用键）匹配。对 `A6` 加 `"word"` 则只覆盖一个中心名词。`status: "accepted"` 使该项通过，并在报告中保留它与理由；其他状态（如 `pending`）使它保持待处理并显示理由。`paperrules accept 规则 "句子" --reason "…"` 追加一条（键用 `--key`）。
+例外按规则，并按**完全相同的句子**（`sentence_en`）匹配结果；文档级结果按 `key`（标签或引用键）匹配。对 `A6` 加 `"word"` 则只覆盖一个中心名词。`status: "accepted"` 使该项通过，并在报告中保留它与理由；其他状态（如 `pending`）使它保持待处理并显示理由。`paper_workbench accept 规则 "句子" --reason "…"` 追加一条（键用 `--key`）。
 
 例外指向的是那句话，所以改了句子，例外随之失效：规则会重新检查新句子。
 

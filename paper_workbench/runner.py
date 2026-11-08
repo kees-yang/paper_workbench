@@ -148,7 +148,7 @@ def run(project: Project, only=None):
     for g in sorted({r['check']['group'] for r in rules if r['check']['type'] == 'builtin' and project.enabled(r) and (only is None or r['id'] in only)}):
         res = run_group(g, ctx)
         if res is None:
-            skipped[g] = {'heads': 'no glossary in the project (set "glossary" in paperrules.json)', 'glossary_terms': 'no glossary in the project',
+            skipped[g] = {'heads': 'no glossary in the project (set "glossary" in paper_workbench.json)', 'glossary_terms': 'no glossary in the project',
                           'bib_citations': 'no .bib file found', 'bib_entries': 'no .bib file found',
                           'figures': 'PyMuPDF is not installed (pip install pymupdf)'}[g]
             continue

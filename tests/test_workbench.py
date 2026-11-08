@@ -4,9 +4,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from paperrules import texread
-from paperrules.config import load_project
-from paperrules.workbench import annot, model, page
+from paper_workbench import texread
+from paper_workbench.config import load_project
+from paper_workbench.workbench import annot, model, page
 from helpers import BIB, DOC, EXAMPLE, make_project
 
 try:
@@ -99,7 +99,7 @@ class Build(unittest.TestCase):
 @unittest.skipIf(fitz is None, 'PyMuPDF not installed')
 class Pdf(unittest.TestCase):
     def test_paragraphs_are_found_on_the_page(self):
-        from paperrules.workbench import pdfmap
+        from paper_workbench.workbench import pdfmap
         d = Path(tempfile.mkdtemp(prefix='paperrules-pdf-'))
         doc = fitz.open()
         pg = doc.new_page()
@@ -144,7 +144,7 @@ class Review(unittest.TestCase):
     PAGE = EXAMPLE / 'expected' / 'workbench.html'
 
     def test_review_page(self):
-        from paperrules.workbench import review
+        from paper_workbench.workbench import review
         d = Path(tempfile.mkdtemp())
         scores = d / 'scores.json'
         scores.write_text(json.dumps({'target': 8, 'rounds': [{'line': 'main', 'round': 'R1', 'version': 'v1', 'score': 5},
@@ -164,14 +164,14 @@ class Review(unittest.TestCase):
         self.assertNotIn('Quantitative', st)
 
     def test_definition_forms(self):
-        from paperrules.workbench import review
+        from paper_workbench.workbench import review
         rows = [dict(id='P001-R001', kind='paragraph', en_source='We use the structural similarity (SSIM) and EN (entropy of the image).'),
                 dict(id='P001-R002', kind='paragraph', en_source='VIF is the visual information fidelity. AG rises.')]
         st = {x['abbr']: x['status'] for x in review.abbreviations(rows, set())}
         self.assertEqual(st, {'SSIM': 'defined', 'EN': 'defined', 'VIF': 'defined', 'AG': 'undefined'})
 
     def test_cli(self):
-        from paperrules import cli
+        from paper_workbench import cli
         out = Path(tempfile.mkdtemp()) / 'r.html'
         cli.main(['review', f'example={self.PAGE}', '--out', str(out), '--names', 'APTP,MSRS'])
         self.assertTrue(out.is_file())

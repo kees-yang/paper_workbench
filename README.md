@@ -1,8 +1,10 @@
-# paperrules
+# paper_workbench
 
 **English** · [简体中文](README.zh-CN.md)
 
-Rule-based writing checks for LaTeX papers. You write down what good writing means *for your paper* as rules; `paperrules` reads the LaTeX source, applies the rules sentence by sentence, paragraph by paragraph and document-wide, and gives you an offline report arranged along a **rule tree**, so you know which layer of the paper to revise first.
+> **Renamed in 0.5.0.** This project was called *paperrules*. `python -m paperrules`, `import paperrules` and project files named `paperrules.json` still work; new projects get `paper_workbench.json`. The old GitHub address redirects here.
+
+Rule-based writing checks for LaTeX papers. You write down what good writing means *for your paper* as rules; `paper_workbench` reads the LaTeX source, applies the rules sentence by sentence, paragraph by paragraph and document-wide, and gives you an offline report arranged along a **rule tree**, so you know which layer of the paper to revise first.
 
 <p align="center"><img src="docs/img/report-desktop.png" alt="Report of the example paper, rule tree with open findings" width="760"></p>
 
@@ -16,13 +18,13 @@ Rule-based writing checks for LaTeX papers. You write down what good writing mea
 ## Quick start
 
 ```bash
-git clone <this repository> && cd paperrules
+git clone <this repository> && cd paper_workbench
 pip install -e .                                  # installs spaCy
 pip install -e ".[figures]"                       # optional: PyMuPDF for the figure-file rules G1–G4
 python -m spacy download en_core_web_sm           # the parser model used by the structure rules
 
-python -m paperrules test examples/aptp-cvpr2026  # the rules pass their own tests (R0, R1)
-python -m paperrules check examples/aptp-cvpr2026 # check the example paper (a few seconds)
+python -m paper_workbench test examples/aptp-cvpr2026  # the rules pass their own tests (R0, R1)
+python -m paper_workbench check examples/aptp-cvpr2026 # check the example paper (a few seconds)
 # open examples/aptp-cvpr2026/out/report.html
 ```
 
@@ -31,21 +33,21 @@ The example is a published CVPR 2026 infrared–visible image-fusion paper that 
 ## Check your own paper
 
 ```bash
-python -m paperrules init my-paper --main main.tex --bib refs.bib   # writes paperrules.json and starter files
+python -m paper_workbench init my-paper --main main.tex --bib refs.bib   # writes paper_workbench.json and starter files
 # copy or point to your LaTeX sources inside my-paper/ (or use "main_tex": "../paper/main.tex")
-python -m paperrules check my-paper               # text summary + out/report.html, report.json, report.txt
-python -m paperrules check my-paper -v            # every open finding in the terminal
-python -m paperrules check my-paper --only W10,W14
-python -m paperrules check my-paper --strict      # exit status 1 on warnings too (CI)
+python -m paper_workbench check my-paper               # text summary + out/report.html, report.json, report.txt
+python -m paper_workbench check my-paper -v            # every open finding in the terminal
+python -m paper_workbench check my-paper --only W10,W14
+python -m paper_workbench check my-paper --strict      # exit status 1 on warnings too (CI)
 ```
 
 Read the report top-down. For each finding you can:
 
 1. **rewrite the sentence** (the usual case);
-2. **keep it, with a reason**: `python -m paperrules accept W12 "We evaluate …" --reason "the authors are the actor" --project my-paper`; the sentence passes next time, the reason stays in the report;
+2. **keep it, with a reason**: `python -m paper_workbench accept W12 "We evaluate …" --reason "the authors are the actor" --project my-paper`; the sentence passes next time, the reason stays in the report;
 3. **change the rule**, if the rule is wrong for your paper: see [Customize the rules](#customize-the-rules).
 
-`python -m paperrules sentences my-paper --grep "regex"` prints the sentences exactly as the checker reads them: useful when a finding looks strange.
+`python -m paper_workbench sentences my-paper --grep "regex"` prints the sentences exactly as the checker reads them: useful when a finding looks strange.
 
 ### Exit status
 
@@ -62,11 +64,11 @@ Read the report top-down. For each finding you can:
 | **S5 Format** | venue limits, floats, references | abstract limits (`J1`), figure/table/algorithm order (`T1`, `T2`), proposed method last in tables (`T10`, opt-in), unknown labels (`B2`); figure files measured at their printed size — embedded fonts, body font family, text ≥ 8 pt, line weights (`G1`–`G4`), and a figure-design checklist (`G5`–`G9`: one visual language and colour roles, line grammar, no formulas or small grey text in diagrams, boxes sized to content, real or schematic images from registered files) |
 | **S6 Rule system** | the register itself | every rule is in the tree (`R0`); every rule passes its own tests (`R1`) |
 
-All 49 rules, bilingual: [`docs/rules.md`](docs/rules.md) (`python -m paperrules rules tree` prints the tree, `rules show W14` one rule). Rules have a **method**: `auto` (the checker decides), `partial` (the checker flags, you decide) and `manual` (a person checks; these appear as a checklist at the end of the report).
+All 49 rules, bilingual: [`docs/rules.md`](docs/rules.md) (`python -m paper_workbench rules tree` prints the tree, `rules show W14` one rule). Rules have a **method**: `auto` (the checker decides), `partial` (the checker flags, you decide) and `manual` (a person checks; these appear as a checklist at the end of the report).
 
 ## Customize the rules
 
-Everything is merged from the pack in `paperrules/packs/default/` and a local file next to your paper, `rules.local.json`. The full guide, with the schema of every file, is [`docs/customizing-rules.md`](docs/customizing-rules.md). The common moves:
+Everything is merged from the pack in `paper_workbench/packs/default/` and a local file next to your paper, `rules.local.json`. The full guide, with the schema of every file, is [`docs/customizing-rules.md`](docs/customizing-rules.md). The common moves:
 
 ```jsonc
 // my-paper/rules.local.json
@@ -86,17 +88,17 @@ Everything is merged from the pack in `paperrules/packs/default/` and a local fi
 }
 ```
 
-Then run `python -m paperrules test my-paper` (R1 runs every test sentence of every rule, including yours) and `python -m paperrules check my-paper --only U1`. A glossary (`glossary.json`) switches on the term rules: `A3` flags names you retired (`avoid_en`), `A6` flags subjects and objects whose head noun is not a glossary noun, `A7` flags phrases that name a concept with another noun.
+Then run `python -m paper_workbench test my-paper` (R1 runs every test sentence of every rule, including yours) and `python -m paper_workbench check my-paper --only U1`. A glossary (`glossary.json`) switches on the term rules: `A3` flags names you retired (`avoid_en`), `A6` flags subjects and objects whose head noun is not a glossary noun, `A7` flags phrases that name a concept with another noun.
 
 ## The workbench
 
-`paperrules workbench <project>` builds one offline page that puts the paper's PDF, an argument canvas (abstract → introduction → body → conclusion, wired by the claims each paragraph serves) and analysis panels side by side: sentence-by-sentence analysis with subject/predicate/object marks and links to the text before, the storyline of each claim through the paper, the glossary, and views for the rules, the argument tree, the evidence behind each number, the figures and tables, and the sentences that changed since you last accepted the page. You keep your notes next to each sentence.
+`paper_workbench workbench <project>` builds one offline page that puts the paper's PDF, an argument canvas (abstract → introduction → body → conclusion, wired by the claims each paragraph serves) and analysis panels side by side: sentence-by-sentence analysis with subject/predicate/object marks and links to the text before, the storyline of each claim through the paper, the glossary, and views for the rules, the argument tree, the evidence behind each number, the figures and tables, and the sentences that changed since you last accepted the page. You keep your notes next to each sentence.
 
 <p align="center"><img src="docs/img/workbench-overview.png" alt="The workbench on the example paper: PDF pane, argument canvas and sentence analysis" width="900"></p>
 
 ```bash
 pip install -e ".[workbench]"                       # PyMuPDF for the PDF pane
-python -m paperrules workbench examples/aptp-cvpr2026
+python -m paper_workbench workbench examples/aptp-cvpr2026
 # open examples/aptp-cvpr2026/out/workbench.html     (a built copy: examples/aptp-cvpr2026/expected/workbench.html)
 ```
 
@@ -104,10 +106,10 @@ The reader, the rules, the PDF alignment and the English marks are automatic. Th
 
 ### The review page
 
-`paperrules review <page or project> [...]` reads built workbench pages and makes one compact page for review: a table per paragraph with each sentence, its rendering and its link to the previous sentence (a red chip marks a sentence that picks up nothing), the PDF page beside it, a check that every abbreviation is defined at its first use in the abstract, the body and the supplement, per-sentence notes exported as Markdown, and an optional log of review scores per round. Several papers or versions sit in tabs. Details: [`docs/review.md`](docs/review.md).
+`paper_workbench review <page or project> [...]` reads built workbench pages and makes one compact page for review: a table per paragraph with each sentence, its rendering and its link to the previous sentence (a red chip marks a sentence that picks up nothing), the PDF page beside it, a check that every abbreviation is defined at its first use in the abstract, the body and the supplement, per-sentence notes exported as Markdown, and an optional log of review scores per round. Several papers or versions sit in tabs. Details: [`docs/review.md`](docs/review.md).
 
 ```bash
-python -m paperrules review main=examples/aptp-cvpr2026/expected/workbench.html --names "APTP,MSRS,TNO" --out review.html
+python -m paper_workbench review main=examples/aptp-cvpr2026/expected/workbench.html --names "APTP,MSRS,TNO" --out review.html
 ```
 
 ## What the checker does not do
@@ -121,12 +123,13 @@ python -m paperrules review main=examples/aptp-cvpr2026/expected/workbench.html 
 ## Layout
 
 ```
-paperrules/             package (reader, rules, runner, report, CLI) and packs/default/*.json (the rules)
-paperrules/workbench/   the workbench: page template, data builder, PDF alignment
+paper_workbench/        package (reader, rules, runner, report, CLI) and packs/default/*.json (the rules)
+paperrules/             alias package: the name before 0.5.0
+paper_workbench/workbench/ the workbench: page template, data builder, PDF alignment
 examples/aptp-cvpr2026/ a CC BY 4.0 paper, a glossary, local rules, exceptions, expected/ output
 AGENTS.md               guide for agents: setup, revision loop, author feedback → rules, figures
 docs/                   customizing-rules, workbench and review (EN, 中文), rules.md, screenshots
-tests/                  python -m unittest discover -s tests   (49 tests)
+tests/                  python -m unittest discover -s tests   (52 tests)
 ```
 
 ## Credits

@@ -1,6 +1,6 @@
 """The review page: one or more built workbench pages side by side in a compact reading view.
 
-It reads the data that ``paperrules workbench`` already wrote into each ``workbench.html`` and builds one offline page with
+It reads the data that ``paper_workbench workbench`` already wrote into each ``workbench.html`` and builds one offline page with
   Sentences      one paragraph at a time: its question and claim, then a table of the sentences (original and rendering) with
                  the link of each sentence to the previous one and to earlier text, and the PDF page with the paragraph box
   Abbreviations  the first use of each abbreviation in the abstract, the body and the supplement, and whether a definition

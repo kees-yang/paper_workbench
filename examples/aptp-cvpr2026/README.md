@@ -18,7 +18,7 @@ It was chosen because arXiv lists it under CC BY 4.0, which allows redistributio
 
 | file | purpose |
 |---|---|
-| `paperrules.json` | project settings: main file, bibliography, glossary, `limitation_sections` (the paper has no Discussion, so its Conclusion may state limits) |
+| `paper_workbench.json` | project settings: main file, bibliography, glossary, `limitation_sections` (the paper has no Discussion, so its Conclusion may state limits) |
 | `rules.local.json` | local rules: switches on `J1` (abstract 150–250 words), `T5` (“Fig.”) and `A6`; adds dataset and metric names and general nouns; two rules of its own, `U1` and `U2`, with tests |
 | `glossary.json` | a small **illustrative** glossary (terms for rules `A3`, `A6`) — not the authors' terminology |
 | `exceptions.json` | one accepted finding, with the reason |
@@ -30,10 +30,10 @@ It was chosen because arXiv lists it under CC BY 4.0, which allows redistributio
 ## Run it
 
 ```bash
-python -m paperrules test  examples/aptp-cvpr2026       # R0 and R1: 42 test sentences
-python -m paperrules check examples/aptp-cvpr2026       # writes examples/aptp-cvpr2026/out/
-python -m paperrules check examples/aptp-cvpr2026 --only W15,A3 -v
-python -m paperrules workbench examples/aptp-cvpr2026   # the workbench page: out/workbench.html (needs PyMuPDF)
+python -m paper_workbench test  examples/aptp-cvpr2026       # R0 and R1: 42 test sentences
+python -m paper_workbench check examples/aptp-cvpr2026       # writes examples/aptp-cvpr2026/out/
+python -m paper_workbench check examples/aptp-cvpr2026 --only W15,A3 -v
+python -m paper_workbench workbench examples/aptp-cvpr2026   # the workbench page: out/workbench.html (needs PyMuPDF)
 ```
 
 ## What to look at
@@ -61,7 +61,7 @@ python -m paperrules workbench examples/aptp-cvpr2026   # the workbench page: ou
 
 | 文件 | 作用 |
 |---|---|
-| `paperrules.json` | 项目设置：主文件、参考文献、术语表、`limitation_sections`（这篇论文没有 Discussion，因此结论中可以写局限） |
+| `paper_workbench.json` | 项目设置：主文件、参考文献、术语表、`limitation_sections`（这篇论文没有 Discussion，因此结论中可以写局限） |
 | `rules.local.json` | 本地规则：打开 `J1`（摘要150–250词）、`T5`（“Fig.”）与 `A6`；加入数据集与指标名称、通用名词；两条自带测试的新规则 `U1`、`U2` |
 | `glossary.json` | 一个小型**示意**术语表（供规则 `A3`、`A6` 使用）——不是作者的术语 |
 | `exceptions.json` | 一条已接受的结果及其理由 |
@@ -73,10 +73,10 @@ python -m paperrules workbench examples/aptp-cvpr2026   # the workbench page: ou
 ### 运行
 
 ```bash
-python -m paperrules test  examples/aptp-cvpr2026       # R0 与 R1：42 个测试句
-python -m paperrules check examples/aptp-cvpr2026       # 写入 examples/aptp-cvpr2026/out/
-python -m paperrules check examples/aptp-cvpr2026 --only W15,A3 -v
-python -m paperrules workbench examples/aptp-cvpr2026   # 工作台页面：out/workbench.html（需要 PyMuPDF）
+python -m paper_workbench test  examples/aptp-cvpr2026       # R0 与 R1：42 个测试句
+python -m paper_workbench check examples/aptp-cvpr2026       # 写入 examples/aptp-cvpr2026/out/
+python -m paper_workbench check examples/aptp-cvpr2026 --only W15,A3 -v
+python -m paper_workbench workbench examples/aptp-cvpr2026   # 工作台页面：out/workbench.html（需要 PyMuPDF）
 ```
 
 ### 看什么

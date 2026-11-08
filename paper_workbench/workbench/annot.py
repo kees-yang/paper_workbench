@@ -5,7 +5,7 @@ the paper: the Chinese rendering of each sentence, the link of a sentence to the
 how the abstract and the conclusion relate to the body, and the storyline. Every field is optional; a panel without its
 annotation shows what it can (the English text, the rule findings) and says what is missing.
 
-Ids: paragraphs are ``P001``…, rows (sentences) are ``<paragraph>-R001``…, as printed by ``paperrules workbench ids``.
+Ids: paragraphs are ``P001``…, rows (sentences) are ``<paragraph>-R001``…, as printed by ``paper_workbench workbench ids``.
 """
 import json
 import re
