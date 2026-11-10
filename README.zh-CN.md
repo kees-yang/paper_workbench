@@ -64,7 +64,11 @@ python -m paper_workbench check my-paper --strict      # 有提示也以状态�
 | **S5 格式** | 期刊限制、图表、引用 | 摘要字数（`J1`）、图表与算法顺序（`T1`、`T2`）、本文方法排在表格最后（`T10`，需打开）、未知标签（`B2`）；按印刷尺寸测量图件文件——嵌入字体、正文字族、字号≥8 pt、线宽（`G1`–`G4`），以及图件设计核对清单（`G5`–`G9`：统一视觉语言与颜色角色、线型语法、框图内不写公式与灰色小字、方框按内容定尺寸、真实或示意图像取自登记文件） |
 | **S6 规则系统** | 规则登记本身 | 每条规则都在树中（`R0`）；每条规则通过自身测试（`R1`） |
 
-49 条规则的中英文对照见 [`docs/rules.md`](docs/rules.md)（`python -m paper_workbench rules tree --lang zh` 打印规则树，`rules show W14` 看单条规则）。规则按**方法**分为：`auto`（检查器判定）、`partial`（检查器标出、由你判断）、`manual`（人工检查；这类规则出现在报告末尾的核对清单里）。
+57 条规则的中英文对照见 [`docs/rules.md`](docs/rules.md)（`python -m paper_workbench rules tree --lang zh` 打印规则树，`rules show W14` 看单条规则）。规则按**方法**分为：`auto`（检查器判定）、`partial`（检查器标出、由你判断）、`manual`（人工检查；这类规则出现在报告末尾的核对清单里）。
+
+## 写作方法
+
+[`docs/writing-method.zh-CN.md`](docs/writing-method.zh-CN.md) 按使用顺序把规则组织成一套“一致、连贯”的写作方法：从摘要到结论的一条主线（`W20`、`E6`、`E7`）、句与句的衔接（旧信息在前，`W21`）、平实的句子（`W14`–`W16`、`W23`）、肯定式表述（`W22`）、由正文带出的图表（图注长度 `T11`、页面位置 `T12`、选例说明 `T13`、正文自成一体 `O3`）、修改循环，以及可比较的审稿轮次（`tools/review_fresh.sh`）。0.6.0 新增的八条规则默认关闭；该页给出一段 `rules.local.json` 配置，可在新项目中整体启用。
 
 ## 自定义规则
 
@@ -116,7 +120,7 @@ python -m paper_workbench review main=examples/aptp-cvpr2026/expected/workbench.
 ## 检查器不做什么
 
 * **它不评判科学内容或论证。** 它读句子与结构。报告干净不等于论文好；一篇好论文上的标出项也不是对它的批评。
-* **它读 LaTeX 源文件，不读编译后的 PDF。** 图表顺序指源文件中的顺序；页面版式和溢出盒不检查。图件文件例外：`G1`–`G4` 打开图件，按印刷尺寸测量字体、字号和线宽。
+* **它读 LaTeX 源文件，不读编译后的 PDF。** 图表顺序指源文件中的顺序；页面版式和溢出盒不检查。可选的 `T12` 例外：它读取编译出的 PDF，比较每个图表所在页与其首次引用所在页。图件文件也例外：`G1`–`G4` 打开图件，按印刷尺寸测量字体、字号和线宽。
 * **只支持英文。** 句子规则与 spaCy 模型针对英文。报告是双语的，论文不是。
 * **句法解析会出错。** `W14`–`W16` 与 `A6` 使用小型 spaCy 模型，有时会读错句子。写明理由后接受即可。
 * **不包含：** 自动的证据登记（工作台只显示你写的数字记录，没有任何东西会自己把数字追溯到结果文件）、译文与原句的自动核对、PDF 版式检查。它们存在于本项目所源自的研究工作区中，是后续版本的候选。
@@ -129,8 +133,9 @@ paperrules/             别名包：0.5.0 之前的名称
 paper_workbench/workbench/ 工作台：页面模板、数据生成、PDF 对齐
 examples/aptp-cvpr2026/ 一篇 CC BY 4.0 论文、术语表、本地规则、例外、expected/ 输出
 AGENTS.md               智能体指南：设置、修改循环、作者意见→规则、图件
-docs/                   自定义规则与工作台（English、中文）、rules.md、截图
-tests/                  python -m unittest discover -s tests   （57 个测试）
+docs/                   写作方法、自定义规则与工作台（English、中文）、rules.md、截图
+tools/                  review_fresh.sh：以全新的审稿上下文运行一轮审稿
+tests/                  python -m unittest discover -s tests   （63 个测试）
 ```
 
 ## 致谢与参考

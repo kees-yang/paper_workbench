@@ -279,3 +279,55 @@ class FigureRules(unittest.TestCase):
         d = make_project({'main.tex': self.DOC % 'nofile'})
         res = runner.run(load_project(d))
         self.assertEqual([f['rule'] for f in res['findings'] if f['rule'].startswith('G')], ['G1'])
+
+
+class WritingMethodRules(unittest.TestCase):
+    """Opt-in rules of the writing method (0.6.0): caption length, float pages, flow, sentence length, affirmative wording."""
+
+    CAP = ('\\documentclass{article}\n\\begin{document}\nFig.~\\ref{fig:a} and Fig.~\\ref{fig:b} show it.\n'
+           '\\begin{figure}\\caption{Short one.}\\label{fig:a}\\end{figure}\n'
+           '\\begin{figure}\\caption{Left: the two inputs of the model. Middle: the output of each method. '
+           'Right: the output of the proposed method at full size.}\\label{fig:b}\\end{figure}\n\\end{document}')
+
+    def test_caption_length(self):
+        d = make_project({'main.tex': self.CAP}, local={'enable': ['T11']})
+        res = runner.run(load_project(d))
+        self.assertEqual([f['key'] for f in res['findings'] if f['rule'] == 'T11'], ['fig:a'])
+
+    def test_new_rules_are_off_by_default(self):
+        res = runner.run(load_project(make_project({'main.tex': self.CAP})))
+        by = {r['id']: r['status'] for r in res['rules']}
+        self.assertEqual({by[i] for i in ('T11', 'T12', 'T13', 'W21', 'W22', 'W23', 'E7', 'O3')}, {'off'})
+
+    def make_pdf(self, path, pages):
+        import fitz
+        doc = fitz.open()
+        for lines in pages:
+            pg = doc.new_page()
+            for k, t in enumerate(lines):
+                pg.insert_text((72, 100 + 60 * k), t, fontsize=10)
+        doc.save(str(path))
+
+    def test_float_pages(self):
+        from paper_workbench import rules_document as RD
+        d = make_project({'main.tex': self.CAP}, local={'enable': ['T12']})
+        self.make_pdf(d / 'main.pdf', [['Figure 2. Placed before its citation.'],
+                                       ['Figure 1 shows the pipeline, and Figs. 2 and 3 show results.', 'Figure 1. On the citation page.'],
+                                       ['Plain text.'], ['Plain text.'], ['Figure 3: Two pages late.', 'References'],
+                                       ['Figure 4. Not cited: left to T2.', 'Table 1 lists the runs.'], ['Table 1. Next page: fine.']])
+        got = {f['key']: f['matched'] for f in RD.float_pages(d / 'main.pdf', {'T12': {'pages_after': 1}})}
+        self.assertEqual(set(got), {'figure 2', 'figure 3'}, got)
+        self.assertIn('before', got['figure 2'])
+        self.assertIn('3 pages after', got['figure 3'])
+        res = runner.run(load_project(d))
+        self.assertEqual({r['id']: r['status'] for r in res['rules']}['T12'], 'warn')
+
+    def test_float_pages_skipped_without_pdf(self):
+        res = runner.run(load_project(make_project({'main.tex': self.CAP}, local={'enable': ['T12']})))
+        self.assertEqual({r['id']: r['status'] for r in res['rules']}['T12'], 'skip')
+
+    def test_flow_and_length(self):
+        r = rows('The network reads two images.', 'Training lasts ten epochs on one card.', 'First, the loss falls.',
+                 'This loss has ' + 'very ' * 24 + 'many terms.')
+        got = [(f['rule'], f['id']) for f in runner.sentence_findings(r, load_project(EXAMPLE), only={'W21', 'W23'}, include_disabled=True)]
+        self.assertEqual(sorted(got), [('W21', r[1]['id']), ('W23', r[3]['id'])])

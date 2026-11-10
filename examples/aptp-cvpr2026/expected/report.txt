@@ -1,5 +1,5 @@
-paperrules 2026-10-27 23:06:26 · paper/main.tex · 196 sentences, 7 figures, 4 tables, 57 citations
-rules: 12 pass, 17 warn, 0 fail, 13 manual, 0 skipped, 9 off
+paper_workbench 2026-11-10 18:05:05 · paper/main.tex · 196 sentences, 7 figures, 4 tables, 57 citations
+rules: 12 pass, 17 warn, 0 fail, 13 manual, 0 skipped, 17 off
 
 1. Sources: references and glossary  [warn]
   [pass  ] B1  Every cited key exists in the bibliography.

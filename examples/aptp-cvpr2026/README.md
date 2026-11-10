@@ -30,7 +30,7 @@ It was chosen because arXiv lists it under CC BY 4.0, which allows redistributio
 ## Run it
 
 ```bash
-python -m paper_workbench test  examples/aptp-cvpr2026       # R0 and R1: 42 test sentences
+python -m paper_workbench test  examples/aptp-cvpr2026       # R0 and R1: 52 test sentences
 python -m paper_workbench check examples/aptp-cvpr2026       # writes examples/aptp-cvpr2026/out/
 python -m paper_workbench check examples/aptp-cvpr2026 --only W15,A3 -v
 python -m paper_workbench workbench examples/aptp-cvpr2026   # the workbench page: out/workbench.html (needs PyMuPDF)
@@ -73,7 +73,7 @@ python -m paper_workbench workbench examples/aptp-cvpr2026   # the workbench pag
 ### 运行
 
 ```bash
-python -m paper_workbench test  examples/aptp-cvpr2026       # R0 与 R1：42 个测试句
+python -m paper_workbench test  examples/aptp-cvpr2026       # R0 与 R1：52 个测试句
 python -m paper_workbench check examples/aptp-cvpr2026       # 写入 examples/aptp-cvpr2026/out/
 python -m paper_workbench check examples/aptp-cvpr2026 --only W15,A3 -v
 python -m paper_workbench workbench examples/aptp-cvpr2026   # 工作台页面：out/workbench.html（需要 PyMuPDF）

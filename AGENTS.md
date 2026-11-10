@@ -177,6 +177,10 @@ preamble. Set it by hand (`times`, `cm`, `helvetica`, `libertine` or a regular e
 
 ## 7. Practices outside the checker
 
+The method as a whole, with the rule for each step and one block that switches it on, is in
+[docs/writing-method.md](docs/writing-method.md). Read it before the first revision of a new paper. Run the rules on your own
+proposal (an abstract, a caption) before it goes to the author.
+
 These steps worked well in practice. The checker does not enforce them.
 
 - **Version folders.** Write every delivered revision to a new folder, such as `submission/<date>_v<version>/`, with its
@@ -205,6 +209,7 @@ These steps worked well in practice. The checker does not enforce them.
 | debug the reader | `python -m paper_workbench sentences <dir> --grep "<regex>"` |
 | workbench page (PDF, argument canvas, analysis panels) | `python -m paper_workbench workbench <dir>` (`--ids`, `--skeleton`, `--check`, `--accept "label"`) |
 | package tests | `python -m unittest discover -s tests` |
+| one review round with a blank reviewer context | `REVIEW_MODEL=<model> bash tools/review_fresh.sh <packet_dir> <out_prefix>` |
 
 Exit status: `0` when no `error` rule is open; `1` otherwise, or when a warning is open under `--strict`.
 

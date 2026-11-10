@@ -64,7 +64,11 @@ Read the report top-down. For each finding you can:
 | **S5 Format** | venue limits, floats, references | abstract limits (`J1`), figure/table/algorithm order (`T1`, `T2`), proposed method last in tables (`T10`, opt-in), unknown labels (`B2`); figure files measured at their printed size — embedded fonts, body font family, text ≥ 8 pt, line weights (`G1`–`G4`), and a figure-design checklist (`G5`–`G9`: one visual language and colour roles, line grammar, no formulas or small grey text in diagrams, boxes sized to content, real or schematic images from registered files) |
 | **S6 Rule system** | the register itself | every rule is in the tree (`R0`); every rule passes its own tests (`R1`) |
 
-All 49 rules, bilingual: [`docs/rules.md`](docs/rules.md) (`python -m paper_workbench rules tree` prints the tree, `rules show W14` one rule). Rules have a **method**: `auto` (the checker decides), `partial` (the checker flags, you decide) and `manual` (a person checks; these appear as a checklist at the end of the report).
+All 57 rules, bilingual: [`docs/rules.md`](docs/rules.md) (`python -m paper_workbench rules tree` prints the tree, `rules show W14` one rule). Rules have a **method**: `auto` (the checker decides), `partial` (the checker flags, you decide) and `manual` (a person checks; these appear as a checklist at the end of the report).
+
+## The writing method
+
+[`docs/writing-method.md`](docs/writing-method.md) puts the rules in the order of use, as one method for consistent, coherent writing: one thread from the abstract to the conclusion (`W20`, `E6`, `E7`), sentences that hand over to each other (old before new, `W21`), plain sentences (`W14`–`W16`, `W23`), affirmative wording (`W22`), floats that the text carries (caption length `T11`, page placement `T12`, selection clause `T13`, a body that stands alone `O3`), the revision loop, and review rounds that can be compared (`tools/review_fresh.sh`). The eight rules added in 0.6.0 are off by default. The page gives one `rules.local.json` block that switches the method on in a new project.
 
 ## Customize the rules
 
@@ -115,7 +119,7 @@ python -m paper_workbench review main=examples/aptp-cvpr2026/expected/workbench.
 ## What the checker does not do
 
 * **It does not judge the science or the argument.** It reads sentences and structure. A clean report is not a good paper, and the findings on a good paper are not criticism of it.
-* **It reads the LaTeX source, not the compiled PDF.** Float order is the order in the source; page layout and overfull boxes are not checked. Figure files are the exception: `G1`–`G4` open them and measure fonts, text sizes and line weights at the printed size.
+* **It reads the LaTeX source, not the compiled PDF.** Float order is the order in the source; page layout and overfull boxes are not checked. Two exceptions: `G1`–`G4` open the figure files and measure fonts, text sizes and line weights at the printed size, and the opt-in `T12` reads the compiled PDF to compare the page of each float with the page of its first citation.
 * **English only.** The sentence rules and the spaCy model are English. The report is bilingual; the paper is not.
 * **Parser mistakes happen.** `W14`–`W16` and `A6` use a small spaCy model and sometimes misread a sentence. Accept the finding with a reason.
 * **Not included:** an automatic evidence registry (the workbench shows the number records you write; nothing traces a number to a result file by itself), automatic checks of a translation against its sentence, and PDF layout checks. They exist in the research workspace this project grew out of and are candidates for later releases.
@@ -128,8 +132,9 @@ paperrules/             alias package: the name before 0.5.0
 paper_workbench/workbench/ the workbench: page template, data builder, PDF alignment
 examples/aptp-cvpr2026/ a CC BY 4.0 paper, a glossary, local rules, exceptions, expected/ output
 AGENTS.md               guide for agents: setup, revision loop, author feedback → rules, figures
-docs/                   customizing-rules, workbench and review (EN, 中文), rules.md, screenshots
-tests/                  python -m unittest discover -s tests   (57 tests)
+docs/                   writing-method, customizing-rules, workbench and review (EN, 中文), rules.md, screenshots
+tools/                  review_fresh.sh: one review round with a blank reviewer context
+tests/                  python -m unittest discover -s tests   (63 tests)
 ```
 
 ## Credits

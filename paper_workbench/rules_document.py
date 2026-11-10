@@ -1,6 +1,6 @@
 """Document-level rules: abstract, keywords, figures and tables, cross-references and the bibliography.
 
-All checks read the LaTeX source (and the .bib file); none needs a compiled PDF. Each function returns findings
+All checks read the LaTeX source (and the .bib file). Only T12 (float pages) reads the compiled PDF. Each function returns findings
 ``dict(rule, key, file, line, matched)``; ``key`` names the thing the finding is about (a label, a citation key, ...).
 """
 import re
@@ -157,6 +157,67 @@ def table_order(paper, cfg):
         if re.search(r'(?<![\w-])%s(?![\w-])' % re.escape(name), cell):
             out.append(dict(rule='T10', key=fl['label'] or f'table {fl["number"]}', file=fl.get('file', ''), line=fl.get('line', 0),
                             matched=f'table {fl["number"]} opens with {name}; list the proposed method last'))
+    return out
+
+
+def caption_length(paper, cfg):
+    """T11 (opt-in): every caption has between T11.min and T11.max words (document.json). A caption says what the float shows and
+    how to read it; a shorter one leaves the reader guessing, a longer one moves the argument out of the text."""
+    c = cfg.get('T11', {})
+    lo, hi = c.get('min', 15), c.get('max', 35)
+    out = []
+    for fl in paper.floats:
+        cap = fl.get('caption_plain') or ''
+        if not cap:
+            continue
+        n = len(re.findall(r"[A-Za-z0-9][A-Za-z0-9'’\-]*", cap))
+        if n < lo or n > hi:
+            out.append(dict(rule='T11', key=fl['label'] or f'{fl["env"]} {fl["number"]}', file=fl.get('file', ''), line=fl.get('line', 0),
+                            matched=f'the caption of {fl["env"]} {fl["number"]} has {n} words (allowed {lo}–{hi})'))
+    return out
+
+
+CAPTION_RE = re.compile(r'^(Figure|Fig\.|Table|Algorithm)\s+(\d+)\s*[.:]')
+CITE_RE = re.compile(r'\b(Figs?\.|Figures?|Tables?|Tabs?\.|Algorithms?|Algs?\.)\s+((?:\d+(?:\([a-z]\)|[a-z])?(?:\s*,\s*(?:and\s+)?|\s+and\s+)?)+)')
+RANGE_RE = re.compile(r'\b((?:Fig|Tab|Alg)[a-z]*\.?)\s+(\d+)\s*(?:–|-|\s+to\s+)\s*(?:(?:Fig|Tab|Alg)[a-z]*\.?\s+)?(\d+)')
+HEADING_RE = re.compile(r'^\s*(References|Bibliography)\s*$', re.M)
+
+
+def _kind(word):
+    return {'f': 'figure', 't': 'table', 'a': 'algorithm'}[word[0].lower()]
+
+
+def float_pages(pdf_path, cfg):
+    """T12 (opt-in): in the compiled PDF, a figure, table or algorithm sits on the page of its first text citation or at most
+    T12.pages_after pages later, never before it (document.json). Reads the PDF with PyMuPDF. A text block that opens with
+    "Figure N." or "Table N:" is a caption; every other mention is a citation. Floats and citations after the page where the
+    reference list starts (a supplement) are matched among themselves. A float without a citation is left to T2."""
+    import fitz
+    after = cfg.get('T12', {}).get('pages_after', 1)
+    caps, cites, zone = {}, {}, 0
+    with fitz.open(str(pdf_path)) as doc:
+        for i, page in enumerate(doc, 1):
+            texts = [b[4] for b in page.get_text('blocks') if b[6] == 0]
+            for t in texts:
+                m = CAPTION_RE.match(t.strip())
+                if m:
+                    caps.setdefault((zone, _kind(m.group(1)), int(m.group(2))), i)
+                    continue
+                flat = re.sub(r'-\s*\n\s*', '', t).replace('\n', ' ')
+                flat = RANGE_RE.sub(lambda r: r.group(1) + ' ' + ', '.join(str(n) for n in range(int(r.group(2)), int(r.group(3)) + 1)), flat)
+                for m in CITE_RE.finditer(flat):
+                    for n in re.findall(r'\d+', m.group(2)):
+                        cites.setdefault((zone, _kind(m.group(1)), int(n)), i)
+            if zone == 0 and any(HEADING_RE.search(t) for t in texts):
+                zone = 1
+    out, name = [], Path(pdf_path).name
+    for (z, kind, num), f in sorted(caps.items()):
+        c = cites.get((z, kind, num))
+        if c is None or c <= f <= c + after:
+            continue
+        where = f'{f - c} pages after' if f > c else 'before'
+        out.append(dict(rule='T12', key=f'{kind} {num}' + (' (after the references)' if z else ''), file=name, line=0,
+                        matched=f'{kind} {num} is on page {f}, {where} its first citation on page {c} (allowed: the same page or up to {after} later)'))
     return out
 
 

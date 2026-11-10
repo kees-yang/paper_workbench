@@ -9,7 +9,7 @@ from . import texread
 from .config import Project
 
 RANK = {'fail': 3, 'warn': 2, 'pending': 2, 'manual': 1, 'skip': 0, 'off': 0, 'pass': 0}
-SENTENCE_GROUPS = ('voice', 'connectives', 'heads', 'glossary_terms', 'repeated')
+SENTENCE_GROUPS = ('voice', 'connectives', 'heads', 'glossary_terms', 'repeated', 'flow', 'length')
 
 
 class Ctx:
@@ -32,6 +32,15 @@ def _doc_findings(items):
                  line=it.get('line', 0), matched=it['matched'], word='') for it in items]
 
 
+def paper_pdf(project):
+    """The compiled PDF of the paper: "pdf" in paper_workbench.json, else the PDF of the workbench, else main.pdf next to main.tex."""
+    for cand in (project.settings.get('pdf'), project.settings.get('workbench', {}).get('pdf')):
+        if cand and (project.root / cand).exists():
+            return project.root / cand
+    guess = project.main_tex.with_suffix('.pdf')
+    return guess if guess.exists() else None
+
+
 def run_group(name, c, force=False):
     """Findings of one group of builtin checks, or None when the input the group needs is missing (reason in c.skip)."""
     p, proj = c.paper, c.project
@@ -41,6 +50,10 @@ def run_group(name, c, force=False):
         return _rows_findings(RS.connectives(c.rows, proj.rules))
     if name == 'repeated':
         return _rows_findings(RS.repeated_sentences(c.rows))
+    if name == 'flow':
+        return _rows_findings(RS.flow(c.rows, proj.rules))
+    if name == 'length':
+        return _rows_findings(RS.sentence_length(c.rows, proj.rules))
     if name in ('heads', 'glossary_terms'):
         if not proj.glossary and not (force and name == 'heads'):
             return None
@@ -62,6 +75,11 @@ def run_group(name, c, force=False):
         return _doc_findings(RD.abstract_structure(p, proj.rules['document']))
     if name == 'table_order':
         return _doc_findings(RD.table_order(p, proj.rules['document']))
+    if name == 'captions':
+        return _doc_findings(RD.caption_length(p, proj.rules['document']))
+    if name == 'float_pages':
+        pdf = paper_pdf(proj)
+        return _doc_findings(RD.float_pages(pdf, proj.rules['document'])) if pdf and RF.available() else None
     if name == 'register':
         return []                      # R0 and R1 are computed in run()
     raise KeyError(name)
@@ -150,7 +168,8 @@ def run(project: Project, only=None):
         if res is None:
             skipped[g] = {'heads': 'no glossary in the project (set "glossary" in paper_workbench.json)', 'glossary_terms': 'no glossary in the project',
                           'bib_citations': 'no .bib file found', 'bib_entries': 'no .bib file found',
-                          'figures': 'PyMuPDF is not installed (pip install pymupdf)'}[g]
+                          'figures': 'PyMuPDF is not installed (pip install pymupdf)',
+                          'float_pages': 'no compiled PDF found (set "pdf" in paper_workbench.json) or PyMuPDF is not installed'}[g]
             continue
         ran[g] = True
         findings += res

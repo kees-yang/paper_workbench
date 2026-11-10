@@ -55,5 +55,18 @@
  "W13": {
   "en": "\\b(therefore|thus|hence|consequently|accordingly|thereby|as a result)\\b|[,;]\\s+(so)\\b(?!\\s+(?:that|far|on)\\b)",
   "propose_en": "\\bwe (propose|present|introduce)\\b"
+ },
+ "W21": {
+  "skip_kinds": [
+   "figure",
+   "table"
+  ]
+ },
+ "W23": {
+  "max_words": 25,
+  "skip_kinds": [
+   "figure",
+   "table"
+  ]
  }
 }

@@ -20,14 +20,20 @@ The sentence rules of the default pack adapt these STE principles to scientific 
 | one word, one meaning | `A3`, `A6`, `A7`: glossary terms and head nouns |
 | plain, approved words | `M1`: plain words and direct verbs |
 
-paper_workbench does not claim STE compliance. It uses no STE dictionary and does not limit sentence length. It keeps the
-technical terms a paper needs. Obtain the specification from ASD.
+paper_workbench does not claim STE compliance. It uses no STE dictionary. Sentence length is limited only by the opt-in rule
+`W23`, with a limit the project sets. It keeps the technical terms a paper needs. Obtain the specification from ASD.
 
 **"80% of the way to ASD-STE100."** A. Karpathy, post on X, 2 October 2026.
 https://x.com/karpathy/status/2105819303471976479
 
 The post suggested asking models to write about 80% of the way to ASD-STE100, so that their output is easier to read. The
 default pack follows that idea: it applies the STE principles above and leaves the rest of the standard out.
+
+**Old before new and topic chains.** The flow marks of the review page and the opt-in rule `W21` follow two descriptions of
+coherent prose: G. D. Gopen and J. A. Swan, “The Science of Scientific Writing”, American Scientist 78(6), 1990 (old
+information at the start of a sentence, new information at its end), and F. Daneš, “Functional sentence perspective and the
+organization of the text”, in Papers on Functional Sentence Perspective, 1974 (linear and constant thematic progression). The
+marks are a word-overlap heuristic, not an implementation of either work.
 
 The other rules come from the authors' own revision rounds on manuscripts, and their reasons are given in the register:
 
@@ -37,7 +43,9 @@ The other rules come from the authors' own revision rounds on manuscripts, and t
 - consequence connectives;
 - the abstract structure;
 - table order;
-- the figure rules.
+- the figure rules;
+- caption length, float pages, the selection clause and the body that stands alone;
+- affirmative wording and the roles of the abstract numbers.
 
 ## Interface
 
@@ -85,8 +93,9 @@ paper_workbench 借鉴了以下工作的思路。它没有复制这些设计参�
   - 一词一义（`A3`、`A6`、`A7`：术语表与中心名词）；
   - 用简单、规定的词（`M1`）。
 
-  本项目不声称符合 STE，不使用 STE 词典，不限制句长，并保留论文必需的术语。规范本身请向 ASD 获取。
+  本项目不声称符合 STE，不使用 STE 词典；句长只由可选规则 `W23` 限制，上限由项目设定；并保留论文必需的术语。规范本身请向 ASD 获取。
 - **“80% of the way to ASD-STE100”。** A. Karpathy 于 2026 年 10 月 2 日在 X 上发帖，https://x.com/karpathy/status/2105819303471976479 。帖子建议让模型的写法接近 ASD-STE100 的八成，使输出更易读。默认规则包按这一思路，只采用上述 STE 原则，不采用标准的其余部分。
+- **旧信息在前与主题链。** 审阅页的衔接标记和可选规则 `W21` 依据两种对连贯文字的描述：G. D. Gopen 与 J. A. Swan，“The Science of Scientific Writing”，American Scientist 78(6)，1990（句首放旧信息，句末放新信息）；F. Daneš，“Functional sentence perspective and the organization of the text”，载 Papers on Functional Sentence Perspective，1974（线性与恒定的主位推进）。这些标记是基于词重叠的启发式方法，并非对两者的实现。
 - 其余规则来自作者自己对稿件的多轮修改，理由写在规则登记中：
   - 规则树（先改最上层未通过的层）；
   - 先写优势；
@@ -94,7 +103,9 @@ paper_workbench 借鉴了以下工作的思路。它没有复制这些设计参�
   - 结果连接词；
   - 摘要结构；
   - 表格行顺序；
-  - 图件规则。
+  - 图件规则；
+  - 图注长度、图表所在页、选例说明、正文自成一体；
+  - 肯定式表述与摘要数字的角色。
 
 **界面**
 

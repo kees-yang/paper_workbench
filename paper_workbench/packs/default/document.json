@@ -1,5 +1,5 @@
 {
- "note": "Settings of the document rules. Venue-dependent rules (J1, J3, E6, B4, T5) and the opt-in style rules W20 (abstract structure) and T10 (set T10.method to your method name) are switched off in the register; enable them with \"enable\" and set the numbers here or in rules.local.json.",
+ "note": "Settings of the document rules. Venue-dependent rules (J1, J3, E6, B4, T5) and the opt-in style rules W20 (abstract structure), T10 (set T10.method to your method name), T11 (caption length) and T12 (float pages in the compiled PDF) are switched off in the register; enable them with \"enable\" and set the numbers here or in rules.local.json.",
  "J1": {
   "min": 150,
   "max": 250
@@ -62,6 +62,13 @@
  },
  "T10": {
   "method": ""
+ },
+ "T11": {
+  "min": 15,
+  "max": 35
+ },
+ "T12": {
+  "pages_after": 1
  },
  "figures": {
   "note": "G1–G4. Widths in TeX pt of your template (IEEEtran and elsarticle 5p: about 252/516; set yours). body_font: auto (from the preamble), times, cm, helvetica, libertine or a regex of font names. Sizes are printed sizes in pt.",

@@ -170,6 +170,26 @@
    "enabled": false
   },
   {
+   "id": "E7",
+   "stage": "S2",
+   "node": "abstract",
+   "scope": "document",
+   "method": "manual",
+   "severity": "warn",
+   "statement": {
+    "en": "Each number in the abstract has a role: one shows the overall ability of the method and one shows a specific ability, each stated as a lead over the runner-up.",
+    "zh": "摘要中的每个数字都有角色：一个说明方法的整体能力，一个说明某项具体能力，均写成相对第二名的领先幅度。"
+   },
+   "why": {
+    "en": "A number without a role is a statistic; a number with a role is evidence for one claim.",
+    "zh": "没有角色的数字只是统计量；有角色的数字是某一主张的证据。"
+   },
+   "check": {
+    "type": "manual"
+   },
+   "enabled": false
+  },
+  {
    "id": "W20",
    "stage": "S2",
    "node": "abstract",
@@ -295,6 +315,45 @@
    }
   },
   {
+   "id": "W21",
+   "stage": "S3",
+   "node": "paragraph",
+   "scope": "paragraph",
+   "method": "partial",
+   "severity": "warn",
+   "statement": {
+    "en": "Old before new: a sentence links to the one before it by a shared word, a word that points back (this, these, such, it), a connective or a continued subject (the checker flags a sentence with none of them; the author decides).",
+    "zh": "旧信息在前：每句通过共有的词、回指词（this、these、such、it）、连接词或延续的主语与上一句相连（检查器标出四者皆无的句子，作者判断）。"
+   },
+   "why": {
+    "en": "A reader takes in new information from a known starting point; a sentence with no link to the previous one starts a new thread without notice.",
+    "zh": "读者从已知的起点接收新信息；与上一句没有任何联系的句子等于不加提示地另起一条线。"
+   },
+   "check": {
+    "type": "builtin",
+    "group": "flow"
+   },
+   "tests": {
+    "flag": [
+     [
+      "The network reads two images.",
+      "Training lasts ten epochs on one card."
+     ]
+    ],
+    "pass": [
+     [
+      "The network reads two images.",
+      "These images come from one camera."
+     ],
+     [
+      "The network reads two images.",
+      "However, training lasts ten epochs."
+     ]
+    ]
+   },
+   "enabled": false
+  },
+  {
    "id": "O2",
    "stage": "S3",
    "node": "paragraph",
@@ -312,6 +371,45 @@
    "check": {
     "type": "manual"
    }
+  },
+  {
+   "id": "O3",
+   "stage": "S3",
+   "node": "paragraph",
+   "scope": "sentence",
+   "method": "partial",
+   "severity": "warn",
+   "statement": {
+    "en": "The body stands alone: no body sentence points to the supplement or the appendix (the checker flags; the author decides).",
+    "zh": "正文自成一体：正文句子不指向补充材料或附录（自动标出，作者判断）。"
+   },
+   "why": {
+    "en": "A reviewer may read only the body; a claim that needs the supplement is not supported where it is made.",
+    "zh": "审稿人可能只读正文；需要补充材料才成立的主张，在提出之处没有依据。"
+   },
+   "check": {
+    "type": "pattern",
+    "pattern": [
+     "\\b(?:in|see|of|to|from) (?:the |our )?(?:supplement(?:ary material)?|appendix|appendices)\\b",
+     "\\bsupplementary (?:material|section|table|figure|video)s?\\b",
+     "\\bappendix [A-Z]\\b"
+    ],
+    "message": "pointer out of the body:",
+    "skip_sections": [
+     "supplement",
+     "appendix"
+    ],
+    "skip_kinds": []
+   },
+   "tests": {
+    "flag": [
+     "The proof is given in the supplementary material."
+    ],
+    "pass": [
+     "The proof follows from the first lemma."
+    ]
+   },
+   "enabled": false
   },
   {
    "id": "W14",
@@ -430,6 +528,35 @@
      "If the loss does not change, the optimizer stops early."
     ]
    }
+  },
+  {
+   "id": "W23",
+   "stage": "S4",
+   "node": "structure",
+   "scope": "sentence",
+   "method": "auto",
+   "severity": "warn",
+   "statement": {
+    "en": "A sentence has at most a set number of words (tone.json: W23.max_words; captions excepted).",
+    "zh": "每句不超过设定的词数（tone.json：W23.max_words；图注、表题除外）。"
+   },
+   "why": {
+    "en": "A long sentence carries more than one idea, and the reader must hold the first while reading the second.",
+    "zh": "长句承载不止一个意思，读者读第二个时必须记住第一个。"
+   },
+   "check": {
+    "type": "builtin",
+    "group": "length"
+   },
+   "tests": {
+    "flag": [
+     "The network reads the two source images and the current output at every training step, and it then weights the two guidance terms by the state that it predicts for each pixel."
+    ],
+    "pass": [
+     "The network reads the two source images and the current output."
+    ]
+   },
+   "enabled": false
   },
   {
    "id": "W10",
@@ -572,6 +699,51 @@
      "The method leads the score on all four datasets."
     ]
    }
+  },
+  {
+   "id": "W22",
+   "stage": "S4",
+   "node": "tone",
+   "scope": "sentence",
+   "method": "partial",
+   "severity": "warn",
+   "statement": {
+    "en": "Affirmative wording: no pre-emptive concession that answers an imagined objection (“we do not claim”, “admittedly”, “merely”, “serves only as”). State the fact, or state the convention with its source (the checker flags; the author decides).",
+    "zh": "肯定式表述：不写预先让步、回应假想质疑的句子（“we do not claim”“admittedly”“merely”“serves only as”）。直接陈述事实，或陈述惯例并给出出处（自动标出，作者判断）。"
+   },
+   "why": {
+    "en": "A defensive sentence adds no fact and invites the objection it tries to answer. The affirmative form must not claim more than the evidence.",
+    "zh": "防御性句子不增加事实，反而引出它想回应的质疑。肯定式表述不得超出证据。"
+   },
+   "check": {
+    "type": "pattern",
+    "pattern": [
+     "\\b(?:we|this (?:paper|work|study)|the authors) (?:do|does) not (?:claim|argue|attempt|intend|aim|pretend)\\b",
+     "\\b(?:we|the authors) (?:acknowledge|concede|admit)\\b",
+     "\\badmittedly\\b",
+     "\\bto be fair\\b",
+     "\\b(?:is|are) not (?:intended|meant) to\\b",
+     "\\bat best\\b",
+     "\\bmerely\\b",
+     "\\bserves? only as\\b",
+     "\\bit (?:should|must) be (?:noted|stressed|admitted) that\\b"
+    ],
+    "message": "defensive wording:",
+    "skip_sections": [
+     "limitation"
+    ],
+    "skip_kinds": []
+   },
+   "tests": {
+    "flag": [
+     "We do not claim that the rank measures fidelity.",
+     "The rank serves only as a check."
+    ],
+    "pass": [
+     "The rank summarizes six metrics."
+    ]
+   },
+   "enabled": false
   },
   {
    "id": "W13",
@@ -893,6 +1065,68 @@
    "check": {
     "type": "manual"
    }
+  },
+  {
+   "id": "T11",
+   "stage": "S5",
+   "node": "floats",
+   "scope": "document",
+   "method": "auto",
+   "severity": "warn",
+   "statement": {
+    "en": "Every caption has a set number of words (document.json: T11.min, T11.max).",
+    "zh": "每条图注、表题的词数在设定范围内（document.json：T11.min、T11.max）。"
+   },
+   "why": {
+    "en": "A caption tells what the float shows and how to read it. A shorter one leaves the reader guessing; a longer one moves the argument out of the text.",
+    "zh": "图注说明图表展示什么、怎样读。过短让读者猜，过长把论证搬出了正文。"
+   },
+   "check": {
+    "type": "builtin",
+    "group": "captions"
+   },
+   "enabled": false
+  },
+  {
+   "id": "T12",
+   "stage": "S5",
+   "node": "floats",
+   "scope": "document",
+   "method": "auto",
+   "severity": "warn",
+   "statement": {
+    "en": "In the compiled PDF, a figure, table or algorithm sits on the page of its first text citation or at most T12.pages_after pages later, never before it (document.json; needs the PDF and PyMuPDF).",
+    "zh": "在编译出的PDF中，图、表、算法位于正文首次引用所在页或其后至多T12.pages_after页，不早于引用（document.json；需要PDF与PyMuPDF）。"
+   },
+   "why": {
+    "en": "T2 checks the source order; LaTeX may still move a float pages away from the sentence that needs it.",
+    "zh": "T2检查源文件中的顺序；LaTeX仍可能把浮动体排到离引用句数页之外。"
+   },
+   "check": {
+    "type": "builtin",
+    "group": "float_pages"
+   },
+   "enabled": false
+  },
+  {
+   "id": "T13",
+   "stage": "S5",
+   "node": "floats",
+   "scope": "document",
+   "method": "manual",
+   "severity": "warn",
+   "statement": {
+    "en": "A figure of chosen cases says in a few words how the cases were chosen, and it shows a phenomenon; it does not present a named method as worse.",
+    "zh": "展示所选案例的图用几个词说明案例如何选出，并只展示现象，不把某个具名方法呈现为更差。"
+   },
+   "why": {
+    "en": "Readers ask how visual cases were picked; an honest clause answers once, and the picture stays about the phenomenon.",
+    "zh": "读者会问案例是怎么挑的；一句如实的说明一次回答，图则始终围绕现象。"
+   },
+   "check": {
+    "type": "manual"
+   },
+   "enabled": false
   },
   {
    "id": "M5",

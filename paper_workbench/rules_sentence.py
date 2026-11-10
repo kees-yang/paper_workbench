@@ -179,6 +179,39 @@ def connectives(rows, rules):
     return out
 
 
+def flow(rows, rules):
+    """W21 (opt-in): a sentence links to the one before it. Flagged: a sentence that shares no content word with the previous
+    sentence, has no word that points back (this, these, such, it), opens with no connective or ordinal, and takes a new subject.
+    The marks come from workbench.fluency (old before new, topic chain, relation); the review page shows them for every sentence."""
+    from .workbench import fluency
+    skip = set(rules['tone'].get('W21', {}).get('skip_kinds', ['figure', 'table']))
+    out, paras = [], {}
+    for r in rows:
+        if r['kind'] not in skip:
+            paras.setdefault(r['para'], []).append(r)
+    for sents in paras.values():
+        marks, _ = fluency.analyse([(i, r['en'], None) for i, r in enumerate(sents)])
+        for i, r in enumerate(sents[1:], 1):
+            m = marks[i]
+            if m['pos'] == 'no old words' and m['chain'] == 'new' and m['rel']['type'] == 'implicit' and m['open'] != 'ordinal':
+                out.append(dict(rule='W21', row=r, matched='no word links this sentence to the one before it (no shared word, pointing word or connective)'))
+    return out
+
+
+def sentence_length(rows, rules):
+    """W23 (opt-in): a sentence has at most W23.max_words words (tone.json). Captions are skipped (W23.skip_kinds)."""
+    c = rules['tone'].get('W23', {})
+    mx, skip = c.get('max_words', 25), set(c.get('skip_kinds', ['figure', 'table']))
+    out = []
+    for r in rows:
+        if r['kind'] in skip:
+            continue
+        n = len(re.findall(r"[A-Za-z0-9][A-Za-z0-9'’\-]*", r['en']))
+        if n > mx:
+            out.append(dict(rule='W23', row=r, matched=f'{n} words (allowed {mx})'))
+    return out
+
+
 # ---------------------------------------------------------------------------------------------------- glossary and head nouns
 def glossary_heads(terms):
     heads, forms = set(), []
