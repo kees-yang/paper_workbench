@@ -143,6 +143,14 @@ class Review(unittest.TestCase):
     """The review page reads built workbench pages and adds sentence links, an abbreviation check and a score log."""
     PAGE = EXAMPLE / 'expected' / 'workbench.html'
 
+    def test_misplaced_paragraph(self):
+        from paper_workbench.workbench import review
+        paras = [{'id': x} for x in 'ABCDE']
+        where = {'A': (5, 10), 'B': (5, 400), 'C': (27, 80), 'D': (6, 30), 'E': (30, 5)}
+        self.assertEqual(review.misplaced(paras, where), ['C'])    # far from both neighbours, which agree: moved
+        self.assertEqual(where['C'], (5, 400))
+        self.assertEqual(where['E'], (30, 5))                      # the last paragraph has one neighbour only: kept
+
     def test_review_page(self):
         from paper_workbench.workbench import review
         d = Path(tempfile.mkdtemp())

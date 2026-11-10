@@ -83,6 +83,20 @@ def abbreviations(rows, names):
     return list(out.values())
 
 
+def misplaced(paragraphs, where, gap=2):
+    """A paragraph that the locator put more than `gap` pages away from both of its neighbours in source order, while the two
+    neighbours lie within one page of each other, most likely matched a near-repeat elsewhere (for example a supplement sentence
+    that restates it). It takes the place of the paragraph before it. Changes `where` in place; returns the moved ids."""
+    seq = [p['id'] for p in paragraphs if p['id'] in where]
+    moved = []
+    for a, b, c in zip(seq, seq[1:], seq[2:]):
+        pa, pb, pc = where[a][0], where[b][0], where[c][0]
+        if abs(pa - pc) <= 1 and abs(pb - pa) > gap and abs(pb - pc) > gap:
+            where[b] = where[a]
+            moved.append(b)
+    return moved
+
+
 def paper(name, path, names, supp_from=None, supp_page=None):
     data, imgs = load(path)
     rows = data['rows']
@@ -98,6 +112,7 @@ def paper(name, path, names, supp_from=None, supp_page=None):
         if ar:
             pg = min(x['page'] for x in ar)
             where[p['id']] = (pg, min(x['rect'][1] for x in ar if x['page'] == pg))
+    relocated = misplaced(data['paragraphs'], where)
     last = (0, 0)
     for r in rows:                      # rows of an unlocated paragraph keep the place of the row before them
         last = where.get(r.get('paragraph_id'), last)
@@ -142,7 +157,8 @@ def paper(name, path, names, supp_from=None, supp_page=None):
                            for u in L.get('units', [])]) for L in F.get('lines', [])],
         issues=F.get('issues', []), uncovered=F.get('uncovered_paragraphs', []))
     stats = dict(rows=len(R), paras=len(P), prev=sum(1 for v in R.values() if v['prev']), earl=sum(1 for v in R.values() if v['earl']),
-                 located=sum(1 for p in P if p['areas']), undefined=sum(1 for x in ab if x['status'] == 'undefined'))
+                 located=sum(1 for p in P if p['areas']), undefined=sum(1 for x in ab if x['status'] == 'undefined'),
+                 relocated=relocated)
     return dict(name=name, title=data.get('title', ''), version=data.get('pdf_version', ''), P=P, R=R, imgs=imgs,
                 dims=data.get('page_dimensions', []), abbr=ab, flow=flow, stats=stats)
 
